@@ -1,0 +1,14 @@
+@use "../../styles/variables";
+
+.data-table-container {
+  border: 1px solid var(--emg-table-border-color, #{variables.$emg-table-border-color});
+
+  th {
+    background-color: var(--emg-table-header-bg, #{variables.$emg-table-header-bg});
+    color: var(--emg-table-header-color, #{variables.$emg-table-header-color});
+  }
+
+  tr:hover {
+    background-color: var(--emg-table-row-hover-bg, #{variables.$emg-table-row-hover-bg});
+  }
+}

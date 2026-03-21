@@ -1,0 +1,20 @@
+// Customizing the library using the new @use ... with syntax
+@use "../../src/styles/index" with ( // Redefining global variables
+    $emg-background: #f0f7ff,
+    $emg-brand-color: #4cb7ac,
+    $emg-border-color: #007bff,
+    $emg-dark-grey: #002752,
+
+    // Redefining component variables
+    $emg-table-header-bg: #e7f3ff,
+    $emg-table-header-color: #0056b3,
+    $emg-table-row-hover-bg: rgba(0, 123, 255, 0.1));
+
+// Additional example styles
+body {
+    padding-bottom: 50px;
+}
+
+.card {
+    border-color: #e0e0e0;
+}

@@ -1,0 +1,23 @@
+@forward "variables";
+@use "variables";
+
+:root {
+  // Global
+  --emg-font-family-base: #{variables.$emg-font-family-base};
+  --emg-brand-color: #{variables.$emg-brand-color};
+  --emg-border-color: #{variables.$emg-border-color};
+  --emg-background: #{variables.$emg-background};
+  --emg-dark-grey: #{variables.$emg-dark-grey};
+
+  // DataTable
+  --emg-table-border-color: #{variables.$emg-table-border-color};
+  --emg-table-header-bg: #{variables.$emg-table-header-bg};
+  --emg-table-header-color: #{variables.$emg-table-header-color};
+  --emg-table-row-hover-bg: #{variables.$emg-table-row-hover-bg};
+
+  // MessageToast
+  --emg-toast-success: #{variables.$emg-toast-success};
+  --emg-toast-warning: #{variables.$emg-toast-warning};
+  --emg-toast-error: #{variables.$emg-toast-error};
+  --emg-toast-border-radius: #{variables.$emg-toast-border-radius};
+}

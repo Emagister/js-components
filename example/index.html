@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emagister JS Components Example</title>
+    <!-- Bootstrap CSS (External dependency) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Compiled library styles (via main.js/scss) -->
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand">Emagister JS Components Library</span>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">DataTable Component</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- DataTable Example -->
+                        <div data-component="data-table" class="data-table-container"
+                            data-url="http://localhost:5173/example/datatableData.json"
+                            data-columns='[{"key":"id", "label":"ID"}, {"key":"name", "label":"Nombre", "sortable":true}, {"key":"email", "label":"Email"}, {"key":"phone", "label":"Teléfono"}, {"key":"status", "label":"Estado", "badge": "statusLevel"}]'
+                            data-actions='[{"name": "delete", "states": [{"key": "deleteUrl", "label": "Eliminar", "icon": "bi-trash"}]} ]'
+                            data-settings='{ "perPage": 3, "striped": false }'>
+                            <!-- Library will inject content here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">AsyncForm Component</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Contenedor para el toast específico del formulario -->
+                        <div class="position-relative">
+                            <div class="toast-container position-absolute top-0 start-50 translate-middle-x p-3"
+                                style="z-index: 1050; width: 100%; max-width: 400px;">
+                                <div data-component="message-toast" id="form-toast" data-mode="local"
+                                    class="toast message-toast align-items-center border-0 w-100" role="alert"
+                                    aria-live="assertive" aria-atomic="true">
+                                    <div class="d-flex">
+                                        <div class="toast-body" data-toast-message></div>
+                                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"
+                                            aria-label="Close"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form data-component="async-form" data-toast-target="#form-toast"
+                            action="http://localhost:5173/example/formResponse.json" method="POST"
+                            id="example-async-form">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="form-name" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="form-name" name="name" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="form-email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="form-email" name="email" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="form-date" class="form-label">Fecha de nacimiento</label>
+                                    <input type="text" data-component="datepicker" data-settings='{"allowInput": false}'
+                                        class="form-control" id="form-date" name="birthday"
+                                        placeholder="Selecciona fecha">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="form-message" class="form-label">Mensaje</label>
+                                <textarea class="form-control" id="form-message" name="message" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="form-terms" name="terms">
+                                <label class="form-check-label" for="form-terms">Acepto los términos y
+                                    condiciones</label>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary" id="btn-submit-success">Enviar
+                                    (Éxito)</button>
+                                <button type="submit" class="btn btn-outline-warning" id="btn-submit-fields">Errores de
+                                    Campo</button>
+                                <button type="submit" class="btn btn-outline-danger" id="btn-submit-general">Error
+                                    General</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Modal & Confirm</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary" id="open-modal-btn">
+                            Abrir Modal
+                        </button>
+                        <button type="button" class="btn btn-danger" id="confirm-action-btn">
+                            Test Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Message Toast & Tooltip</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-success" id="show-toast-success-btn">
+                            Mostrar Éxito
+                        </button>
+                        <button type="button" class="btn btn-warning" id="show-toast-warning-btn">
+                            Mostrar Warning
+                        </button>
+                        <button type="button" class="btn btn-danger" id="show-toast-error-btn">
+                            Mostrar Error
+                        </button>
+                        <button type="button" class="btn btn-info" data-component="tooltip"
+                            data-bs-toggle="tooltip shadow-sm" title="¡Esto es un tooltip personalizado!">
+                            Hover me
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 mb-4">
+                <div class="card shadow-sm" id="loader-test-container">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Loader Component</h5>
+                    </div>
+                    <div class="card-body" data-component="loader"
+                        style="height: 150px; display: flex; align-items: center; justify-content: center;">
+                        <p class="text-muted">Este contenedor puede mostrar un loader</p>
+                        <button type="button" class="btn btn-outline-primary ms-3" id="show-loader-btn">
+                            Activar Loader (3s)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Basic Setup -->
+    <div data-component="modal" class="modal fade" id="example-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ejemplo de Modal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Este modal es gestionado por la clase Modal de la librería.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Component Setup -->
+    <div data-component="confirm" id="confirm-component" class="modal fade" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-confirm-title>Confirmar</h5>
+                </div>
+                <div class="modal-body" data-confirm-message>
+                    ¿Estás seguro?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-cancel-btn>Cancelar</button>
+                    <button type="button" class="btn btn-danger" data-confirm-btn>Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div data-component="message-toast" id="toast-container" class="toast message-toast align-items-center border-0"
+            role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" data-toast-message>
+                    <!-- El mensaje se insertará aquí -->
+                </div>
+                <button type="button" class="btn-close btn-close me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Entry Point -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+
+</html>

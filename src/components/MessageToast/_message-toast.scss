@@ -1,0 +1,30 @@
+@use "sass:color";
+@use "sass:string";
+@use "../../styles/variables";
+
+.message-toast {
+  border-radius: var(--emg-toast-border-radius, #{variables.$emg-toast-border-radius});
+
+  &.is-success {
+    background-color: color.mix(variables.$emg-toast-success, #fff, 18%);
+    color: var(--emg-toast-success, #{variables.$emg-toast-success});
+    border: 1px solid color.mix(variables.$emg-toast-success, #fff, 25%);
+
+    // Using CSS variables where possible
+    background-color: color.mix(#3c763d, #fff, 18%); // Default color fallback if needed, but better to use the var
+    background-color: string.unquote("color-mix(in srgb, var(--emg-toast-success, #{variables.$emg-toast-success}), #fff 82%)");
+    border-color: string.unquote("color-mix(in srgb, var(--emg-toast-success, #{variables.$emg-toast-success}), #fff 75%)");
+  }
+
+  &.is-warning {
+    color: var(--emg-toast-warning, #{variables.$emg-toast-warning});
+    background-color: string.unquote("color-mix(in srgb, var(--emg-toast-warning, #{variables.$emg-toast-warning}), #fff 82%)");
+    border: 1px solid string.unquote("color-mix(in srgb, var(--emg-toast-warning, #{variables.$emg-toast-warning}), #fff 75%)");
+  }
+
+  &.is-error {
+    color: var(--emg-toast-error, #{variables.$emg-toast-error});
+    background-color: string.unquote("color-mix(in srgb, var(--emg-toast-error, #{variables.$emg-toast-error}), #fff 82%)");
+    border: 1px solid string.unquote("color-mix(in srgb, var(--emg-toast-error, #{variables.$emg-toast-error}), #fff 75%)");
+  }
+}

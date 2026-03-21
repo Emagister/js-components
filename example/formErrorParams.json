@@ -1,0 +1,10 @@
+{
+    "error": {
+        "message": "Hay errores de validación en los campos indicados.",
+        "params": {
+            "name": "El nombre es demasiado corto (mínimo 3 caracteres).",
+            "email": "Esta dirección de correo ya está registrada en nuestro sistema.",
+            "birthday": "Debes ser mayor de edad para registrarte."
+        }
+    }
+}
