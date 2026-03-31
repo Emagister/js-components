@@ -29,13 +29,26 @@ jobs:
           initial_version: 1.0.0
           dry_run: true
 
-      - name: Update package.json version
+      - name: Update package.json and CHANGELOG.md
         run: |
           NEW_VERSION="${{ steps.dry_run.outputs.new_version }}"
+          NEW_TAG="${{ steps.dry_run.outputs.new_tag }}"
+          CHANGELOG="${{ steps.dry_run.outputs.changelog }}"
+
           npm version "$NEW_VERSION" --no-git-tag-version
+
+          # Prepend new entry to CHANGELOG.md
+          HEADER="# Changelog"
+          if [ -f CHANGELOG.md ]; then
+            EXISTING=$(tail -n +2 CHANGELOG.md)
+          else
+            EXISTING=""
+          fi
+          printf '%s\n\n%s\n\n%s\n' "$HEADER" "$CHANGELOG" "$EXISTING" > CHANGELOG.md
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json
+          git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore(release): bump version to $NEW_VERSION [skip ci]"
           git push
 
