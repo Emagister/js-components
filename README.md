@@ -4,10 +4,8 @@ Una librería de componentes reutilizables en Javascript para proyectos de Emagi
 
 ## Instalación
 
-Puedes instalar esta librería vía npm (si se publica en un registro privado) o directamente desde el repositorio:
-
 ```bash
-npm install git+https://github.com/emagister/js-components.git
+npm install @emagister/js-components
 ```
 
 ## Uso Principal: ComponentManager
@@ -20,7 +18,7 @@ La forma más eficiente de usar la librería es a través de la clase `Component
 import { ComponentManager } from '@emagister/js-components';
 
 // Opción A: Uso Rápido (CSS estático)
-import '@emagister/js-components.css'; 
+import '@emagister/js-components/style.css';
 
 // Opción B: Uso Personalizado (Recomendado - ver sección Personalización abajo)
 // import './estilos-proyecto.scss'; 
@@ -47,9 +45,6 @@ Solo tienes que añadir el atributo `data-component` a tus elementos HTML. La li
 </button>
 ```
 
-## Componentes Disponibles
-
-- `data-table`: Tabla dinámica con paginación, ordenación y filtrado.
 ## Componentes Disponibles y Configuración
 
 Todos los componentes soportan configuración mediante el atributo `data-settings='{...}'` en el HTML.
@@ -85,7 +80,9 @@ Selector de fechas (Flatpickr).
 - `altFormat` (String, default: 'd/m/Y'): Formato visual amigable.
 - `allowInput` (Boolean, default: true): Permite escribir la fecha manualmente.
 - *Cualquier opción nativa de Flatpickr* (ej: `minDate`, `maxDate`).
-- `tooltip`: Tooltips de Bootstrap.
+
+### `tooltip`
+Tooltips de Bootstrap.
 
 ## Personalización de Estilos
 
@@ -115,14 +112,6 @@ Todos los componentes utilizan **CSS Custom Properties** que heredan de las vari
   --emg-brand-color: #ff5722; /* Cambia el color principal del loader y otros */
   --emg-table-header-bg: #333;
 }
-```
-
-## Desarrollo y Build
-
-Para generar los archivos de distribución (`dist/`), se requiere Docker:
-
-```bash
-docker run --rm --workdir /app --volume $PWD:/app emg_node npm run build
 ```
 
 ## Estructura del Proyecto
