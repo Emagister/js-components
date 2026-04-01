@@ -1,5 +1,5 @@
 // Customizing the library using the new @use ... with syntax
-@use "../../src/styles/index" with ( // Redefining global variables
+@use "../../scss/index" with ( // Redefining global variables
     $emg-background: #f0f7ff,
     $emg-brand-color: #4cb7ac,
     $emg-border-color: #007bff,

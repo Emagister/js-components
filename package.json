@@ -11,11 +11,12 @@
       "require": "./dist/js-components.umd.cjs"
     },
     "./style.css": "./dist/js-components.css",
-    "./scss/*": "./src/styles/*"
+    "./scss/*": "./scss/*"
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "scss"
   ],
   "scripts": {
     "dev": "vite --host",

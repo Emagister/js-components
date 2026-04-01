@@ -41,3 +41,4 @@ Desktop.ini
 .system_generated/
 skills-lock.json
 tmp/
+tmp-*

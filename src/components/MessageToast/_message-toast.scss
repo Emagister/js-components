@@ -1,6 +1,6 @@
 @use "sass:color";
 @use "sass:string";
-@use "../../styles/variables";
+@use "../../../scss/variables";
 
 .message-toast {
   border-radius: var(--emg-toast-border-radius, #{variables.$emg-toast-border-radius});
