@@ -2,11 +2,19 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ComponentManager from '../src/ComponentManager.js';
 
 // Mock del registry para controlar las cargas dinámicas
+// Se mockean ambos especificadores (con y sin .js) para cubrir el import de ComponentManager.
+// vi.hoisted() garantiza que registryMock esté disponible cuando vi.mock() se hoisea al inicio.
+const registryMock = vi.hoisted(() => ({
+    'loader': vi.fn(),
+    'modal': vi.fn(),
+}));
+
 vi.mock('../src/ComponentRegistry.js', () => ({
-    default: {
-        'loader': vi.fn(),
-        'modal': vi.fn(),
-    },
+    default: registryMock,
+}));
+
+vi.mock('../src/ComponentRegistry', () => ({
+    default: registryMock,
 }));
 
 function createMockComponentClass() {

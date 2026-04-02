@@ -16,21 +16,24 @@ export default class Confirm extends Component {
         // Initialize Modal on this root element
         new Modal(this.root);
 
-        this.confirmBtn.addEventListener('click', () => {
+        this._onConfirmClick = () => {
             this.root.modal.hide();
             if (this.resolve) {
                 this.resolve(true);
                 this.resolve = null;
             }
-        });
+        };
 
-        this.cancelBtn.addEventListener('click', () => {
+        this._onCancelClick = () => {
             this.root.modal.hide();
             if (this.resolve) {
                 this.resolve(false);
                 this.resolve = null;
             }
-        });
+        };
+
+        this.confirmBtn.addEventListener('click', this._onConfirmClick);
+        this.cancelBtn.addEventListener('click', this._onCancelClick);
 
         // Global access
         window.confirmCustom = (message, title = 'Confirmar') => {
@@ -60,6 +63,9 @@ export default class Confirm extends Component {
     }
 
     #destroy() {
+        this.confirmBtn.removeEventListener('click', this._onConfirmClick);
+        this.cancelBtn.removeEventListener('click', this._onCancelClick);
+        this.root.modal?.destroy?.();
         delete window.confirmCustom;
     }
 }
