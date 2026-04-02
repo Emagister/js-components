@@ -6,9 +6,9 @@ import "./_table.scss";
 export default class DataTable extends Component {
     constructor(element) {
         super(element);
-        
+
         const settings = JSON.parse(this.root.dataset.settings || '{}');
-        
+
         this.config = {
             url: this.root.dataset.url,
             columns: JSON.parse(this.root.dataset.columns || '[]'),
@@ -17,8 +17,10 @@ export default class DataTable extends Component {
             filterFormId: settings.filterFormId || this.root.dataset.filterForm,
             sortBy: settings.sortBy || this.root.dataset.sortBy || null,
             sortOrder: settings.sortOrder || this.root.dataset.sortOrder || 'asc',
-            striped: settings.striped !== undefined ? settings.striped : true,
+            striped: settings.striped !== undefined ? settings.striped : false,
             hover: settings.hover !== undefined ? settings.hover : true,
+            headerClass: settings.headerClass || null,
+            scrollOffset: parseInt(settings.scrollOffset, 10) || 0,
         };
 
         this.state = {
@@ -199,6 +201,8 @@ export default class DataTable extends Component {
             meta: { ...this.state.meta, page: page }
         });
 
+        const top = this.root.getBoundingClientRect().top + window.scrollY - this.config.scrollOffset;
+        window.scrollTo({ top, behavior: 'smooth' });
         this.#fetchData();
     }
 

@@ -47,42 +47,129 @@ Solo tienes que añadir el atributo `data-component` a tus elementos HTML. La li
 
 ## Componentes Disponibles y Configuración
 
-Todos los componentes soportan configuración mediante el atributo `data-settings='{...}'` en el HTML.
+Todos los componentes se activan añadiendo `data-component="<nombre>"` al elemento HTML. La configuración se puede pasar mediante `data-settings='{"opcion": valor}'` o en algunos componentes directamente como atributos `data-*`.
 
 ### `data-table`
 Tabla dinámica con paginación y ordenación.
+
+Atributos HTML:
+- `data-url` (String): URL de la API que devuelve los datos.
+- `data-columns` (JSON): Definición de columnas (ver más abajo).
+- `data-actions` (JSON): Definición de acciones (ver más abajo).
+- `data-settings` (JSON): Configuración adicional.
+
+Opciones en `data-settings`:
 - `perPage` (Number, default: 10): Filas por página.
 - `filterFormId` (String): ID del formulario para filtrar la tabla.
 - `sortBy` (String): Columna por la que ordenar inicialmente.
-- `sortOrder` (String: 'asc'|'desc'): Dirección del orden inicial.
-- `striped` (Boolean, default: true): Activa/desactiva el estilo de filas alternas.
+- `sortOrder` (String: `'asc'`|`'desc'`): Dirección del orden inicial.
+- `striped` (Boolean, default: false): Activa/desactiva el estilo de filas alternas.
 - `hover` (Boolean, default: true): Activa/desactiva el efecto hover en filas.
+- `headerClass` (String): Clases CSS aplicadas al `<tr>` del encabezado.
+- `scrollOffset` (Number, default: 0): Desplazamiento en píxeles al hacer scroll al paginar. Útil para compensar navbars fijos.
+
+Propiedades de `data-columns` (array de objetos):
+- `key` (String): Clave del campo en los datos.
+- `label` (String): Texto del encabezado.
+- `sortable` (Boolean): Activa la ordenación por esta columna.
+- `headerClass` (String): Clases CSS aplicadas al `<th>` de esta columna.
+- `link` (String): Clave del campo que contiene la URL para enlazar el valor.
+- `badge` (String): Clave del campo que determina el nivel del badge Bootstrap.
+
+Propiedades de `data-actions` (array de objetos), renderizadas como iconos con tooltip:
+- `name` (String): Identificador de la acción, disponible en el evento `datatable:action`.
+- `label` (String): Texto del tooltip.
+- `icon` (String): Clase del icono Bootstrap Icons (ej: `bi bi-pencil`).
+- `states` (Array): Estados condicionales. Cada estado admite `key` (campo del row que lo activa), `label` e `icon`.
+
+La API devuelta por el servidor debe tener el formato: `{ data: [...], meta: { page, total, perPage } }`.
+
+El componente emite el evento `datatable:action` en el elemento con `detail: { action, id, row }` al pulsar una acción.
 
 ### `async-form`
-Gestión de formularios AJAX con validación.
+Convierte un formulario HTML en un formulario asíncrono con validación y feedback.
+
+Atributos HTML:
+- `action` (String): URL del endpoint (atributo estándar del `<form>`).
+- `method` (String): Método HTTP: `GET`, `POST`, `PATCH`, `PUT`, `DELETE`.
+- `data-toast-target` (String): Selector CSS del `message-toast` donde mostrar el feedback. Si se omite, se usa el toast global.
+
+Opciones en `data-settings`:
 - `messageDuration` (Number, default: 3000): Duración del toast de éxito/error en ms.
-- Otros: Soporta `data-toast-target="#selector"` para feedback localizado.
+
+El servidor debe responder con JSON. En caso de error de validación (HTTP 4XX), puede devolver `{ error: { status: 4XX, message: "mensaje", params: { campo1: "mensaje1", campo2: "mensaje2" } } }` para mostrar errores por campo.
 
 ### `message-toast`
-Sistema de notificaciones.
-- `mode` (String: 'global'|'local'): 'global' escucha eventos `toast:show`, 'local' solo responde a llamadas directas.
-- `duration` (Number, default: 3000): Tiempo visible por defecto.
+Sistema de notificaciones tipo toast.
 
-### Otros Componentes
-- `loader`: Overlay de carga.
-- `modal`: Diálogos de Bootstrap.
-- `confirm`: Diálogos de confirmación (uso: `window.confirmCustom(msg, title)`).
+Atributos HTML:
+- `data-mode` (String: `'global'`|`'local'`, default: `'global'`): En modo global escucha el evento `toast:show` en `window`. En modo local solo responde a llamadas directas vía `root.messageToast.show()`.
+- `data-duration` (Number, default: 3000): Tiempo visible en ms. Usa `-1` para no cerrar automáticamente.
+
+Para mostrar un toast globalmente desde JS:
+```javascript
+window.dispatchEvent(new CustomEvent('toast:show', {
+  detail: { message: 'Texto', type: 'success' } // type: success | error | warning | info
+}));
+```
 
 ### `datepicker`
-Selector de fechas (Flatpickr).
-- `dateFormat` (String, default: 'Y-m-d'): Formato de envío al servidor.
-- `altInput` (Boolean, default: true): Muestra un input amigable al usuario.
-- `altFormat` (String, default: 'd/m/Y'): Formato visual amigable.
+Selector de fechas basado en Flatpickr. Detecta automáticamente el idioma del navegador.
+
+Opciones en `data-settings`:
+- `dateFormat` (String, default: `'Y-m-d'`): Formato del valor enviado al servidor.
+- `altInput` (Boolean, default: true): Muestra un campo visual separado del campo real.
+- `altFormat` (String, default: `'Y-m-d'`): Formato visual mostrado al usuario.
 - `allowInput` (Boolean, default: true): Permite escribir la fecha manualmente.
 - *Cualquier opción nativa de Flatpickr* (ej: `minDate`, `maxDate`).
 
+### `loader`
+Overlay de carga con spinner, posicionado sobre su elemento contenedor.
+
+No requiere configuración. Se puede controlar mediante eventos:
+```javascript
+element.dispatchEvent(new CustomEvent('loader:show'));
+element.dispatchEvent(new CustomEvent('loader:hide'));
+```
+
+### `modal`
+Wrapper del componente Modal de Bootstrap. Expone la API en `element.modal`: `show()`, `hide()`.
+
+### `confirm`
+Diálogo de confirmación reutilizable. Requiere la siguiente estructura HTML:
+
+```html
+<div data-component="confirm" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 data-confirm-title>Confirmar</h5>
+      </div>
+      <div class="modal-body" data-confirm-message>¿Estás seguro?</div>
+      <div class="modal-footer">
+        <button data-cancel-btn>Cancelar</button>
+        <button data-confirm-btn>Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+Uso desde JS:
+```javascript
+const confirmed = await window.confirmCustom('¿Eliminar este elemento?', 'Confirmar eliminación');
+if (confirmed) { /* ... */ }
+```
+
 ### `tooltip`
-Tooltips de Bootstrap.
+Wrapper del Tooltip de Bootstrap. Usa el atributo estándar `title` para el texto.
+
+```html
+<button data-component="tooltip" title="Texto del tooltip">Hover me</button>
+```
+
+### `dropdown`
+Wrapper del Dropdown de Bootstrap. Expone la API en `element.dropdown`: `show()`, `hide()`, `toggle()`.
 
 ## Personalización de Estilos
 
@@ -117,7 +204,7 @@ Todos los componentes utilizan **CSS Custom Properties** que heredan de las vari
 ## Estructura del Proyecto
 
 - `src/components/`: Cada componente tiene su propia carpeta con su JS y su SCSS específico.
-- `src/styles/`: Variables globales y utilidades.
+- `scss/`: Variables globales y estilos públicos para personalización por el cliente.
 - `example/`: Aplicación de ejemplo completa para pruebas y referencia.
 
 ## Simulación de Backend en el Ejemplo

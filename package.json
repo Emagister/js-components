@@ -11,11 +11,12 @@
       "require": "./dist/js-components.umd.cjs"
     },
     "./style.css": "./dist/js-components.css",
-    "./scss/*": "./src/styles/*"
+    "./scss/*": "./scss/*"
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "scss"
   ],
   "scripts": {
     "dev": "vite --host",
@@ -34,7 +35,7 @@
   "author": "Emagister",
   "license": "ISC",
   "peerDependencies": {
-    "bootstrap": "^5.0.0",
+    "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.11.0",
     "flatpickr": "^4.0.0"
   },

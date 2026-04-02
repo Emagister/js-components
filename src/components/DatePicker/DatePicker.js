@@ -14,7 +14,7 @@ export default class DatePicker extends Component {
             dateFormat: settings.dateFormat || this.root.dataset.dateFormat || "Y-m-d",
             allowInput: settings.allowInput !== undefined ? settings.allowInput : true,
             altInput: settings.altInput !== undefined ? settings.altInput : true,
-            altFormat: settings.altFormat || this.root.dataset.altFormat || "d/m/Y",
+            altFormat: settings.altFormat || this.root.dataset.altFormat || "Y-m-d",
             ...settings
         };
     }

@@ -1,5 +1,5 @@
 // Styles
-import './styles/index.scss';
+import '../scss/index.scss';
 
 // Base and Registry
 export { default as Component } from './components/Component';
