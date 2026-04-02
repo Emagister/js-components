@@ -22,7 +22,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint src",
+    "lint": "eslint src tests",
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage"
