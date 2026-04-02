@@ -246,7 +246,7 @@ describe('AsyncForm', () => {
 
             const input = form.querySelector('[name="email"]');
             expect(input.classList.contains('is-invalid')).toBe(true);
-            expect(form.querySelector('.form-error-message').textContent).toBe('Email inválido');
+            expect(form.querySelector('.invalid-feedback').textContent).toBe('Email inválido');
         });
 
         it('limpia los errores de campo al volver a enviar el formulario', async () => {
@@ -266,7 +266,7 @@ describe('AsyncForm', () => {
             await af.handleSubmit(new Event('submit', { cancelable: true }));
 
             expect(form.querySelector('.is-invalid')).toBeNull();
-            expect(form.querySelector('.form-error-message')).toBeNull();
+            expect(form.querySelector('.invalid-feedback')).toBeNull();
         });
     });
 
@@ -309,11 +309,11 @@ describe('AsyncForm', () => {
         });
 
         it('elimina los mensajes de error del DOM', () => {
-            const msg = document.createElement('span');
-            msg.className = 'form-error-message';
+            const msg = document.createElement('div');
+            msg.className = 'invalid-feedback';
             element.appendChild(msg);
             asyncForm.reset();
-            expect(element.querySelector('.form-error-message')).toBeNull();
+            expect(element.querySelector('.invalid-feedback')).toBeNull();
         });
     });
 });

@@ -263,8 +263,8 @@ export default class AsyncForm extends Component {
 
             target.classList.add('is-invalid');
 
-            const msgEl = document.createElement('span');
-            msgEl.className = 'form-error-message';
+            const msgEl = document.createElement('div');
+            msgEl.className = 'invalid-feedback';
             msgEl.textContent = message;
 
             // Insertar después del elemento visible
@@ -285,7 +285,7 @@ export default class AsyncForm extends Component {
 
     #clearErrors() {
         this.root.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        this.root.querySelectorAll('.form-error-message').forEach(el => el.remove());
+        this.root.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
     }
 
     #activateLoader() {
