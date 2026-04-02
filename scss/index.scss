@@ -1,5 +1,9 @@
 @forward "variables";
 @use "variables";
+@use "../src/components/DataTable/table";
+@use "../src/components/DatePicker/datepicker";
+@use "../src/components/Loader/loader";
+@use "../src/components/MessageToast/message-toast";
 
 :root {
   // Global
@@ -8,6 +12,10 @@
   --emg-border-color: #{variables.$emg-border-color};
   --emg-background: #{variables.$emg-background};
   --emg-dark-grey: #{variables.$emg-dark-grey};
+
+  // DatePicker
+  --emg-datepicker-selected-bg: #{variables.$emg-datepicker-selected-bg};
+  --emg-datepicker-hover-bg: #{variables.$emg-datepicker-hover-bg};
 
   // DataTable
   --emg-table-border-color: #{variables.$emg-table-border-color};

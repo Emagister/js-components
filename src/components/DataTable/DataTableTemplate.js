@@ -40,6 +40,10 @@ export default class DataTableTemplate {
     }
 
     #appendHeader(state, config, headerRow) {
+        if (config.headerClass) {
+            headerRow.className = config.headerClass;
+        }
+
         for (const col of config.columns) {
             headerRow.appendChild(this.#createTh(state, col));
         }
@@ -58,6 +62,10 @@ export default class DataTableTemplate {
         const sortIcon = isSorted ? (state.sortOrder === 'asc' ? ' ↑' : ' ↓') : '';
 
         th.textContent = col.label + sortIcon;
+
+        if (col.headerClass) {
+            th.className = col.headerClass;
+        }
 
         if (col.sortable) {
             th.setAttribute('data-sort', col.key);
@@ -92,7 +100,7 @@ export default class DataTableTemplate {
             const span = document.createElement('span');
             // Assuming col.badge format is something like "badge bg-%level%"
             const level = row[col.badge] || 'secondary';
-            span.className = `badge bg-${level}`;
+            span.className = `badge bg-${level}-subtle text-${level}`;
             span.textContent = cellValue;
             td.appendChild(span);
             return td;
@@ -147,17 +155,21 @@ export default class DataTableTemplate {
                 continue;
             }
 
-            const button = document.createElement('button');
-            button.className = 'btn btn-sm btn-outline-secondary me-1';
-            button.setAttribute('data-action', action.name);
-            
-            if (activeState) {
-                button.setAttribute('title', activeState.label);
-                button.innerHTML = `<i class="${activeState.icon || 'bi bi-gear'}"></i>`;
-            } else {
-                button.textContent = action.label || action.name;
-            }
+            const label = activeState ? activeState.label : (action.label || action.name);
+            const icon = activeState ? (activeState.icon || 'bi bi-gear') : (action.icon || 'bi bi-gear');
 
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-link p-0 me-2';
+            button.setAttribute('data-action', action.name);
+            button.setAttribute('data-component', 'tooltip');
+            button.setAttribute('title', label);
+            button.setAttribute('aria-label', label);
+
+            const i = document.createElement('i');
+            i.className = icon;
+
+            button.appendChild(i);
             td.appendChild(button);
         }
 
@@ -200,7 +212,7 @@ export default class DataTableTemplate {
     #createPaginationItem(pageId, text, active = false, disabled = false) {
         const li = document.createElement('li');
         li.className = 'page-item';
-        
+
         if (active) {
             li.classList.add('active');
         }
@@ -211,7 +223,7 @@ export default class DataTableTemplate {
         const a = document.createElement('a');
         a.className = 'page-link';
         a.textContent = text;
-        
+
         if (!disabled && text !== '...') {
             a.setAttribute('data-page', pageId);
             a.setAttribute('href', '#');
@@ -234,7 +246,7 @@ export default class DataTableTemplate {
         const tbody = document.createElement('tbody');
 
         this.#appendMessageRow(config, tbody, 'Ocurrió un error al cargar los datos.');
-        
+
         table.appendChild(tbody);
         wrapper.appendChild(table);
         return wrapper;

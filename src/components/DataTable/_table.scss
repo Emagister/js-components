@@ -1,4 +1,4 @@
-@use "../../styles/variables";
+@use "../../../scss/variables";
 
 .data-table-container {
   border: 1px solid var(--emg-table-border-color, #{variables.$emg-table-border-color});

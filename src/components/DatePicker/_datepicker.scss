@@ -1,4 +1,4 @@
-@use "../../styles/variables";
+@use "../../../scss/variables";
 
 // flatpickr theme customization
 .flatpickr-calendar {
@@ -25,7 +25,7 @@
     .flatpickr-day.selected.nextMonthDay,
     .flatpickr-day.startRange.nextMonthDay,
     .flatpickr-day.endRange.nextMonthDay {
-        background: var(--emg-background, #{variables.$emg-background});
+        background: var(--emg-datepicker-selected-bg, #{variables.$emg-datepicker-selected-bg});
         border-color: var(--emg-border-color, #{variables.$emg-border-color});
         color: #fff;
     }
@@ -42,7 +42,7 @@
     .flatpickr-day:focus,
     .flatpickr-day.prevMonthDay:focus,
     .flatpickr-day.nextMonthDay:focus {
-        background: var(--emg-background, #{variables.$emg-background});
+        background: var(--emg-datepicker-hover-bg, #{variables.$emg-datepicker-hover-bg});
         border-color: transparent;
     }
 
