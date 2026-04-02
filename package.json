@@ -21,6 +21,7 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
+    "lint": "eslint src",
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage"
@@ -38,7 +39,9 @@
     "flatpickr": "^4.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
     "@vitest/coverage-v8": "^4.1.2",
+    "eslint": "^9.0.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "flatpickr": "^4.6.13",
