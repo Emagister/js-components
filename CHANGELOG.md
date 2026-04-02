@@ -1,5 +1,25 @@
 # Changelog
 
+### [1.1.1](https://github.com/Emagister/js-components/compare/v1.1.0...v1.1.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* **async-form:** use Bootstrap native invalid-feedback class for field errors ([1a9e9f5](https://github.com/Emagister/js-components/commit/1a9e9f5144b1ff8dd42ffcf0f5551abd714f1504))
+
+
+### Reverts
+
+* Revert "ci: add npm auth debug step" ([b4adcb8](https://github.com/Emagister/js-components/commit/b4adcb8569e073b9181259cf6679fbfa15f189fb))
+
+
+### Continuous Integration
+
+* fix changelog interpolation breaking shell script ([1347b14](https://github.com/Emagister/js-components/commit/1347b14ae39abda611756ba4193227f0da3db434))
+
+
+
+
 ## [1.1.0](https://github.com/Emagister/js-components/compare/v1.0.2...v1.1.0) (2026-04-02)
 
 
