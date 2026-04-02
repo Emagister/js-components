@@ -55,6 +55,10 @@ export default class DataTable extends Component {
         this.#bindEvents();
         this.#bindFilterForm();
 
+        this.root.dataTable = {
+            destroy: () => this.#destroy()
+        };
+
         this.root.dispatchEvent(new CustomEvent('datatable:initialized'));
     }
 
@@ -235,7 +239,7 @@ export default class DataTable extends Component {
         this.root.dispatchEvent(new CustomEvent('component:scan', { bubbles: true }));
     }
 
-    destroy() {
+    #destroy() {
         this.contentWrapper.innerHTML = '';
     }
 }

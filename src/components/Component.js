@@ -17,8 +17,4 @@ export default class Component {
     init() {
         throw new Error(`The component "${this.constructor.name}" must implement the init() method.`);
     }
-
-    destroy() {
-        throw new Error(`The component "${this.constructor.name}" must implement the destroy() method.`);
-    }
 }

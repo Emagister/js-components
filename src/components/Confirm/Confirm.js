@@ -37,6 +37,10 @@ export default class Confirm extends Component {
             return this.ask(message, title);
         };
 
+        this.root.confirm = {
+            destroy: () => this.#destroy()
+        };
+
         this.root.dispatchEvent(new CustomEvent('confirm:initialized'));
     }
 
@@ -55,7 +59,7 @@ export default class Confirm extends Component {
         });
     }
 
-    destroy() {
+    #destroy() {
         delete window.confirmCustom;
     }
 }

@@ -22,7 +22,8 @@ export default class MessageToast extends Component {
 
         this.root.messageToast = {
             show: (message, type, duration) => this.show(message, type, duration || this.settings.duration),
-            hide: () => this.hide()
+            hide: () => this.hide(),
+            destroy: () => this.#destroy()
         };
 
         this.toast = new Toast(this.root, {
@@ -45,7 +46,7 @@ export default class MessageToast extends Component {
         this.show(message, type, duration);
     }
 
-    destroy() {
+    #destroy() {
         this.#clearTimeout();
         if (this.toast) {
             this.toast.dispose();

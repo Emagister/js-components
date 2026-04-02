@@ -61,7 +61,8 @@ export default class AsyncForm extends Component {
                 this.reset();
 
                 return this.root.asyncForm;
-            }
+            },
+            destroy: () => this.#destroy()
         };
 
         this.root.dispatchEvent(new CustomEvent('asyncForm:initialized'));
@@ -307,7 +308,7 @@ export default class AsyncForm extends Component {
         this.#hideToast();
     }
 
-    destroy() {
+    #destroy() {
         this.root.removeEventListener('submit', this.handleSubmit);
         delete this.root.asyncForm;
     }

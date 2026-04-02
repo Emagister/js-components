@@ -9,10 +9,14 @@ export default class Tooltip extends Component {
     init() {
         this.bootstrapTooltip = new BootstrapTooltip(this.root);
 
+        this.root.tooltip = {
+            destroy: () => this.#destroy()
+        };
+
         this.root.dispatchEvent(new CustomEvent('tooltip:initialized'));
     }
 
-    destroy() {
+    #destroy() {
         this.bootstrapTooltip.dispose();
     }
 }
