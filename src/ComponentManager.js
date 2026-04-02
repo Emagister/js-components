@@ -25,7 +25,7 @@ export default class ComponentManager {
         this.#observeDOM();
         this.#listenScanEvent();
 
-        window.dispatchEvent(new CustomEvent('app:initialized'));
+        window.dispatchEvent(new CustomEvent('emg-jsc:initialized'));
     }
 
     #mountAll(root) {
@@ -55,7 +55,7 @@ export default class ComponentManager {
     }
 
     #listenScanEvent() {
-        document.body.addEventListener('component:scan', (e) => {
+        document.body.addEventListener('emg-jsc:component:scan', (e) => {
             this.#mountAll(e.target);
         });
     }

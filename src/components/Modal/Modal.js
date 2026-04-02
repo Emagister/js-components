@@ -22,7 +22,7 @@ export default class Modal extends Component {
             }
         });
 
-        this.root.dispatchEvent(new CustomEvent('modal:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:modal:initialized'));
     }
 
     #show() {

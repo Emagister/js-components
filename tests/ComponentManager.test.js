@@ -101,11 +101,11 @@ describe('ComponentManager', () => {
     });
 
     describe('init()', () => {
-        it('emite el evento app:initialized en window', () => {
+        it('emite el evento emg-jsc:initialized en window', () => {
             const handler = vi.fn();
-            window.addEventListener('app:initialized', handler);
+            window.addEventListener('emg-jsc:initialized', handler);
             manager.init();
-            window.removeEventListener('app:initialized', handler);
+            window.removeEventListener('emg-jsc:initialized', handler);
             expect(handler).toHaveBeenCalledOnce();
         });
     });
@@ -161,8 +161,8 @@ describe('ComponentManager', () => {
         });
     });
 
-    describe('evento component:scan', () => {
-        it('monta componentes al recibir component:scan en un subelemento', async () => {
+    describe('evento emg-jsc:component:scan', () => {
+        it('monta componentes al recibir emg-jsc:component:scan en un subelemento', async () => {
             const MockClass = createMockComponentClass();
             const { default: registry } = await import('../src/ComponentRegistry.js');
             registry['loader'].mockResolvedValue({ default: MockClass });
@@ -175,7 +175,7 @@ describe('ComponentManager', () => {
             container.appendChild(child);
             document.body.appendChild(container);
 
-            container.dispatchEvent(new CustomEvent('component:scan', { bubbles: false }));
+            container.dispatchEvent(new CustomEvent('emg-jsc:component:scan', { bubbles: false }));
 
             await vi.waitFor(() => {
                 expect(MockClass).toHaveBeenCalledOnce();

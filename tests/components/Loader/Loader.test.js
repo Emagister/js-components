@@ -41,9 +41,9 @@ describe('Loader', () => {
             expect(typeof element.loader.hide).toBe('function');
         });
 
-        it('emite el evento loader:initialized', () => {
+        it('emite el evento emg-jsc:loader:initialized', () => {
             const handler = vi.fn();
-            element.addEventListener('loader:initialized', handler);
+            element.addEventListener('emg-jsc:loader:initialized', handler);
             loader.init();
             expect(handler).toHaveBeenCalledOnce();
         });
@@ -87,16 +87,16 @@ describe('Loader', () => {
     });
 
     describe('eventos del DOM', () => {
-        it('muestra el overlay al recibir loader:show', () => {
+        it('muestra el overlay al recibir emg-jsc:loader:show', () => {
             loader.init();
-            element.dispatchEvent(new Event('loader:show'));
+            element.dispatchEvent(new Event('emg-jsc:loader:show'));
             expect(loader.overlay.classList.contains('is-visible')).toBe(true);
         });
 
-        it('oculta el overlay al recibir loader:hide', () => {
+        it('oculta el overlay al recibir emg-jsc:loader:hide', () => {
             loader.init();
             loader.show();
-            element.dispatchEvent(new Event('loader:hide'));
+            element.dispatchEvent(new Event('emg-jsc:loader:hide'));
             expect(loader.overlay.classList.contains('is-visible')).toBe(false);
         });
     });

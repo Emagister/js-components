@@ -19,10 +19,10 @@ export default class Loader extends Component {
             destroy: () => this.#destroy()
         };
 
-        this.root.addEventListener('loader:show', this.handleShow);
-        this.root.addEventListener('loader:hide', this.handleHide);
+        this.root.addEventListener('emg-jsc:loader:show', this.handleShow);
+        this.root.addEventListener('emg-jsc:loader:hide', this.handleHide);
 
-        this.root.dispatchEvent(new CustomEvent('loader:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:loader:initialized'));
     }
 
     show() {
@@ -71,8 +71,8 @@ export default class Loader extends Component {
             this.overlay.remove();
         }
 
-        this.root.removeEventListener('loader:show', this.handleShow);
-        this.root.removeEventListener('loader:hide', this.handleHide);
+        this.root.removeEventListener('emg-jsc:loader:show', this.handleShow);
+        this.root.removeEventListener('emg-jsc:loader:hide', this.handleHide);
 
         delete this.root.loader;
     }

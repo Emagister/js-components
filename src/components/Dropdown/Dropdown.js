@@ -17,7 +17,7 @@ export default class Dropdown extends Component {
             destroy: () => this.#destroy()
         };
 
-        this.root.dispatchEvent(new CustomEvent('dropdown:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:dropdown:initialized'));
     }
 
     show() {

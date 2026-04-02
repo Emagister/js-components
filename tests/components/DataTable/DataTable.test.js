@@ -78,9 +78,9 @@ describe('DataTable', () => {
     });
 
     describe('init()', () => {
-        it('emite el evento datatable:initialized', async () => {
+        it('emite el evento emg-jsc:datatable:initialized', async () => {
             const handler = vi.fn();
-            element.addEventListener('datatable:initialized', handler);
+            element.addEventListener('emg-jsc:datatable:initialized', handler);
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
@@ -136,9 +136,9 @@ describe('DataTable', () => {
             );
         });
 
-        it('emite component:scan tras renderizar el contenido', async () => {
+        it('emite emg-jsc:component:scan tras renderizar el contenido', async () => {
             const handler = vi.fn();
-            element.addEventListener('component:scan', handler);
+            element.addEventListener('emg-jsc:component:scan', handler);
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(handler).toHaveBeenCalled());
@@ -312,7 +312,7 @@ describe('DataTable', () => {
     });
 
     describe('handleAction()', () => {
-        it('emite el evento datatable:action con action, id y row', async () => {
+        it('emite el evento emg-jsc:datatable:action con action, id y row', async () => {
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
@@ -320,7 +320,7 @@ describe('DataTable', () => {
             dt.state.data = [{ id: 42, name: 'Alice' }];
 
             const handler = vi.fn();
-            element.addEventListener('datatable:action', handler);
+            element.addEventListener('emg-jsc:datatable:action', handler);
 
             dt.handleAction('edit', 42);
 
@@ -331,7 +331,7 @@ describe('DataTable', () => {
             expect(row.name).toBe('Alice');
         });
 
-        it('el evento datatable:action burbujea en el DOM', async () => {
+        it('el evento emg-jsc:datatable:action burbujea en el DOM', async () => {
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
@@ -339,7 +339,7 @@ describe('DataTable', () => {
             dt.state.data = [{ id: 1, name: 'Alice' }];
 
             const handler = vi.fn();
-            document.body.addEventListener('datatable:action', handler);
+            document.body.addEventListener('emg-jsc:datatable:action', handler);
 
             dt.handleAction('delete', 1);
             expect(handler).toHaveBeenCalledOnce();
@@ -353,7 +353,7 @@ describe('DataTable', () => {
             await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
             dt.state.isLoading = false;
 
-            element.dispatchEvent(new Event('datatable:refresh'));
+            element.dispatchEvent(new Event('emg-jsc:datatable:refresh'));
             await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
         });
 
@@ -362,7 +362,7 @@ describe('DataTable', () => {
             dt.init();
             await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
 
-            element.dispatchEvent(new Event('datatable:loader:show'));
+            element.dispatchEvent(new Event('emg-jsc:datatable:loader:show'));
             expect(element.querySelector('.loader-overlay').classList.contains('is-visible')).toBe(true);
         });
 
@@ -371,8 +371,8 @@ describe('DataTable', () => {
             dt.init();
             await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
 
-            element.dispatchEvent(new Event('datatable:loader:show'));
-            element.dispatchEvent(new Event('datatable:loader:hide'));
+            element.dispatchEvent(new Event('emg-jsc:datatable:loader:show'));
+            element.dispatchEvent(new Event('emg-jsc:datatable:loader:hide'));
             expect(element.querySelector('.loader-overlay').classList.contains('is-visible')).toBe(false);
         });
 

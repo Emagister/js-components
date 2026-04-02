@@ -59,7 +59,7 @@ export default class DataTable extends Component {
             destroy: () => this.#destroy()
         };
 
-        this.root.dispatchEvent(new CustomEvent('datatable:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:initialized'));
     }
 
     #initializeFilters() {
@@ -123,9 +123,9 @@ export default class DataTable extends Component {
         this._onLoaderHide = () => this.loader.hide();
 
         this.root.addEventListener('click', this._onRootClick);
-        this.root.addEventListener('datatable:refresh', this._onRefresh);
-        this.root.addEventListener('datatable:loader:show', this._onLoaderShow);
-        this.root.addEventListener('datatable:loader:hide', this._onLoaderHide);
+        this.root.addEventListener('emg-jsc:datatable:refresh', this._onRefresh);
+        this.root.addEventListener('emg-jsc:datatable:loader:show', this._onLoaderShow);
+        this.root.addEventListener('emg-jsc:datatable:loader:hide', this._onLoaderHide);
     }
 
     async #fetchData() {
@@ -216,7 +216,7 @@ export default class DataTable extends Component {
     }
 
     handleAction(action, id) {
-        const event = new CustomEvent('datatable:action', {
+        const event = new CustomEvent('emg-jsc:datatable:action', {
             bubbles: true,
             detail: { action, id, row: this.state.data.find(r => r.id == id) }
         });
@@ -226,21 +226,21 @@ export default class DataTable extends Component {
     #render() {
         this.contentWrapper.innerHTML = '';
         this.contentWrapper.appendChild(this.templating.createContent(this.state, this.config));
-        this.root.dispatchEvent(new CustomEvent('component:scan', { bubbles: true }));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:component:scan', { bubbles: true }));
     }
 
 
     #renderError() {
         this.contentWrapper.innerHTML = '';
         this.contentWrapper.appendChild(this.templating.createErrorContent(this.config));
-        this.root.dispatchEvent(new CustomEvent('component:scan', { bubbles: true }));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:component:scan', { bubbles: true }));
     }
 
     #destroy() {
         this.root.removeEventListener('click', this._onRootClick);
-        this.root.removeEventListener('datatable:refresh', this._onRefresh);
-        this.root.removeEventListener('datatable:loader:show', this._onLoaderShow);
-        this.root.removeEventListener('datatable:loader:hide', this._onLoaderHide);
+        this.root.removeEventListener('emg-jsc:datatable:refresh', this._onRefresh);
+        this.root.removeEventListener('emg-jsc:datatable:loader:show', this._onLoaderShow);
+        this.root.removeEventListener('emg-jsc:datatable:loader:hide', this._onLoaderHide);
         this.loader?.destroy?.();
         this.contentWrapper.innerHTML = '';
     }
