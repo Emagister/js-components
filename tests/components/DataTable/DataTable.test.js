@@ -347,7 +347,7 @@ describe('DataTable', () => {
     });
 
     describe('eventos del DOM', () => {
-        it('refresca datos al recibir datatable:refresh', async () => {
+        it('refresca datos al recibir emg-jsc:datatable:refresh', async () => {
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
@@ -357,7 +357,7 @@ describe('DataTable', () => {
             await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
         });
 
-        it('muestra el loader al recibir datatable:loader:show', async () => {
+        it('muestra el loader al recibir emg-jsc:datatable:loader:show', async () => {
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
@@ -366,7 +366,7 @@ describe('DataTable', () => {
             expect(element.querySelector('.loader-overlay').classList.contains('is-visible')).toBe(true);
         });
 
-        it('oculta el loader al recibir datatable:loader:hide', async () => {
+        it('oculta el loader al recibir emg-jsc:datatable:loader:hide', async () => {
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
