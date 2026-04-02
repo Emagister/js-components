@@ -37,7 +37,7 @@ export default class Dropdown extends Component {
         }
     }
 
-    #destroy() {
+    destroy() {
         if (this.bootstrapDropdown) {
             this.bootstrapDropdown.dispose();
             this.bootstrapDropdown = null;

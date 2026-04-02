@@ -55,7 +55,7 @@ export default class Confirm extends Component {
         });
     }
 
-    #destroy() {
+    destroy() {
         delete window.confirmCustom;
     }
 }

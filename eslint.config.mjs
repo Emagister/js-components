@@ -14,6 +14,12 @@ export default [
         CustomEvent: 'readonly',
         console: 'readonly',
         HTMLElement: 'readonly',
+        FormData: 'readonly',
+        URLSearchParams: 'readonly',
+        fetch: 'readonly',
+        navigator: 'readonly',
+        clearTimeout: 'readonly',
+        setTimeout: 'readonly',
       },
     },
     rules: {

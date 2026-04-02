@@ -46,12 +46,12 @@ export default class DatePicker extends Component {
             const module = await import(`flatpickr/dist/l10n/${locale}.js`);
 
             return module.default[locale] || module[locale] || module.default;
-        } catch (e) {
+        } catch {
             return null;
         }
     }
 
-    #destroy() {
+    destroy() {
         if (this.instance) {
             this.instance.destroy();
         }

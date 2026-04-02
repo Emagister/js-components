@@ -65,7 +65,7 @@ export default class Loader extends Component {
         }
     }
 
-    #destroy() {
+    destroy() {
         if (this.overlay) {
             this.overlay.remove();
         }

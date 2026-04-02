@@ -307,7 +307,7 @@ export default class AsyncForm extends Component {
         this.#hideToast();
     }
 
-    #destroy() {
+    destroy() {
         this.root.removeEventListener('submit', this.handleSubmit);
         delete this.root.asyncForm;
     }

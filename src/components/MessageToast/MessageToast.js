@@ -45,7 +45,7 @@ export default class MessageToast extends Component {
         this.show(message, type, duration);
     }
 
-    #destroy() {
+    destroy() {
         this.#clearTimeout();
         if (this.toast) {
             this.toast.dispose();

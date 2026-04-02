@@ -235,7 +235,7 @@ export default class DataTable extends Component {
         this.root.dispatchEvent(new CustomEvent('component:scan', { bubbles: true }));
     }
 
-    #destroy() {
+    destroy() {
         this.contentWrapper.innerHTML = '';
     }
 }

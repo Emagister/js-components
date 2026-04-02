@@ -12,7 +12,7 @@ export default class Tooltip extends Component {
         this.root.dispatchEvent(new CustomEvent('tooltip:initialized'));
     }
 
-    #destroy() {
+    destroy() {
         this.bootstrapTooltip.dispose();
     }
 }
