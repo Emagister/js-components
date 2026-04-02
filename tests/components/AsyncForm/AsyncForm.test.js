@@ -94,11 +94,11 @@ describe('AsyncForm', () => {
             expect(api.setErrorHandler(() => {})).toBe(api);
         });
 
-        it('emite el evento asyncForm:initialized', () => {
+        it('emite el evento emg-jsc:asyncForm:initialized', () => {
             const form = createForm();
             document.body.appendChild(form);
             const handler = vi.fn();
-            form.addEventListener('asyncForm:initialized', handler);
+            form.addEventListener('emg-jsc:asyncForm:initialized', handler);
             new AsyncForm(form).init();
             expect(handler).toHaveBeenCalledOnce();
         });
@@ -154,7 +154,7 @@ describe('AsyncForm', () => {
             const event = new Event('submit', { cancelable: true });
             await asyncForm.handleSubmit(event);
             expect(dispatchSpy).toHaveBeenCalledWith(
-                expect.objectContaining({ type: 'toast:show' })
+                expect.objectContaining({ type: 'emg-jsc:toast:show' })
             );
         });
 
@@ -164,7 +164,7 @@ describe('AsyncForm', () => {
             const event = new Event('submit', { cancelable: true });
             await asyncForm.handleSubmit(event);
             const toastEvent = dispatchSpy.mock.calls.find(
-                ([e]) => e.type === 'toast:show' && e.detail?.type === MessageToastType.ERROR
+                ([e]) => e.type === 'emg-jsc:toast:show' && e.detail?.type === MessageToastType.ERROR
             );
             expect(toastEvent).toBeDefined();
         });

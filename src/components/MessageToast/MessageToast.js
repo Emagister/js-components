@@ -34,11 +34,11 @@ export default class MessageToast extends Component {
             this.#bindEvents();
         }
 
-        this.root.dispatchEvent(new CustomEvent('messageToast:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:messageToast:initialized'));
     }
 
     #bindEvents() {
-        window.addEventListener('toast:show', this.handleShow);
+        window.addEventListener('emg-jsc:toast:show', this.handleShow);
     }
 
     #handleGlobalShow(e) {
@@ -51,7 +51,7 @@ export default class MessageToast extends Component {
         if (this.toast) {
             this.toast.dispose();
         }
-        window.removeEventListener('toast:show', this.handleShow);
+        window.removeEventListener('emg-jsc:toast:show', this.handleShow);
         delete this.root.messageToast;
     }
 

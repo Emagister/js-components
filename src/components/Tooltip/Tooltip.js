@@ -13,7 +13,7 @@ export default class Tooltip extends Component {
             destroy: () => this.#destroy()
         };
 
-        this.root.dispatchEvent(new CustomEvent('tooltip:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:tooltip:initialized'));
     }
 
     #destroy() {

@@ -65,7 +65,7 @@ export default class AsyncForm extends Component {
             destroy: () => this.#destroy()
         };
 
-        this.root.dispatchEvent(new CustomEvent('asyncForm:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:asyncForm:initialized'));
     }
 
     #addNormalizer(field, fn) {
@@ -231,7 +231,7 @@ export default class AsyncForm extends Component {
             }
         }
 
-        window.dispatchEvent(new CustomEvent('toast:show', {
+        window.dispatchEvent(new CustomEvent('emg-jsc:toast:show', {
             detail: { message: message, type: type, duration: this.settings.messageDuration }
         }));
     }

@@ -44,7 +44,7 @@ export default class Confirm extends Component {
             destroy: () => this.#destroy()
         };
 
-        this.root.dispatchEvent(new CustomEvent('confirm:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:confirm:initialized'));
     }
 
     ask(message, title) {

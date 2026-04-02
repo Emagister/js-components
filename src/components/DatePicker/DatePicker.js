@@ -38,7 +38,7 @@ export default class DatePicker extends Component {
             destroy: () => this.#destroy()
         };
 
-        this.root.dispatchEvent(new CustomEvent('datePicker:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:datePicker:initialized'));
     }
 
     #getBrowserLocale() {

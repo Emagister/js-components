@@ -56,11 +56,11 @@ describe('Confirm', () => {
             expect(typeof window.confirmCustom).toBe('function');
         });
 
-        it('emite el evento confirm:initialized', () => {
+        it('emite el evento emg-jsc:confirm:initialized', () => {
             const el = createConfirmElement();
             document.body.appendChild(el);
             const handler = vi.fn();
-            el.addEventListener('confirm:initialized', handler);
+            el.addEventListener('emg-jsc:confirm:initialized', handler);
             new Confirm(el).init();
             expect(handler).toHaveBeenCalledOnce();
         });

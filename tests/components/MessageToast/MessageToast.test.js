@@ -78,11 +78,11 @@ describe('MessageToast', () => {
             expect(typeof element.messageToast.hide).toBe('function');
         });
 
-        it('emite el evento messageToast:initialized', () => {
+        it('emite el evento emg-jsc:messageToast:initialized', () => {
             const el = createElement();
             document.body.appendChild(el);
             const handler = vi.fn();
-            el.addEventListener('messageToast:initialized', handler);
+            el.addEventListener('emg-jsc:messageToast:initialized', handler);
             const t = new MessageToast(el);
             t.init();
             expect(handler).toHaveBeenCalledOnce();
@@ -149,9 +149,9 @@ describe('MessageToast', () => {
     });
 
     describe('modo global', () => {
-        it('responde al evento window toast:show', () => {
+        it('responde al evento window emg-jsc:toast:show', () => {
             const showSpy = vi.spyOn(toast, 'show');
-            window.dispatchEvent(new CustomEvent('toast:show', {
+            window.dispatchEvent(new CustomEvent('emg-jsc:toast:show', {
                 detail: { message: 'Global!', type: MessageToastType.WARNING, duration: 4000 },
             }));
             expect(showSpy).toHaveBeenCalledWith('Global!', MessageToastType.WARNING, 4000);
@@ -159,19 +159,19 @@ describe('MessageToast', () => {
 
         it('usa valores por defecto en el evento si no se proporcionan', () => {
             const showSpy = vi.spyOn(toast, 'show');
-            window.dispatchEvent(new CustomEvent('toast:show', {
+            window.dispatchEvent(new CustomEvent('emg-jsc:toast:show', {
                 detail: { message: 'Sin tipo' },
             }));
             expect(showSpy).toHaveBeenCalledWith('Sin tipo', MessageToastType.SUCCESS, 3000);
         });
 
-        it('en modo local NO responde al evento window toast:show', () => {
+        it('en modo local NO responde al evento window emg-jsc:toast:show', () => {
             const el = createElement({ mode: 'local' });
             document.body.appendChild(el);
             const localToast = new MessageToast(el);
             localToast.init();
             const showSpy = vi.spyOn(localToast, 'show');
-            window.dispatchEvent(new CustomEvent('toast:show', {
+            window.dispatchEvent(new CustomEvent('emg-jsc:toast:show', {
                 detail: { message: 'Test' },
             }));
             expect(showSpy).not.toHaveBeenCalled();

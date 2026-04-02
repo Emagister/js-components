@@ -44,7 +44,10 @@ describe('ComponentManager', () => {
             }
         };
 
-        document.body.innerHTML = '';
+        // Reemplazar document.body para eliminar también los event listeners acumulados
+        // entre tests (innerHTML = '' no elimina listeners del body)
+        const newBody = document.createElement('body');
+        document.documentElement.replaceChild(newBody, document.body);
 
         const { default: registry } = await import('../src/ComponentRegistry.js');
         registry['loader'].mockReset();
@@ -101,11 +104,11 @@ describe('ComponentManager', () => {
     });
 
     describe('init()', () => {
-        it('emite el evento app:initialized en window', () => {
+        it('emite el evento emg-jsc:initialized en window', () => {
             const handler = vi.fn();
-            window.addEventListener('app:initialized', handler);
+            window.addEventListener('emg-jsc:initialized', handler);
             manager.init();
-            window.removeEventListener('app:initialized', handler);
+            window.removeEventListener('emg-jsc:initialized', handler);
             expect(handler).toHaveBeenCalledOnce();
         });
     });
@@ -161,21 +164,26 @@ describe('ComponentManager', () => {
         });
     });
 
-    describe('evento component:scan', () => {
-        it('monta componentes al recibir component:scan en un subelemento', async () => {
+    describe('evento emg-jsc:component:scan', () => {
+        it('monta componentes al recibir emg-jsc:component:scan en un subelemento', async () => {
             const MockClass = createMockComponentClass();
             const { default: registry } = await import('../src/ComponentRegistry.js');
             registry['loader'].mockResolvedValue({ default: MockClass });
 
             manager.init();
 
+            // Insertar el nodo sin data-component para que el MutationObserver
+            // no lo monte. El observer solo escucha childList, no atributos.
             const container = document.createElement('div');
             const child = document.createElement('div');
-            child.dataset.component = 'loader';
             container.appendChild(child);
             document.body.appendChild(container);
 
-            container.dispatchEvent(new CustomEvent('component:scan', { bubbles: false }));
+            // Asignar data-component después de la inserción: el observer no lo detecta
+            child.dataset.component = 'loader';
+
+            // El evento component:scan es el único que desencadena el montaje
+            container.dispatchEvent(new CustomEvent('emg-jsc:component:scan', { bubbles: true }));
 
             await vi.waitFor(() => {
                 expect(MockClass).toHaveBeenCalledOnce();
