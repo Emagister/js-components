@@ -2,6 +2,17 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
+  test: {
+    environment: 'happy-dom',
+    globals: true,
+    css: false,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      include: ['src/**/*.js'],
+      exclude: ['src/styles/**', 'src/index.js'],
+    },
+  },
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.js'),
