@@ -47,6 +47,18 @@ The library's central concept is automatic DOM scanning and lazy loading:
 - `dist/` is in `.gitignore` but included in npm via the `"files"` field in `package.json`. **Never reference this package via a git URL** — the dist won't be present.
 - The package exposes both ESM (`dist/js-components.js`) and UMD (`dist/js-components.umd.cjs`), plus SCSS source via `./scss/*` export.
 
+## Development Guidelines
+
+### Test-Driven Development (TDD)
+
+All new features must be implemented following the TDD red-green-refactor cycle:
+
+1. **Red** — write a failing test that defines the expected behavior.
+2. **Green** — write the minimum code needed to make the test pass.
+3. **Refactor** — clean up the implementation without breaking the tests.
+
+Tests go in `tests/` mirroring the `src/` structure. Run tests via Docker as shown above.
+
 ## Release Process
 
 Releases are manual: trigger the `publish` workflow via GitHub Actions `workflow_dispatch`. It auto-bumps the version (semver from commit messages), updates `CHANGELOG.md`, tags, creates a GitHub Release, and publishes to npm. Requires `BOT_APP_ID` and `BOT_PRIVATE_KEY` secrets (GitHub App) to bypass the main branch ruleset.
