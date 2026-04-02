@@ -37,10 +37,10 @@ jobs:
           dry_run: true
 
       - name: Update package.json and CHANGELOG.md
+        env:
+          NEW_VERSION: ${{ steps.dry_run.outputs.new_version }}
+          CHANGELOG: ${{ steps.dry_run.outputs.changelog }}
         run: |
-          NEW_VERSION="${{ steps.dry_run.outputs.new_version }}"
-          CHANGELOG="${{ steps.dry_run.outputs.changelog }}"
-
           npm version "$NEW_VERSION" --no-git-tag-version
 
           # Prepend new entry to CHANGELOG.md
