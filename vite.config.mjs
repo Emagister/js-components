@@ -1,7 +1,21 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  test: {
+    environment: 'happy-dom',
+    css: false,
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html'],
+      include: ['src/**/*.js'],
+      exclude: ['src/styles/**', 'src/index.js'],
+    },
+  },
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.js'),

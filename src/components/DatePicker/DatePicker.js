@@ -34,6 +34,10 @@ export default class DatePicker extends Component {
 
         this.instance = flatpickr(this.root, this.config);
 
+        this.root.datePicker = {
+            destroy: () => this.#destroy()
+        };
+
         this.root.dispatchEvent(new CustomEvent('datePicker:initialized'));
     }
 
@@ -46,7 +50,7 @@ export default class DatePicker extends Component {
             const module = await import(`flatpickr/dist/l10n/${locale}.js`);
 
             return module.default[locale] || module[locale] || module.default;
-        } catch (e) {
+        } catch {
             return null;
         }
     }

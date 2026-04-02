@@ -14,6 +14,7 @@ export default class Dropdown extends Component {
             show: () => this.show(),
             hide: () => this.hide(),
             toggle: () => this.toggle(),
+            destroy: () => this.#destroy()
         };
 
         this.root.dispatchEvent(new CustomEvent('dropdown:initialized'));

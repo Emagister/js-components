@@ -55,6 +55,10 @@ export default class DataTable extends Component {
         this.#bindEvents();
         this.#bindFilterForm();
 
+        this.root.dataTable = {
+            destroy: () => this.#destroy()
+        };
+
         this.root.dispatchEvent(new CustomEvent('datatable:initialized'));
     }
 
@@ -94,7 +98,7 @@ export default class DataTable extends Component {
     }
 
     #bindEvents() {
-        this.root.addEventListener('click', (e) => {
+        this._onRootClick = (e) => {
             const sortHeader = e.target.closest('[data-sort]');
             if (sortHeader) {
                 this.handleSort(sortHeader.dataset.sort);
@@ -112,19 +116,16 @@ export default class DataTable extends Component {
                 const rowId = actionBtn.closest('tr').dataset.id;
                 this.handleAction(action, rowId);
             }
-        });
+        };
 
-        this.root.addEventListener('datatable:refresh', () => {
-            this.#fetchData();
-        });
+        this._onRefresh = () => this.#fetchData();
+        this._onLoaderShow = () => this.loader.show();
+        this._onLoaderHide = () => this.loader.hide();
 
-        this.root.addEventListener('datatable:loader:show', () => {
-            this.loader.show();
-        });
-
-        this.root.addEventListener('datatable:loader:hide', () => {
-            this.loader.hide();
-        });
+        this.root.addEventListener('click', this._onRootClick);
+        this.root.addEventListener('datatable:refresh', this._onRefresh);
+        this.root.addEventListener('datatable:loader:show', this._onLoaderShow);
+        this.root.addEventListener('datatable:loader:hide', this._onLoaderHide);
     }
 
     async #fetchData() {
@@ -236,6 +237,11 @@ export default class DataTable extends Component {
     }
 
     #destroy() {
+        this.root.removeEventListener('click', this._onRootClick);
+        this.root.removeEventListener('datatable:refresh', this._onRefresh);
+        this.root.removeEventListener('datatable:loader:show', this._onLoaderShow);
+        this.root.removeEventListener('datatable:loader:hide', this._onLoaderHide);
+        this.loader?.destroy?.();
         this.contentWrapper.innerHTML = '';
     }
 }

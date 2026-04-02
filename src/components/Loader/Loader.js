@@ -15,7 +15,8 @@ export default class Loader extends Component {
 
         this.root.loader = {
             show: this.handleShow,
-            hide: this.handleHide
+            hide: this.handleHide,
+            destroy: () => this.#destroy()
         };
 
         this.root.addEventListener('loader:show', this.handleShow);
