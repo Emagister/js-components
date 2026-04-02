@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/Emagister/js-components/compare/v1.1.1...v1.2.0) (2026-04-02)
+
+
+### Features
+
+* rename all custom events to use emg-jsc: prefix ([8f46f12](https://github.com/Emagister/js-components/commit/8f46f12231bc65d136fe7d1c44f601ba75a4ddc2))
+
+
+### Tests
+
+* fix component:scan event test and update test descriptions ([2e761e4](https://github.com/Emagister/js-components/commit/2e761e48f54d4d721e6c0c4e6a13f3d7f9f5a02b))
+
+
+
+
 ### [1.1.1](https://github.com/Emagister/js-components/compare/v1.1.0...v1.1.1) (2026-04-02)
 
 
