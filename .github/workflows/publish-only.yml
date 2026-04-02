@@ -24,5 +24,10 @@ jobs:
       - name: Install dependencies and build
         run: npm ci && npm run build
 
+      - name: Debug npm auth
+        run: |
+          npm whoami
+          npm access list packages @emagister || true
+
       - name: Publish to npm
         run: npm publish --access public --provenance
