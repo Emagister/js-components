@@ -16,7 +16,7 @@ docker run --rm -v $(pwd):/app -w /app node:lts npm run coverage
 
 Available scripts: `dev` (dev server), `build` (ESM + UMD + CSS to dist/), `preview`, `test`, `coverage`.
 
-Vitest, happy-dom, and @vitest/coverage-v8 are already in devDependencies. The test config lives in `vite.config.mjs` under the `test` key. Tests go in `src/__tests__/`.
+Vitest, happy-dom, and @vitest/coverage-v8 are already in devDependencies. The test config lives in `vite.config.mjs` under the `test` key. Tests go in `tests/`.
 
 ## Architecture
 
