@@ -158,14 +158,19 @@ export default class DataTableTemplate {
             const label = activeState ? activeState.label : (action.label || action.name);
             const icon = activeState ? (activeState.icon || 'bi bi-gear') : (action.icon || 'bi bi-gear');
 
-            const i = document.createElement('i');
-            i.className = `${icon} me-2`;
-            i.setAttribute('data-action', action.name);
-            i.setAttribute('data-component', 'tooltip');
-            i.setAttribute('title', label);
-            i.style.cursor = 'pointer';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-link p-0 me-2';
+            button.setAttribute('data-action', action.name);
+            button.setAttribute('data-component', 'tooltip');
+            button.setAttribute('title', label);
+            button.setAttribute('aria-label', label);
 
-            td.appendChild(i);
+            const i = document.createElement('i');
+            i.className = icon;
+
+            button.appendChild(i);
+            td.appendChild(button);
         }
 
         tr.appendChild(td);

@@ -63,7 +63,7 @@ Opciones en `data-settings`:
 - `filterFormId` (String): ID del formulario para filtrar la tabla.
 - `sortBy` (String): Columna por la que ordenar inicialmente.
 - `sortOrder` (String: `'asc'`|`'desc'`): Dirección del orden inicial.
-- `striped` (Boolean, default: true): Activa/desactiva el estilo de filas alternas.
+- `striped` (Boolean, default: false): Activa/desactiva el estilo de filas alternas.
 - `hover` (Boolean, default: true): Activa/desactiva el efecto hover en filas.
 - `headerClass` (String): Clases CSS aplicadas al `<tr>` del encabezado.
 - `scrollOffset` (Number, default: 0): Desplazamiento en píxeles al hacer scroll al paginar. Útil para compensar navbars fijos.
@@ -119,7 +119,7 @@ Selector de fechas basado en Flatpickr. Detecta automáticamente el idioma del n
 Opciones en `data-settings`:
 - `dateFormat` (String, default: `'Y-m-d'`): Formato del valor enviado al servidor.
 - `altInput` (Boolean, default: true): Muestra un campo visual separado del campo real.
-- `altFormat` (String, default: `'d/m/Y'`): Formato visual mostrado al usuario.
+- `altFormat` (String, default: `'Y-m-d'`): Formato visual mostrado al usuario.
 - `allowInput` (Boolean, default: true): Permite escribir la fecha manualmente.
 - *Cualquier opción nativa de Flatpickr* (ej: `minDate`, `maxDate`).
 

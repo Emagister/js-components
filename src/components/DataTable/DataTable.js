@@ -20,7 +20,7 @@ export default class DataTable extends Component {
             striped: settings.striped !== undefined ? settings.striped : false,
             hover: settings.hover !== undefined ? settings.hover : true,
             headerClass: settings.headerClass || null,
-            scrollOffset: parseInt(settings.scrollOffset || '0'),
+            scrollOffset: parseInt(settings.scrollOffset, 10) || 0,
         };
 
         this.state = {
