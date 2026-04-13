@@ -67,6 +67,31 @@ Opciones en `data-settings`:
 - `hover` (Boolean, default: true): Activa/desactiva el efecto hover en filas.
 - `headerClass` (String): Clases CSS aplicadas al `<tr>` del encabezado.
 - `scrollOffset` (Number, default: 0): Desplazamiento en píxeles al hacer scroll al paginar. Útil para compensar navbars fijos.
+- `labels` (Object): Textos del componente. Permite traducir o personalizar todos los literales:
+  - `total` (String, default: `'Mostrando {from} - {to} de {total} resultados'`): Contador de resultados mostrado sobre la paginación. Soporta los placeholders `{from}`, `{to}` y `{total}`, que se sustituyen automáticamente con el rango de la página actual y el total de registros.
+  - `noResults` (String, default: `'No se encontraron resultados.'`): Mensaje cuando la respuesta devuelve datos vacíos.
+  - `error` (String, default: `'Ocurrió un error al cargar los datos.'`): Mensaje cuando la petición a la API falla.
+  - `previous` (String, default: `'Anterior'`): Texto del botón anterior de la paginación.
+  - `next` (String, default: `'Siguiente'`): Texto del botón siguiente de la paginación.
+  - `actions` (String, default: `'Acciones'`): Texto del encabezado de la columna de acciones.
+
+Ejemplo de personalización en inglés:
+```html
+<div data-component="data-table"
+     data-url="/api/items"
+     data-columns='[{"key":"name","label":"Name"}]'
+     data-settings='{
+       "labels": {
+         "total": "Showing {from} - {to} of {total} results",
+         "noResults": "No results found.",
+         "error": "Failed to load data.",
+         "previous": "Previous",
+         "next": "Next",
+         "actions": "Actions"
+       }
+     }'>
+</div>
+```
 
 Propiedades de `data-columns` (array de objetos):
 - `key` (String): Clave del campo en los datos.

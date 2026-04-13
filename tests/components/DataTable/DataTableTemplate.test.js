@@ -17,6 +17,14 @@ describe('DataTableTemplate', () => {
             striped: false,
             hover: true,
             headerClass: null,
+            labels: {
+                total: 'Mostrando {from} - {to} de {total} resultados',
+                noResults: 'No se encontraron resultados.',
+                error: 'Ocurrió un error al cargar los datos.',
+                previous: 'Anterior',
+                next: 'Siguiente',
+                actions: 'Acciones',
+            },
         };
         baseState = {
             data: [{ id: 1, name: 'Alice', age: 30 }],
@@ -247,6 +255,50 @@ describe('DataTableTemplate', () => {
         });
     });
 
+    describe('total de resultados', () => {
+        it('muestra el rango de la primera página', () => {
+            const state = { ...baseState, meta: { page: 1, total: 50, perPage: 10, lastPage: 5 } };
+            const content = template.createContent(state, baseConfig);
+            const total = content.querySelector('.datatable-total');
+            expect(total).not.toBeNull();
+            expect(total.textContent).toBe('Mostrando 1 - 10 de 50 resultados');
+        });
+
+        it('muestra el rango de la segunda página', () => {
+            const state = { ...baseState, meta: { page: 2, total: 1598, perPage: 20, lastPage: 80 } };
+            const content = template.createContent(state, baseConfig);
+            expect(content.querySelector('.datatable-total').textContent).toBe('Mostrando 21 - 40 de 1598 resultados');
+        });
+
+        it('limita el "to" al total en la última página incompleta', () => {
+            const state = { ...baseState, meta: { page: 3, total: 25, perPage: 10, lastPage: 3 } };
+            const content = template.createContent(state, baseConfig);
+            expect(content.querySelector('.datatable-total').textContent).toBe('Mostrando 21 - 25 de 25 resultados');
+        });
+
+        it('no muestra el total cuando meta.total es 0', () => {
+            const state = { ...baseState, data: [], meta: { page: 1, total: 0, perPage: 10, lastPage: 1 } };
+            const content = template.createContent(state, baseConfig);
+            expect(content.querySelector('.datatable-total')).toBeNull();
+        });
+
+        it('muestra el total incluso cuando solo hay una página', () => {
+            const state = { ...baseState, meta: { page: 1, total: 5, perPage: 10, lastPage: 1 } };
+            const content = template.createContent(state, baseConfig);
+            expect(content.querySelector('.datatable-total').textContent).toBe('Mostrando 1 - 5 de 5 resultados');
+        });
+
+        it('el total aparece antes de la nav de paginación', () => {
+            const state = { ...baseState, meta: { page: 1, total: 30, perPage: 10, lastPage: 3 } };
+            const content = template.createContent(state, baseConfig);
+            const paginationContainer = content.querySelector('.mt-3');
+            const children = [...paginationContainer.children];
+            const totalIdx = children.findIndex(el => el.classList.contains('datatable-total'));
+            const navIdx = children.findIndex(el => el.tagName === 'NAV');
+            expect(totalIdx).toBeLessThan(navIdx);
+        });
+    });
+
     describe('paginación', () => {
         it('no renderiza nav de paginación si lastPage <= 1', () => {
             const content = template.createContent(baseState, baseConfig);
@@ -365,6 +417,48 @@ describe('DataTableTemplate', () => {
             const content = template.createContent(baseState, config);
             const cols = content.querySelectorAll('colgroup col');
             expect(cols[0].style.width).toBe('40%');
+        });
+    });
+
+    describe('labels personalizados', () => {
+        it('usa config.labels.total con placeholders {from}, {to} y {total}', () => {
+            const config = { ...baseConfig, labels: { ...baseConfig.labels, total: 'Showing {from}-{to} of {total}' } };
+            const state = { ...baseState, meta: { page: 2, total: 50, perPage: 10, lastPage: 5 } };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('.datatable-total').textContent).toBe('Showing 11-20 of 50');
+        });
+
+        it('usa config.labels.noResults cuando no hay datos', () => {
+            const config = { ...baseConfig, labels: { ...baseConfig.labels, noResults: 'No results found.' } };
+            const state = { ...baseState, data: [] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody td').textContent).toBe('No results found.');
+        });
+
+        it('usa config.labels.error en createErrorContent', () => {
+            const config = { ...baseConfig, labels: { ...baseConfig.labels, error: 'Failed to load data.' } };
+            const content = template.createErrorContent(config);
+            expect(content.querySelector('td').textContent).toBe('Failed to load data.');
+        });
+
+        it('usa config.labels.previous y next en la paginación', () => {
+            const config = { ...baseConfig, labels: { ...baseConfig.labels, previous: 'Prev', next: 'Next' } };
+            const state = { ...baseState, meta: { page: 2, total: 30, perPage: 10, lastPage: 3 } };
+            const content = template.createContent(state, config);
+            const links = [...content.querySelectorAll('.page-link')].map(a => a.textContent);
+            expect(links).toContain('Prev');
+            expect(links).toContain('Next');
+        });
+
+        it('usa config.labels.actions en la cabecera de acciones', () => {
+            const config = {
+                ...baseConfig,
+                actions: [{ name: 'edit', label: 'Edit' }],
+                labels: { ...baseConfig.labels, actions: 'Actions' },
+            };
+            const content = template.createContent(baseState, config);
+            const ths = content.querySelectorAll('thead th');
+            expect(ths[ths.length - 1].textContent).toBe('Actions');
         });
     });
 

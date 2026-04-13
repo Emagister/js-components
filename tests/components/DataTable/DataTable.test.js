@@ -66,6 +66,27 @@ describe('DataTable', () => {
             expect(dt.config.perPage).toBe(20);
         });
 
+        it('tiene labels en español por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.labels.total).toBe('Mostrando {from} - {to} de {total} resultados');
+            expect(dt.config.labels.noResults).toBe('No se encontraron resultados.');
+            expect(dt.config.labels.error).toBe('Ocurrió un error al cargar los datos.');
+            expect(dt.config.labels.previous).toBe('Anterior');
+            expect(dt.config.labels.next).toBe('Siguiente');
+            expect(dt.config.labels.actions).toBe('Acciones');
+        });
+
+        it('permite personalizar labels desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({
+                labels: { total: 'Showing {from}-{to} of {total}', previous: 'Previous', next: 'Next' }
+            });
+            const dt = new DataTable(element);
+            expect(dt.config.labels.total).toBe('Showing {from}-{to} of {total}');
+            expect(dt.config.labels.previous).toBe('Previous');
+            expect(dt.config.labels.next).toBe('Next');
+            expect(dt.config.labels.noResults).toBe('No se encontraron resultados.');
+        });
+
         it('inicializa el estado con page 1', () => {
             const dt = new DataTable(element);
             expect(dt.state.meta.page).toBe(1);

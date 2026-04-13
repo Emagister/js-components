@@ -21,6 +21,14 @@ export default class DataTable extends Component {
             hover: settings.hover !== undefined ? settings.hover : true,
             headerClass: settings.headerClass || null,
             scrollOffset: parseInt(settings.scrollOffset, 10) || 0,
+            labels: {
+                total: settings.labels?.total ?? 'Mostrando {from} - {to} de {total} resultados',
+                noResults: settings.labels?.noResults ?? 'No se encontraron resultados.',
+                error: settings.labels?.error ?? 'Ocurrió un error al cargar los datos.',
+                previous: settings.labels?.previous ?? 'Anterior',
+                next: settings.labels?.next ?? 'Siguiente',
+                actions: settings.labels?.actions ?? 'Acciones',
+            },
         };
 
         this.state = {

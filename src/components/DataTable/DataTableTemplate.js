@@ -34,7 +34,7 @@ export default class DataTableTemplate {
 
         const paginationContainer = document.createElement('div');
         paginationContainer.className = 'mt-3';
-        this.#appendPagination(state.meta, paginationContainer);
+        this.#appendPagination(state.meta, config, paginationContainer);
 
         const container = document.createElement('div');
         container.appendChild(wrapper);
@@ -74,7 +74,7 @@ export default class DataTableTemplate {
 
         if (config.actions && config.actions.length > 0) {
             const actionTh = document.createElement('th');
-            actionTh.textContent = 'Acciones';
+            actionTh.textContent = config.labels.actions;
             headerRow.appendChild(actionTh);
         }
     }
@@ -200,8 +200,21 @@ export default class DataTableTemplate {
         tr.appendChild(td);
     }
 
-    #appendPagination(meta, paginationContainer) {
-        const { page, lastPage } = meta;
+    #appendPagination(meta, config, paginationContainer) {
+        const { page, lastPage, total, perPage } = meta;
+        const { labels } = config;
+
+        if (total > 0) {
+            const from = (page - 1) * perPage + 1;
+            const to = Math.min(page * perPage, total);
+            const totalEl = document.createElement('p');
+            totalEl.className = 'text-center text-muted small mb-2 datatable-total';
+            totalEl.textContent = labels.total
+                .replace('{from}', from)
+                .replace('{to}', to)
+                .replace('{total}', total);
+            paginationContainer.appendChild(totalEl);
+        }
 
         if (lastPage <= 1) {
             return;
@@ -221,13 +234,13 @@ export default class DataTableTemplate {
         const ul = document.createElement('ul');
         ul.className = 'pagination justify-content-center mb-0';
 
-        ul.appendChild(this.#createPaginationItem(page - 1, 'Anterior', false, page === 1));
+        ul.appendChild(this.#createPaginationItem(page - 1, labels.previous, false, page === 1));
 
         for (const p of pages) {
             ul.appendChild(this.#createPaginationItem(p, p, parseInt(page) === p, p === '...'));
         }
 
-        ul.appendChild(this.#createPaginationItem(page + 1, 'Siguiente', false, page === lastPage));
+        ul.appendChild(this.#createPaginationItem(page + 1, labels.next, false, page === lastPage));
 
         nav.appendChild(ul);
         paginationContainer.appendChild(nav);
@@ -258,7 +271,7 @@ export default class DataTableTemplate {
     }
 
     #appendNoContent(config, tableBody) {
-        this.#appendMessageRow(config, tableBody, 'No se encontraron resultados.');
+        this.#appendMessageRow(config, tableBody, config.labels.noResults);
     }
 
     createErrorContent(config) {
@@ -269,7 +282,7 @@ export default class DataTableTemplate {
         table.className = 'table';
         const tbody = document.createElement('tbody');
 
-        this.#appendMessageRow(config, tbody, 'Ocurrió un error al cargar los datos.');
+        this.#appendMessageRow(config, tbody, config.labels.error);
 
         table.appendChild(tbody);
         wrapper.appendChild(table);
