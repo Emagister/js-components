@@ -33,9 +33,9 @@ Solo tienes que añadir el atributo `data-component` a tus elementos HTML. La li
 
 ```html
 <!-- Ejemplo de Tabla con carga perezosa -->
-<div data-component="data-table" 
-     data-url="/api/data" 
-     data-columns='[{"key":"id", "label":"ID"}, {"key":"name", "label":"Nombre", "sortable":true}]'
+<div data-component="data-table"
+     data-url="/api/data"
+     data-columns='[{"key":"id", "label":"ID", "width":"80px"}, {"key":"name", "label":"Nombre", "sortable":true}]'
      data-settings='{ "perPage": 10, "sortBy": "name", "sortOrder": "desc" }'>
 </div>
 
@@ -75,6 +75,7 @@ Propiedades de `data-columns` (array de objetos):
 - `headerClass` (String): Clases CSS aplicadas al `<th>` de esta columna.
 - `link` (String): Clave del campo que contiene la URL para enlazar el valor.
 - `badge` (String): Clave del campo que determina el nivel del badge Bootstrap.
+- `width` (String): Ancho de la columna (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Si al menos una columna define `width`, se genera un `<colgroup>` para controlar los anchos.
 
 Propiedades de `data-actions` (array de objetos), renderizadas como iconos con tooltip:
 - `name` (String): Identificador de la acción, disponible en el evento `datatable:action`.

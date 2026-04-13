@@ -296,6 +296,78 @@ describe('DataTableTemplate', () => {
         });
     });
 
+    describe('ancho de columnas (width)', () => {
+        it('no renderiza colgroup si ninguna columna tiene width definido', () => {
+            const content = template.createContent(baseState, baseConfig);
+            expect(content.querySelector('colgroup')).toBeNull();
+        });
+
+        it('renderiza colgroup cuando al menos una columna tiene width definido', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                    { key: 'age', label: 'Edad' },
+                ],
+            };
+            const content = template.createContent(baseState, config);
+            expect(content.querySelector('colgroup')).not.toBeNull();
+        });
+
+        it('aplica el ancho correcto al col de la columna con width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                    { key: 'age', label: 'Edad' },
+                ],
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            expect(cols[0].style.width).toBe('200px');
+        });
+
+        it('el col sin width no tiene style width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                    { key: 'age', label: 'Edad' },
+                ],
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            expect(cols[1].style.width).toBe('');
+        });
+
+        it('incluye col para la columna de acciones cuando hay actions', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                    { key: 'age', label: 'Edad' },
+                ],
+                actions: [{ name: 'edit', label: 'Editar' }],
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            expect(cols).toHaveLength(3); // 2 columnas + 1 acciones
+        });
+
+        it('soporta width como porcentaje', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '40%' },
+                    { key: 'age', label: 'Edad' },
+                ],
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            expect(cols[0].style.width).toBe('40%');
+        });
+    });
+
     describe('createErrorContent()', () => {
         it('devuelve un elemento con la clase table-responsive', () => {
             const content = template.createErrorContent(baseConfig);

@@ -24,6 +24,10 @@ export default class DataTableTemplate {
         this.#appendHeader(state, config, headerRow);
         this.#appendBody(state, config, tbody);
 
+        const colgroup = this.#createColgroup(config);
+        if (colgroup) {
+            table.appendChild(colgroup);
+        }
         table.appendChild(thead);
         table.appendChild(tbody);
         wrapper.appendChild(table);
@@ -37,6 +41,26 @@ export default class DataTableTemplate {
         container.appendChild(paginationContainer);
 
         return container;
+    }
+
+    #createColgroup(config) {
+        const hasWidth = config.columns.some(col => col.width);
+        if (!hasWidth) return null;
+
+        const colgroup = document.createElement('colgroup');
+        for (const col of config.columns) {
+            const colEl = document.createElement('col');
+            if (col.width) {
+                colEl.style.width = col.width;
+            }
+            colgroup.appendChild(colEl);
+        }
+
+        if (config.actions && config.actions.length > 0) {
+            colgroup.appendChild(document.createElement('col'));
+        }
+
+        return colgroup;
     }
 
     #appendHeader(state, config, headerRow) {
