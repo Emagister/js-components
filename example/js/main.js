@@ -2,6 +2,9 @@
 const originalFetch = window.fetch;
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
+// In-memory store of deleted IDs for the demo
+const deletedIds = new Set();
+
 window.fetch = async (url, options) => {
     const urlObj = new URL(url, window.location.origin);
 
@@ -14,18 +17,34 @@ window.fetch = async (url, options) => {
         const response = await originalFetch(urlObj.pathname, options);
         const fullData = await response.json();
 
+        // Filter out records deleted during this session
+        const remaining = fullData.data.filter(item => !deletedIds.has(String(item.id)));
+
         const start = (page - 1) * limit;
         const end = start + limit;
-        const paginatedItems = fullData.data.slice(start, end);
+        const paginatedItems = remaining.slice(start, end);
 
         return new Response(JSON.stringify({
             data: paginatedItems,
             meta: {
-                total: fullData.data.length,
+                total: remaining.length,
                 page: page,
                 perPage: limit
             }
         }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
+    // Simulation for DataTable Bulk Delete
+    if (urlObj.pathname.includes('bulkDelete')) {
+        await delay(600);
+        const body = JSON.parse(options?.body || '{}');
+        const ids = body.ids || [];
+        ids.forEach(id => deletedIds.add(String(id)));
+
+        return new Response(JSON.stringify({ deleted: ids.length }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
@@ -54,6 +73,18 @@ import '../scss/styles.scss';
 // Initialize the library automatically with Dynamic Loading
 const app = new ComponentManager();
 app.start();
+
+// DataTable bulk delete events (registered at module level — DOMContentLoaded is not reliable for module scripts)
+document.addEventListener('emg-jsc:datatable:bulk-delete:success', (e) => {
+    window.dispatchEvent(new CustomEvent('toast:show', {
+        detail: { message: `${e.detail.count} registro(s) eliminado(s) correctamente`, type: MessageToastType.SUCCESS, duration: 3000 }
+    }));
+});
+document.addEventListener('emg-jsc:datatable:bulk-delete:error', () => {
+    window.dispatchEvent(new CustomEvent('toast:show', {
+        detail: { message: 'Error al eliminar los registros seleccionados', type: MessageToastType.ERROR, duration: 3000 }
+    }));
+});
 
 // Custom logic for the example page
 document.addEventListener('DOMContentLoaded', () => {
@@ -92,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('¡La librería funciona correctamente. Error!', MessageToastType.ERROR);
     });
 
-    // Tooltips are handled automatically by the ComponentManager class 
+    // Tooltips are handled automatically by the ComponentManager class
     // because we added data-component="tooltip" in the HTML.
 
     // Loader

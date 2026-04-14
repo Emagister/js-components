@@ -67,6 +67,7 @@ Opciones en `data-settings`:
 - `hover` (Boolean, default: true): Activa/desactiva el efecto hover en filas.
 - `headerClass` (String): Clases CSS aplicadas al `<tr>` del encabezado.
 - `scrollOffset` (Number, default: 0): Desplazamiento en píxeles al hacer scroll al paginar. Útil para compensar navbars fijos.
+- `bulkDeleteUrl` (String, default: `null`): URL del endpoint para la eliminación masiva de registros. **Si no se indica, la funcionalidad queda completamente desactivada** (no aparecen checkboxes ni el botón de eliminar). Cuando está activo, se añade una columna de checkboxes al inicio de la tabla y un botón "Eliminar seleccionados" al pie. Al pulsar el botón, se envía `POST` a esta URL con `{ ids: ["1", "2", ...] }` como cuerpo JSON. Tras la respuesta exitosa, la tabla se refresca automáticamente.
 - `labels` (Object): Textos del componente. Permite traducir o personalizar todos los literales:
   - `total` (String, default: `'Mostrando {from} - {to} de {total} resultados'`): Contador de resultados mostrado sobre la paginación. Soporta los placeholders `{from}`, `{to}` y `{total}`, que se sustituyen automáticamente con el rango de la página actual y el total de registros.
   - `noResults` (String, default: `'No se encontraron resultados.'`): Mensaje cuando la respuesta devuelve datos vacíos.
@@ -74,8 +75,23 @@ Opciones en `data-settings`:
   - `previous` (String, default: `'Anterior'`): Texto del botón anterior de la paginación.
   - `next` (String, default: `'Siguiente'`): Texto del botón siguiente de la paginación.
   - `actions` (String, default: `'Acciones'`): Texto del encabezado de la columna de acciones.
+  - `bulkDelete` (String, default: `'Eliminar seleccionados'`): Texto del botón de eliminación masiva. El número de elementos seleccionados se añade automáticamente entre paréntesis.
 
-Ejemplo de personalización en inglés:
+Ejemplo con eliminación masiva activada:
+```html
+<div data-component="data-table"
+     data-url="/api/users"
+     data-columns='[{"key":"name","label":"Nombre"},{"key":"email","label":"Email"}]'
+     data-settings='{ "bulkDeleteUrl": "/api/users/bulk-delete" }'>
+</div>
+```
+
+El servidor recibirá una petición `DELETE /api/users/bulk-delete` con el siguiente cuerpo:
+```json
+{ "ids": ["3", "7", "12"] }
+```
+
+Ejemplo de personalización de labels en inglés:
 ```html
 <div data-component="data-table"
      data-url="/api/items"
@@ -87,7 +103,8 @@ Ejemplo de personalización en inglés:
          "error": "Failed to load data.",
          "previous": "Previous",
          "next": "Next",
-         "actions": "Actions"
+         "actions": "Actions",
+         "bulkDelete": "Delete selected"
        }
      }'>
 </div>
@@ -110,7 +127,17 @@ Propiedades de `data-actions` (array de objetos), renderizadas como iconos con t
 
 La API devuelta por el servidor debe tener el formato: `{ data: [...], meta: { page, total, perPage } }`.
 
-El componente emite el evento `datatable:action` en el elemento con `detail: { action, id, row }` al pulsar una acción.
+Eventos emitidos por el componente:
+- `emg-jsc:datatable:action` — al pulsar un botón de acción. `detail: { action, id, row }`.
+- `emg-jsc:datatable:bulk-delete:success` — tras una eliminación masiva exitosa. `detail: { count }` (número de registros eliminados).
+- `emg-jsc:datatable:bulk-delete:error` — si el endpoint de eliminación masiva responde con error. `detail: { error }`.
+
+Ejemplo de escucha de eventos de eliminación masiva:
+```javascript
+document.querySelector('[data-component="data-table"]').addEventListener('emg-jsc:datatable:bulk-delete:success', (e) => {
+    console.log(`${e.detail.count} registros eliminados`);
+});
+```
 
 ### `async-form`
 Convierte un formulario HTML en un formulario asíncrono con validación y feedback.

@@ -423,6 +423,293 @@ describe('DataTable', () => {
         });
     });
 
+    describe('eliminación masiva', () => {
+        beforeEach(() => {
+            element.dataset.bulkDeleteUrl = '/api/bulk-delete';
+            mockFetch(
+                [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }],
+                { page: 1, total: 2, perPage: 10 }
+            );
+        });
+
+        describe('configuración', () => {
+            it('lee bulkDeleteUrl del dataset', () => {
+                const dt = new DataTable(element);
+                expect(dt.config.bulkDeleteUrl).toBe('/api/bulk-delete');
+            });
+
+            it('bulkDeleteUrl es null por defecto', () => {
+                delete element.dataset.bulkDeleteUrl;
+                const dt = new DataTable(element);
+                expect(dt.config.bulkDeleteUrl).toBeNull();
+            });
+
+            it('tiene label bulkDelete "Eliminar seleccionados" por defecto', () => {
+                const dt = new DataTable(element);
+                expect(dt.config.labels.bulkDelete).toBe('Eliminar seleccionados');
+            });
+
+            it('permite personalizar el label bulkDelete desde data-settings', () => {
+                element.dataset.settings = JSON.stringify({ labels: { bulkDelete: 'Delete selected' } });
+                const dt = new DataTable(element);
+                expect(dt.config.labels.bulkDelete).toBe('Delete selected');
+            });
+
+            it('inicializa selectedIds como un Set vacío', () => {
+                const dt = new DataTable(element);
+                expect(dt.state.selectedIds).toBeInstanceOf(Set);
+                expect(dt.state.selectedIds.size).toBe(0);
+            });
+        });
+
+        describe('renderizado de checkboxes', () => {
+            it('muestra checkboxes por fila cuando bulkDeleteUrl está configurado', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+                expect(element.querySelectorAll('[data-select-id]')).toHaveLength(2);
+            });
+
+            it('no muestra checkboxes cuando bulkDeleteUrl no está configurado', async () => {
+                delete element.dataset.bulkDeleteUrl;
+                mockFetch([{ id: 1, name: 'Alice' }], { page: 1, total: 1, perPage: 10 });
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('tbody tr')).not.toBeNull());
+                expect(element.querySelector('[data-select-id]')).toBeNull();
+            });
+
+            it('muestra checkbox de selección global en el encabezado', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-all]')).not.toBeNull());
+            });
+        });
+
+        describe('selección de filas', () => {
+            it('selecciona una fila al hacer click en su checkbox', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                expect(dt.state.selectedIds.has('1')).toBe(true);
+            });
+
+            it('deselecciona una fila al desmarcar su checkbox', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                const checkbox = element.querySelector('[data-select-id="1"]');
+                checkbox.click();
+                checkbox.click();
+                expect(dt.state.selectedIds.has('1')).toBe(false);
+            });
+
+            it('selecciona todas las filas al hacer click en el checkbox global', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-all]')).not.toBeNull());
+
+                element.querySelector('[data-select-all]').click();
+                expect(dt.state.selectedIds.size).toBe(2);
+            });
+
+            it('deselecciona todas las filas al desmarcar el checkbox global', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-all]')).not.toBeNull());
+
+                const selectAll = element.querySelector('[data-select-all]');
+                selectAll.click();
+                selectAll.click();
+                expect(dt.state.selectedIds.size).toBe(0);
+            });
+        });
+
+        describe('barra de acciones masivas', () => {
+            it('la barra de acciones masivas está oculta inicialmente', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('.datatable-bulk-actions')).not.toBeNull());
+                expect(element.querySelector('.datatable-bulk-actions').classList.contains('d-none')).toBe(true);
+            });
+
+            it('muestra la barra al seleccionar una fila', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                expect(element.querySelector('.datatable-bulk-actions').classList.contains('d-none')).toBe(false);
+            });
+
+            it('oculta la barra al deseleccionar todas las filas', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                const checkbox = element.querySelector('[data-select-id="1"]');
+                checkbox.click();
+                checkbox.click();
+                expect(element.querySelector('.datatable-bulk-actions').classList.contains('d-none')).toBe(true);
+            });
+
+            it('muestra el número de elementos seleccionados en el botón', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                element.querySelector('[data-select-id="2"]').click();
+                const btn = element.querySelector('[data-bulk-delete]');
+                expect(btn.textContent).toContain('2');
+            });
+        });
+
+        describe('handleBulkDelete()', () => {
+            it('envía POST a bulkDeleteUrl con los ids seleccionados', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                element.querySelector('[data-bulk-delete]').click();
+
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
+                const [url, options] = fetch.mock.calls[0];
+                expect(url).toBe('/api/bulk-delete');
+                expect(options.method).toBe('DELETE');
+                expect(JSON.parse(options.body)).toEqual({ ids: ['1'] });
+            });
+
+            it('limpia la selección tras eliminar correctamente', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                element.querySelector('[data-bulk-delete]').click();
+                await vi.waitFor(() => expect(dt.state.selectedIds.size).toBe(0));
+            });
+
+            it('emite emg-jsc:datatable:bulk-delete:success tras eliminar', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-delete:success', handler);
+
+                element.querySelector('[data-bulk-delete]').click();
+                await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
+                expect(handler.mock.calls[0][0].detail.count).toBe(1);
+            });
+
+            it('emite emg-jsc:datatable:bulk-delete:error si el servidor responde con error', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn().mockResolvedValue({ ok: false });
+                vi.spyOn(console, 'error').mockImplementation(() => {});
+
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-delete:error', handler);
+
+                element.querySelector('[data-bulk-delete]').click();
+                await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
+            });
+
+            it('refresca los datos tras eliminar correctamente', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                let callCount = 0;
+                global.fetch = vi.fn().mockImplementation((url) => {
+                    callCount++;
+                    const body = url === '/api/bulk-delete'
+                        ? {}
+                        : { data: [], meta: { page: 1, total: 0, perPage: 10 } };
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve(body) });
+                });
+
+                element.querySelector('[data-bulk-delete]').click();
+                await vi.waitFor(() => expect(callCount).toBe(2));
+            });
+
+            it('muestra el loader mientras se procesa el borrado masivo', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                let loaderVisibleDuringRequest = false;
+                global.fetch = vi.fn().mockImplementation((url) => {
+                    if (url === '/api/bulk-delete') {
+                        loaderVisibleDuringRequest = element.querySelector('.loader-overlay').classList.contains('is-visible');
+                    }
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve(
+                        url === '/api/bulk-delete' ? {} : { data: [], meta: { page: 1, total: 0, perPage: 10 } }
+                    )});
+                });
+
+                element.querySelector('[data-bulk-delete]').click();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/bulk-delete', expect.anything()));
+                expect(loaderVisibleDuringRequest).toBe(true);
+            });
+
+            it('oculta el loader si el borrado masivo falla', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn().mockResolvedValue({ ok: false });
+                vi.spyOn(console, 'error').mockImplementation(() => {});
+
+                element.querySelector('[data-bulk-delete]').click();
+                await vi.waitFor(() => expect(
+                    element.querySelector('.loader-overlay').classList.contains('is-visible')
+                ).toBe(false));
+            });
+
+            it('no llama al endpoint si no hay ids seleccionados', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-bulk-delete]')).not.toBeNull());
+
+                global.fetch = vi.fn();
+                element.querySelector('[data-bulk-delete]').click();
+                expect(fetch).not.toHaveBeenCalled();
+            });
+        });
+    });
+
     describe('formulario de filtros', () => {
         let form;
 

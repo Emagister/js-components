@@ -21,6 +21,7 @@ export default class DataTable extends Component {
             hover: settings.hover !== undefined ? settings.hover : true,
             headerClass: settings.headerClass || null,
             scrollOffset: parseInt(settings.scrollOffset, 10) || 0,
+            bulkDeleteUrl: settings.bulkDeleteUrl || this.root.dataset.bulkDeleteUrl || null,
             labels: {
                 total: settings.labels?.total ?? 'Mostrando {from} - {to} de {total} resultados',
                 noResults: settings.labels?.noResults ?? 'No se encontraron resultados.',
@@ -28,6 +29,7 @@ export default class DataTable extends Component {
                 previous: settings.labels?.previous ?? 'Anterior',
                 next: settings.labels?.next ?? 'Siguiente',
                 actions: settings.labels?.actions ?? 'Acciones',
+                bulkDelete: settings.labels?.bulkDelete ?? 'Eliminar seleccionados',
             },
         };
 
@@ -42,7 +44,8 @@ export default class DataTable extends Component {
             filters: {},
             sortBy: this.config.sortBy,
             sortOrder: this.config.sortOrder, // asc, desc
-            isLoading: false
+            isLoading: false,
+            selectedIds: new Set(),
         };
 
         this.handleSort = this.handleSort.bind(this);
@@ -107,6 +110,24 @@ export default class DataTable extends Component {
 
     #bindEvents() {
         this._onRootClick = (e) => {
+            const selectAllCheckbox = e.target.closest('[data-select-all]');
+            if (selectAllCheckbox) {
+                this.#handleSelectAll(selectAllCheckbox.checked);
+                return;
+            }
+
+            const selectCheckbox = e.target.closest('[data-select-id]');
+            if (selectCheckbox) {
+                this.#handleSelectRow(selectCheckbox.dataset.selectId, selectCheckbox.checked);
+                return;
+            }
+
+            const bulkDeleteBtn = e.target.closest('[data-bulk-delete]');
+            if (bulkDeleteBtn) {
+                this.#handleBulkDelete();
+                return;
+            }
+
             const sortHeader = e.target.closest('[data-sort]');
             if (sortHeader) {
                 this.handleSort(sortHeader.dataset.sort);
@@ -134,6 +155,102 @@ export default class DataTable extends Component {
         this.root.addEventListener('emg-jsc:datatable:refresh', this._onRefresh);
         this.root.addEventListener('emg-jsc:datatable:loader:show', this._onLoaderShow);
         this.root.addEventListener('emg-jsc:datatable:loader:hide', this._onLoaderHide);
+    }
+
+    #handleSelectAll(checked) {
+        const newSelected = new Set(this.state.selectedIds);
+        const pageIds = this.state.data.map(row => String(row.id));
+
+        if (checked) {
+            pageIds.forEach(id => newSelected.add(id));
+        } else {
+            pageIds.forEach(id => newSelected.delete(id));
+        }
+
+        this.#setState({ selectedIds: newSelected });
+        this.#updateBulkUI();
+    }
+
+    #handleSelectRow(id, checked) {
+        const newSelected = new Set(this.state.selectedIds);
+
+        if (checked) {
+            newSelected.add(id);
+        } else {
+            newSelected.delete(id);
+        }
+
+        this.#setState({ selectedIds: newSelected });
+        this.#updateBulkUI();
+    }
+
+    #updateBulkUI() {
+        if (!this.config.bulkDeleteUrl) return;
+
+        const count = this.state.selectedIds.size;
+
+        // Update individual checkboxes
+        this.root.querySelectorAll('[data-select-id]').forEach(checkbox => {
+            checkbox.checked = this.state.selectedIds.has(checkbox.dataset.selectId);
+        });
+
+        // Update select-all checkbox
+        const selectAllCheckbox = this.root.querySelector('[data-select-all]');
+        if (selectAllCheckbox) {
+            const totalRows = this.state.data.length;
+            const selectedInPage = this.state.data.filter(row =>
+                this.state.selectedIds.has(String(row.id))
+            ).length;
+            selectAllCheckbox.checked = totalRows > 0 && selectedInPage === totalRows;
+            selectAllCheckbox.indeterminate = selectedInPage > 0 && selectedInPage < totalRows;
+        }
+
+        // Update bulk actions bar
+        const bulkBar = this.root.querySelector('.datatable-bulk-actions');
+        if (bulkBar) {
+            bulkBar.classList.toggle('d-none', count === 0);
+            const btn = bulkBar.querySelector('[data-bulk-delete]');
+            if (btn) {
+                btn.textContent = `${this.config.labels.bulkDelete} (${count})`;
+            }
+        }
+    }
+
+    async #handleBulkDelete() {
+        if (!this.config.bulkDeleteUrl || this.state.selectedIds.size === 0) return;
+
+        const ids = [...this.state.selectedIds];
+
+        this.loader.show();
+        try {
+            const response = await fetch(this.config.bulkDeleteUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: JSON.stringify({ ids }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Bulk delete failed');
+            }
+
+            this.#setState({ selectedIds: new Set() });
+            this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-delete:success', {
+                bubbles: true,
+                detail: { count: ids.length },
+            }));
+            this.#fetchData();
+
+        } catch (error) {
+            this.loader.hide();
+            console.error('DataTable bulk delete error:', error);
+            this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-delete:error', {
+                bubbles: true,
+                detail: { error },
+            }));
+        }
     }
 
     async #fetchData() {
@@ -234,6 +351,7 @@ export default class DataTable extends Component {
     #render() {
         this.contentWrapper.innerHTML = '';
         this.contentWrapper.appendChild(this.templating.createContent(this.state, this.config));
+        this.#updateBulkUI();
         this.root.dispatchEvent(new CustomEvent('emg-jsc:component:scan', { bubbles: true }));
     }
 
@@ -253,4 +371,3 @@ export default class DataTable extends Component {
         this.contentWrapper.innerHTML = '';
     }
 }
-

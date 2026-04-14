@@ -6,6 +6,8 @@ export default class DataTableTemplate {
     }
 
     createContent(state, config) {
+        const selectedIds = state.selectedIds || new Set();
+
         const wrapper = document.createElement('div');
         wrapper.className = 'table-responsive';
 
@@ -38,6 +40,24 @@ export default class DataTableTemplate {
 
         const container = document.createElement('div');
         container.appendChild(wrapper);
+
+        if (config.bulkDeleteUrl) {
+            const bulkBar = document.createElement('div');
+            bulkBar.className = 'datatable-bulk-actions mt-2';
+            if (selectedIds.size === 0) {
+                bulkBar.classList.add('d-none');
+            }
+
+            const bulkBtn = document.createElement('button');
+            bulkBtn.type = 'button';
+            bulkBtn.className = 'btn btn-danger';
+            bulkBtn.setAttribute('data-bulk-delete', '');
+            bulkBtn.textContent = `${config.labels.bulkDelete} (${selectedIds.size})`;
+
+            bulkBar.appendChild(bulkBtn);
+            container.appendChild(bulkBar);
+        }
+
         container.appendChild(paginationContainer);
 
         return container;
@@ -48,6 +68,11 @@ export default class DataTableTemplate {
         if (!hasWidth) return null;
 
         const colgroup = document.createElement('colgroup');
+
+        if (config.bulkDeleteUrl) {
+            colgroup.appendChild(document.createElement('col'));
+        }
+
         for (const col of config.columns) {
             const colEl = document.createElement('col');
             if (col.width) {
@@ -66,6 +91,16 @@ export default class DataTableTemplate {
     #appendHeader(state, config, headerRow) {
         if (config.headerClass) {
             headerRow.className = config.headerClass;
+        }
+
+        if (config.bulkDeleteUrl) {
+            const th = document.createElement('th');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'form-check-input';
+            checkbox.setAttribute('data-select-all', '');
+            th.appendChild(checkbox);
+            headerRow.appendChild(th);
         }
 
         for (const col of config.columns) {
@@ -151,14 +186,27 @@ export default class DataTableTemplate {
             return;
         }
 
+        const selectedIds = state.selectedIds || new Set();
+
         for (const row of state.data) {
             const tr = this.#createTr(row.id);
-            this.#appendContentCells(row, config, tr);
+            this.#appendContentCells(row, config, tr, selectedIds);
             tableBody.appendChild(tr);
         }
     }
 
-    #appendContentCells(row, config, tr) {
+    #appendContentCells(row, config, tr, selectedIds = new Set()) {
+        if (config.bulkDeleteUrl) {
+            const td = document.createElement('td');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'form-check-input';
+            checkbox.setAttribute('data-select-id', String(row.id));
+            checkbox.checked = selectedIds.has(String(row.id));
+            td.appendChild(checkbox);
+            tr.appendChild(td);
+        }
+
         for (const col of config.columns) {
             tr.appendChild(this.#createTd(row, col));
         }
@@ -293,7 +341,11 @@ export default class DataTableTemplate {
         const tr = document.createElement('tr');
         const td = document.createElement('td');
 
-        td.setAttribute('colspan', config.columns.length + (config.actions && config.actions.length ? 1 : 0));
+        const colCount = config.columns.length
+            + (config.actions && config.actions.length ? 1 : 0)
+            + (config.bulkDeleteUrl ? 1 : 0);
+
+        td.setAttribute('colspan', colCount);
         td.className = 'text-center py-4 text-muted';
         td.textContent = message;
 
