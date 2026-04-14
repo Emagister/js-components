@@ -1,6 +1,6 @@
 {
   "name": "@emagister/js-components",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Javascript components library for Emagister projects",
   "type": "module",
   "main": "./dist/js-components.umd.cjs",
