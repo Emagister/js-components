@@ -64,8 +64,9 @@ export default class DataTableTemplate {
     }
 
     #createColgroup(config) {
-        const hasWidth = config.columns.some(col => col.width);
-        if (!hasWidth) return null;
+        const hasColumnWidth = config.columns.some(col => col.width);
+        const hasActionsWidth = config.actionsWidth && config.actions?.length > 0;
+        if (!hasColumnWidth && !hasActionsWidth) return null;
 
         const colgroup = document.createElement('colgroup');
 
@@ -82,7 +83,11 @@ export default class DataTableTemplate {
         }
 
         if (config.actions && config.actions.length > 0) {
-            colgroup.appendChild(document.createElement('col'));
+            const colEl = document.createElement('col');
+            if (config.actionsWidth) {
+                colEl.style.width = config.actionsWidth;
+            }
+            colgroup.appendChild(colEl);
         }
 
         return colgroup;

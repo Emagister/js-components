@@ -722,6 +722,17 @@ describe('DataTable', () => {
             expect(dt.config.pageSizeOptions).toEqual([5, 10, 20]);
         });
 
+        it('tiene actionsWidth "80px" por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.actionsWidth).toBe('80px');
+        });
+
+        it('permite personalizar actionsWidth desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ actionsWidth: '120px' });
+            const dt = new DataTable(element);
+            expect(dt.config.actionsWidth).toBe('120px');
+        });
+
         it('tiene label perPage "Filas por página:" por defecto', () => {
             const dt = new DataTable(element);
             expect(dt.config.labels.perPage).toBe('Filas por página:');

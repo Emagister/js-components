@@ -419,6 +419,49 @@ describe('DataTableTemplate', () => {
             const cols = content.querySelectorAll('colgroup col');
             expect(cols[0].style.width).toBe('40%');
         });
+
+        it('aplica actionsWidth al col de acciones cuando hay actions y columnas con width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                    { key: 'age', label: 'Edad' },
+                ],
+                actions: [{ name: 'edit', label: 'Editar' }],
+                actionsWidth: '120px',
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            // último col = acciones
+            expect(cols[cols.length - 1].style.width).toBe('120px');
+        });
+
+        it('genera colgroup solo con actionsWidth aunque ninguna columna tenga width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre' },
+                    { key: 'age', label: 'Edad' },
+                ],
+                actions: [{ name: 'edit', label: 'Editar' }],
+                actionsWidth: '80px',
+            };
+            const content = template.createContent(baseState, config);
+            expect(content.querySelector('colgroup')).not.toBeNull();
+        });
+
+        it('el col de acciones sin actionsWidth no tiene style width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                ],
+                actions: [{ name: 'edit', label: 'Editar' }],
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            expect(cols[cols.length - 1].style.width).toBe('');
+        });
     });
 
     describe('labels personalizados', () => {

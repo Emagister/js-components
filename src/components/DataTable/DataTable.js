@@ -23,6 +23,7 @@ export default class DataTable extends Component {
             scrollOffset: parseInt(settings.scrollOffset, 10) || 0,
             bulkDeleteUrl: settings.bulkDeleteUrl || this.root.dataset.bulkDeleteUrl || null,
             pageSizeOptions: settings.pageSizeOptions || [10, 25, 50, 100],
+            actionsWidth: settings.actionsWidth ?? '80px',
             labels: {
                 total: settings.labels?.total ?? 'Mostrando {from} - {to} de {total} resultados',
                 noResults: settings.labels?.noResults ?? 'No se encontraron resultados.',
