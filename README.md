@@ -60,7 +60,9 @@ Atributos HTML:
 
 Opciones en `data-settings`:
 - `perPage` (Number, default: 10): Filas por página.
-- `filterFormId` (String): ID del formulario para filtrar la tabla.
+- `filterForm` (Object): Configuración del formulario de filtros:
+  - `id` (String): ID del formulario que filtra la tabla. Al hacer submit se recogen los valores del formulario y se aplican como filtros a la petición.
+  - `resetButtonId` (String, opcional): ID del botón que limpia los filtros. Al hacer click resetea el formulario y elimina todos los filtros activos, volviendo a la primera página.
 - `sortBy` (String): Columna por la que ordenar inicialmente.
 - `sortOrder` (String: `'asc'`|`'desc'`): Dirección del orden inicial.
 - `striped` (Boolean, default: false): Activa/desactiva el estilo de filas alternas.
@@ -76,6 +78,21 @@ Opciones en `data-settings`:
   - `next` (String, default: `'Siguiente'`): Texto del botón siguiente de la paginación.
   - `actions` (String, default: `'Acciones'`): Texto del encabezado de la columna de acciones.
   - `bulkDelete` (String, default: `'Eliminar seleccionados'`): Texto del botón de eliminación masiva. El número de elementos seleccionados se añade automáticamente entre paréntesis.
+
+Ejemplo con formulario de filtros y botón de reset:
+```html
+<form id="my-filters">
+  <input type="text" name="q" placeholder="Buscar...">
+  <button type="submit">Filtrar</button>
+  <button type="button" id="my-filters-reset">Limpiar</button>
+</form>
+
+<div data-component="data-table"
+     data-url="/api/users"
+     data-columns='[{"key":"name","label":"Nombre"}]'
+     data-settings='{ "filterForm": { "id": "my-filters", "resetButtonId": "my-filters-reset" } }'>
+</div>
+```
 
 Ejemplo con eliminación masiva activada:
 ```html

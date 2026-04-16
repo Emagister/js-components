@@ -28,13 +28,23 @@
                         <h5 class="mb-0">DataTable Component</h5>
                     </div>
                     <div class="card-body">
+                        <!-- Filter Form -->
+                        <form id="datatable-filter-form" class="row g-2 mb-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control form-control-sm" name="q" placeholder="Buscar por nombre...">
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="datatable-filter-reset">Limpiar</button>
+                            </div>
+                        </form>
                         <!-- DataTable Example -->
                         <div data-component="data-table" id="example-datatable" class="data-table-container"
                             data-url="http://localhost:5173/example/datatableData.json"
                             data-bulk-delete-url="http://localhost:5173/example/bulkDelete"
                             data-columns='[{"key":"id", "label":"ID", "width": "5%"}, {"key":"name", "label":"Nombre", "sortable":true}, {"key":"email", "label":"Email", "width": "30%"}, {"key":"phone", "label":"Teléfono"}, {"key":"status", "label":"Estado", "badge": "statusLevel"}]'
                             data-actions='[{"name": "delete", "states": [{"key": "deleteUrl", "label": "Eliminar", "icon": "bi-trash"}]} ]'
-                            data-settings='{ "perPage": 3, "striped": false }'>
+                            data-settings='{ "perPage": 3, "striped": false, "filterForm": { "id": "datatable-filter-form", "resetButtonId": "datatable-filter-reset" } }'>
                             <!-- Library will inject content here -->
                         </div>
                     </div>
