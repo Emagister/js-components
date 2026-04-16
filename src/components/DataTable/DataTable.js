@@ -100,9 +100,10 @@ export default class DataTable extends Component {
         if (this.config.filterResetButtonId) {
             const resetButton = document.getElementById(this.config.filterResetButtonId);
             if (resetButton) {
-                this._onResetClick = () => {
+                this._onResetClick = (e) => {
+                    e.preventDefault();
                     form.reset();
-                    this.setFilters({});
+                    this.setFilters(this.#getFormData(form));
                 };
                 resetButton.addEventListener('click', this._onResetClick);
                 this._resetButton = resetButton;

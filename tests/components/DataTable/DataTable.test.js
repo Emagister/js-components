@@ -803,7 +803,7 @@ describe('DataTable', () => {
                 resetButton.remove();
             });
 
-            it('llama a setFilters con {} al hacer click en el botón de reset', async () => {
+            it('llama a setFilters con los valores del formulario tras el reset', async () => {
                 const dt = new DataTable(element);
                 const setFiltersSpy = vi.spyOn(dt, 'setFilters');
                 dt.init();
@@ -811,7 +811,19 @@ describe('DataTable', () => {
                 dt.state.isLoading = false;
 
                 resetButton.click();
-                expect(setFiltersSpy).toHaveBeenCalledWith({});
+                // Tras form.reset() los campos sin valor por defecto quedan vacíos
+                expect(setFiltersSpy).toHaveBeenCalledWith({ q: '' });
+            });
+
+            it('llama a preventDefault en el evento click del botón de reset', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+
+                const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+                const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
+                resetButton.dispatchEvent(clickEvent);
+                expect(preventDefaultSpy).toHaveBeenCalled();
             });
 
             it('resetea el formulario al hacer click en el botón de reset', async () => {

@@ -60,9 +60,10 @@ Atributos HTML:
 
 Opciones en `data-settings`:
 - `perPage` (Number, default: 10): Filas por página.
-- `filterForm` (Object): Configuración del formulario de filtros:
+- `filterForm` (Object): Configuración recomendada del formulario de filtros:
   - `id` (String): ID del formulario que filtra la tabla. Al hacer submit se recogen los valores del formulario y se aplican como filtros a la petición.
   - `resetButtonId` (String, opcional): ID del botón que limpia los filtros. Al hacer click resetea el formulario y elimina todos los filtros activos, volviendo a la primera página.
+  - **Retrocompatibilidad:** `filterFormId` en `data-settings` y el atributo HTML `data-filterForm` siguen siendo equivalentes a `filterForm.id`. Se recomienda migrar a la nueva sintaxis `filterForm`; las opciones antiguas se mantienen solo por compatibilidad.
 - `sortBy` (String): Columna por la que ordenar inicialmente.
 - `sortOrder` (String: `'asc'`|`'desc'`): Dirección del orden inicial.
 - `striped` (Boolean, default: false): Activa/desactiva el estilo de filas alternas.
