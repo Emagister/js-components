@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.4.0](https://github.com/Emagister/js-components/compare/v1.3.0...v1.4.0) (2026-04-16)
+
+
+### Features
+
+* **data-table:** add actionsWidth setting to control actions column width ([ecdef12](https://github.com/Emagister/js-components/commit/ecdef12b5184dac7507e8186b652af09c9af2ada))
+* **data-table:** add filterForm object config with resetButtonId support ([3f53b8a](https://github.com/Emagister/js-components/commit/3f53b8aba19bb66e3d674794087c7822da867c10))
+* **data-table:** add page size selector with i18n and layout redesign ([84c7532](https://github.com/Emagister/js-components/commit/84c7532245bc81976f7eb05ac60b46d82816e263))
+
+
+### Bug Fixes
+
+* **data-table:** address PR review comments on filterForm reset button ([ed97322](https://github.com/Emagister/js-components/commit/ed97322dada6ae02516140c5a9b55364e3cccc1a))
+* **data-table:** scroll to table top when changing page size ([fb3b29a](https://github.com/Emagister/js-components/commit/fb3b29a8c5c062740663ea5dd90e00016662dce4))
+* **data-table:** validate perPage input and fix label accessibility ([cd378c3](https://github.com/Emagister/js-components/commit/cd378c3d26516920eb31bf8ec45efc6c2df1e1e6))
+* **lint:** add MouseEvent to eslint globals for test environment ([4d0cff3](https://github.com/Emagister/js-components/commit/4d0cff35fedf904104427c77afc6c9bd624ee563))
+
+
+
+
 ## [1.3.0](https://github.com/Emagister/js-components/compare/v1.2.0...v1.3.0) (2026-04-14)
 
 
