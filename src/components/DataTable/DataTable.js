@@ -354,6 +354,8 @@ export default class DataTable extends Component {
         this.#setState({
             meta: { ...this.state.meta, perPage: perPage, page: 1 }
         });
+        const top = this.root.getBoundingClientRect().top + window.scrollY - this.config.scrollOffset;
+        window.scrollTo({ top, behavior: 'smooth' });
         this.#fetchData();
     }
 

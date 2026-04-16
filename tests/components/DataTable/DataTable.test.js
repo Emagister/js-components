@@ -780,6 +780,19 @@ describe('DataTable', () => {
             await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
         });
 
+        it('llama a window.scrollTo al cambiar perPage', async () => {
+            mockFetch([], { page: 1, total: 50, perPage: 10 });
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-per-page]')).not.toBeNull());
+            dt.state.isLoading = false;
+
+            const select = element.querySelector('[data-per-page]');
+            select.value = '25';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            expect(window.scrollTo).toHaveBeenCalled();
+        });
+
         it('incluye el nuevo perPage en los query params del fetch', async () => {
             mockFetch([], { page: 1, total: 50, perPage: 10 });
             const dt = new DataTable(element);
