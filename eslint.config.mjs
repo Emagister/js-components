@@ -32,6 +32,7 @@ export default [
       globals: {
         Event: 'readonly',
         CustomEvent: 'readonly',
+        MouseEvent: 'readonly',
         global: 'writable',
       },
     },

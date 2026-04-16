@@ -14,7 +14,8 @@ export default class DataTable extends Component {
             columns: JSON.parse(this.root.dataset.columns || '[]'),
             actions: JSON.parse(this.root.dataset.actions || '[]'),
             perPage: parseInt(settings.perPage || this.root.dataset.perPage || '10'),
-            filterFormId: settings.filterFormId || this.root.dataset.filterForm,
+            filterFormId: settings.filterForm?.id || settings.filterFormId || this.root.dataset.filterForm,
+            filterResetButtonId: settings.filterForm?.resetButtonId || null,
             sortBy: settings.sortBy || this.root.dataset.sortBy || null,
             sortOrder: settings.sortOrder || this.root.dataset.sortOrder || 'asc',
             striped: settings.striped !== undefined ? settings.striped : false,
@@ -98,6 +99,21 @@ export default class DataTable extends Component {
             e.preventDefault();
             this.setFilters(this.#getFormData(form));
         });
+
+        if (this.config.filterResetButtonId) {
+            const resetButton = document.getElementById(this.config.filterResetButtonId);
+            if (resetButton) {
+                this._onResetClick = (e) => {
+                    e.preventDefault();
+                    form.reset();
+                    this.setFilters(this.#getFormData(form));
+                };
+                resetButton.addEventListener('click', this._onResetClick);
+                this._resetButton = resetButton;
+            } else {
+                console.warn(`DataTable: Reset button with id "${this.config.filterResetButtonId}" not found.`);
+            }
+        }
     }
 
     #getFormData(form) {
@@ -399,6 +415,9 @@ export default class DataTable extends Component {
         this.root.removeEventListener('emg-jsc:datatable:refresh', this._onRefresh);
         this.root.removeEventListener('emg-jsc:datatable:loader:show', this._onLoaderShow);
         this.root.removeEventListener('emg-jsc:datatable:loader:hide', this._onLoaderHide);
+        if (this._resetButton && this._onResetClick) {
+            this._resetButton.removeEventListener('click', this._onResetClick);
+        }
         this.loader?.destroy?.();
         this.contentWrapper.innerHTML = '';
     }

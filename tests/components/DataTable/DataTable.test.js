@@ -868,5 +868,102 @@ describe('DataTable', () => {
             dt.init();
             expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('nonexistent-form'));
         });
+
+        describe('nueva sintaxis filterForm como objeto', () => {
+            it('lee filterForm.id desde data-settings', () => {
+                delete element.dataset.filterForm;
+                element.dataset.settings = JSON.stringify({ filterForm: { id: 'filter-form' } });
+                const dt = new DataTable(element);
+                expect(dt.config.filterFormId).toBe('filter-form');
+            });
+
+            it('lee filterForm.resetButtonId desde data-settings', () => {
+                element.dataset.settings = JSON.stringify({ filterForm: { id: 'filter-form', resetButtonId: 'reset-btn' } });
+                const dt = new DataTable(element);
+                expect(dt.config.filterResetButtonId).toBe('reset-btn');
+            });
+
+            it('filterResetButtonId es null si no se especifica', () => {
+                const dt = new DataTable(element);
+                expect(dt.config.filterResetButtonId).toBeNull();
+            });
+
+            it('retrocompatibilidad: filterFormId en data-settings sigue funcionando', () => {
+                delete element.dataset.filterForm;
+                element.dataset.settings = JSON.stringify({ filterFormId: 'filter-form' });
+                const dt = new DataTable(element);
+                expect(dt.config.filterFormId).toBe('filter-form');
+            });
+        });
+
+        describe('botón de reset del formulario', () => {
+            let resetButton;
+
+            beforeEach(() => {
+                resetButton = document.createElement('button');
+                resetButton.id = 'reset-btn';
+                resetButton.type = 'button';
+                document.body.appendChild(resetButton);
+                delete element.dataset.filterForm;
+                element.dataset.settings = JSON.stringify({ filterForm: { id: 'filter-form', resetButtonId: 'reset-btn' } });
+            });
+
+            afterEach(() => {
+                resetButton.remove();
+            });
+
+            it('llama a setFilters con los valores del formulario tras el reset', async () => {
+                const dt = new DataTable(element);
+                const setFiltersSpy = vi.spyOn(dt, 'setFilters');
+                dt.init();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+                dt.state.isLoading = false;
+
+                resetButton.click();
+                // Tras form.reset() los campos sin valor por defecto quedan vacíos
+                expect(setFiltersSpy).toHaveBeenCalledWith({ q: '' });
+            });
+
+            it('llama a preventDefault en el evento click del botón de reset', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+
+                const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+                const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault');
+                resetButton.dispatchEvent(clickEvent);
+                expect(preventDefaultSpy).toHaveBeenCalled();
+            });
+
+            it('resetea el formulario al hacer click en el botón de reset', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+
+                const resetSpy = vi.spyOn(form, 'reset');
+                resetButton.click();
+                expect(resetSpy).toHaveBeenCalled();
+            });
+
+            it('vuelve a la página 1 al hacer reset', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+                dt.state.isLoading = false;
+                dt.state.meta.page = 3;
+
+                resetButton.click();
+                expect(dt.state.meta.page).toBe(1);
+            });
+
+            it('emite aviso si el botón de reset no existe en el DOM', async () => {
+                resetButton.remove();
+                vi.spyOn(console, 'warn').mockImplementation(() => {});
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+                expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('reset-btn'));
+            });
+        });
     });
 });
