@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/Emagister/js-components/compare/v1.2.0...v1.3.0) (2026-04-14)
+
+
+### Features
+
+* **data-table:** add column width support via colgroup ([00f98c2](https://github.com/Emagister/js-components/commit/00f98c224f59525334945a796c5a9d5e429e1d06))
+* **data-table:** add optional bulk delete functionality ([3d20594](https://github.com/Emagister/js-components/commit/3d205948cfda8d9067243b1866b33c49b59fca72))
+* **data-table:** add results counter and i18n labels support ([9014642](https://github.com/Emagister/js-components/commit/9014642f79f99a5799db05a00a8e4a96a5282772))
+
+
+
+
 ## [1.2.0](https://github.com/Emagister/js-components/compare/v1.1.1...v1.2.0) (2026-04-02)
 
 
