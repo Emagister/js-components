@@ -710,6 +710,115 @@ describe('DataTable', () => {
         });
     });
 
+    describe('selector de elementos por página', () => {
+        it('tiene pageSizeOptions [10, 25, 50, 100] por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.pageSizeOptions).toEqual([10, 25, 50, 100]);
+        });
+
+        it('permite personalizar pageSizeOptions desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ pageSizeOptions: [5, 10, 20] });
+            const dt = new DataTable(element);
+            expect(dt.config.pageSizeOptions).toEqual([5, 10, 20]);
+        });
+
+        it('tiene actionsWidth "80px" por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.actionsWidth).toBe('80px');
+        });
+
+        it('permite personalizar actionsWidth desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ actionsWidth: '120px' });
+            const dt = new DataTable(element);
+            expect(dt.config.actionsWidth).toBe('120px');
+        });
+
+        it('tiene label perPage "Filas por página:" por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.labels.perPage).toBe('Filas por página:');
+        });
+
+        it('permite personalizar el label perPage desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ labels: { perPage: 'Rows per page:' } });
+            const dt = new DataTable(element);
+            expect(dt.config.labels.perPage).toBe('Rows per page:');
+        });
+
+        it('renderiza un select con data-per-page tras init', async () => {
+            mockFetch([], { page: 1, total: 0, perPage: 10 });
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-per-page]')).not.toBeNull());
+        });
+
+        it('cambia perPage en el estado al seleccionar una opción', async () => {
+            mockFetch([], { page: 1, total: 50, perPage: 10 });
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-per-page]')).not.toBeNull());
+            dt.state.isLoading = false;
+
+            const select = element.querySelector('[data-per-page]');
+            select.value = '25';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            expect(dt.state.meta.perPage).toBe(25);
+        });
+
+        it('resetea la página a 1 al cambiar perPage', async () => {
+            mockFetch([], { page: 1, total: 50, perPage: 10 });
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(dt.state.isLoading).toBe(false));
+            dt.state.meta.page = 3;
+            dt.state.isLoading = false;
+
+            const select = element.querySelector('[data-per-page]');
+            select.value = '25';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            expect(dt.state.meta.page).toBe(1);
+        });
+
+        it('lanza una nueva petición fetch al cambiar perPage', async () => {
+            mockFetch([], { page: 1, total: 50, perPage: 10 });
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-per-page]')).not.toBeNull());
+            dt.state.isLoading = false;
+
+            const select = element.querySelector('[data-per-page]');
+            select.value = '25';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+        });
+
+        it('llama a window.scrollTo al cambiar perPage', async () => {
+            mockFetch([], { page: 1, total: 50, perPage: 10 });
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-per-page]')).not.toBeNull());
+            dt.state.isLoading = false;
+
+            const select = element.querySelector('[data-per-page]');
+            select.value = '25';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            expect(window.scrollTo).toHaveBeenCalled();
+        });
+
+        it('incluye el nuevo perPage en los query params del fetch', async () => {
+            mockFetch([], { page: 1, total: 50, perPage: 10 });
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-per-page]')).not.toBeNull());
+            dt.state.isLoading = false;
+
+            const select = element.querySelector('[data-per-page]');
+            select.value = '50';
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+            expect(fetch.mock.calls[1][0]).toContain('limit=50');
+        });
+    });
+
     describe('formulario de filtros', () => {
         let form;
 

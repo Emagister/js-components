@@ -293,9 +293,10 @@ describe('DataTableTemplate', () => {
             const content = template.createContent(state, baseConfig);
             const paginationContainer = content.querySelector('.mt-3');
             const children = [...paginationContainer.children];
-            const totalIdx = children.findIndex(el => el.classList.contains('datatable-total'));
+            // datatable-total vive dentro del grupo izquierdo (primer hijo directo)
+            const leftGroupIdx = children.findIndex(el => el.querySelector('.datatable-total'));
             const navIdx = children.findIndex(el => el.tagName === 'NAV');
-            expect(totalIdx).toBeLessThan(navIdx);
+            expect(leftGroupIdx).toBeLessThan(navIdx);
         });
     });
 
@@ -417,6 +418,49 @@ describe('DataTableTemplate', () => {
             const content = template.createContent(baseState, config);
             const cols = content.querySelectorAll('colgroup col');
             expect(cols[0].style.width).toBe('40%');
+        });
+
+        it('aplica actionsWidth al col de acciones cuando hay actions y columnas con width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                    { key: 'age', label: 'Edad' },
+                ],
+                actions: [{ name: 'edit', label: 'Editar' }],
+                actionsWidth: '120px',
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            // último col = acciones
+            expect(cols[cols.length - 1].style.width).toBe('120px');
+        });
+
+        it('genera colgroup solo con actionsWidth aunque ninguna columna tenga width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre' },
+                    { key: 'age', label: 'Edad' },
+                ],
+                actions: [{ name: 'edit', label: 'Editar' }],
+                actionsWidth: '80px',
+            };
+            const content = template.createContent(baseState, config);
+            expect(content.querySelector('colgroup')).not.toBeNull();
+        });
+
+        it('el col de acciones sin actionsWidth no tiene style width', () => {
+            const config = {
+                ...baseConfig,
+                columns: [
+                    { key: 'name', label: 'Nombre', width: '200px' },
+                ],
+                actions: [{ name: 'edit', label: 'Editar' }],
+            };
+            const content = template.createContent(baseState, config);
+            const cols = content.querySelectorAll('colgroup col');
+            expect(cols[cols.length - 1].style.width).toBe('');
         });
     });
 
@@ -572,6 +616,68 @@ describe('DataTableTemplate', () => {
             const cols = content.querySelectorAll('colgroup col');
             // 2 columns + 1 checkbox = 3
             expect(cols).toHaveLength(3);
+        });
+    });
+
+    describe('selector de elementos por página', () => {
+        let perPageConfig;
+
+        beforeEach(() => {
+            perPageConfig = {
+                ...baseConfig,
+                pageSizeOptions: [10, 25, 50, 100],
+                labels: {
+                    ...baseConfig.labels,
+                    perPage: 'Filas por página:',
+                },
+            };
+        });
+
+        it('renderiza un select con data-per-page cuando pageSizeOptions tiene valores', () => {
+            const content = template.createContent(baseState, perPageConfig);
+            expect(content.querySelector('[data-per-page]')).not.toBeNull();
+        });
+
+        it('no renderiza el select cuando pageSizeOptions está vacío', () => {
+            const config = { ...perPageConfig, pageSizeOptions: [] };
+            const content = template.createContent(baseState, config);
+            expect(content.querySelector('[data-per-page]')).toBeNull();
+        });
+
+        it('no renderiza el select cuando pageSizeOptions no está definido', () => {
+            const content = template.createContent(baseState, baseConfig);
+            expect(content.querySelector('[data-per-page]')).toBeNull();
+        });
+
+        it('renderiza una opción por cada valor de pageSizeOptions', () => {
+            const content = template.createContent(baseState, perPageConfig);
+            const options = content.querySelectorAll('[data-per-page] option');
+            expect(options).toHaveLength(4);
+        });
+
+        it('los valores de las opciones coinciden con pageSizeOptions', () => {
+            const content = template.createContent(baseState, perPageConfig);
+            const values = [...content.querySelectorAll('[data-per-page] option')].map(o => parseInt(o.value));
+            expect(values).toEqual([10, 25, 50, 100]);
+        });
+
+        it('marca como selected la opción que coincide con meta.perPage', () => {
+            const state = { ...baseState, meta: { ...baseState.meta, perPage: 25 } };
+            const content = template.createContent(state, perPageConfig);
+            const select = content.querySelector('[data-per-page]');
+            expect(parseInt(select.value)).toBe(25);
+        });
+
+        it('usa config.labels.perPage como texto del label', () => {
+            const content = template.createContent(baseState, perPageConfig);
+            const perPageWrapper = content.querySelector('[data-per-page]').closest('div');
+            expect(perPageWrapper.textContent).toContain('Filas por página:');
+        });
+
+        it('el selector de página aparece dentro del contenedor de paginación', () => {
+            const content = template.createContent(baseState, perPageConfig);
+            const paginationContainer = content.querySelector('.mt-3');
+            expect(paginationContainer.querySelector('[data-per-page]')).not.toBeNull();
         });
     });
 

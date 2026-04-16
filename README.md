@@ -71,6 +71,8 @@ Opciones en `data-settings`:
 - `headerClass` (String): Clases CSS aplicadas al `<tr>` del encabezado.
 - `scrollOffset` (Number, default: 0): Desplazamiento en píxeles al hacer scroll al paginar. Útil para compensar navbars fijos.
 - `bulkDeleteUrl` (String, default: `null`): URL del endpoint para la eliminación masiva de registros. **Si no se indica, la funcionalidad queda completamente desactivada** (no aparecen checkboxes ni el botón de eliminar). Cuando está activo, se añade una columna de checkboxes al inicio de la tabla y un botón "Eliminar seleccionados" al pie. Al pulsar el botón, se envía `POST` a esta URL con `{ ids: ["1", "2", ...] }` como cuerpo JSON. Tras la respuesta exitosa, la tabla se refresca automáticamente.
+- `pageSizeOptions` (Array, default: `[10, 25, 50, 100]`): Opciones disponibles en el selector de filas por página. Se renderiza como un `<select>` junto al contador de resultados. El valor activo en cada momento refleja el `perPage` en uso. Al cambiar la selección, la tabla vuelve a la primera página y lanza una nueva petición. Para ocultar el selector, pasa un array vacío: `[]`.
+- `actionsWidth` (String, default: `'80px'`): Ancho fijo de la columna de acciones (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Se genera automáticamente un `<colgroup>` con el ancho indicado para dicha columna, aunque ninguna columna de datos tenga `width`.
 - `labels` (Object): Textos del componente. Permite traducir o personalizar todos los literales:
   - `total` (String, default: `'Mostrando {from} - {to} de {total} resultados'`): Contador de resultados mostrado sobre la paginación. Soporta los placeholders `{from}`, `{to}` y `{total}`, que se sustituyen automáticamente con el rango de la página actual y el total de registros.
   - `noResults` (String, default: `'No se encontraron resultados.'`): Mensaje cuando la respuesta devuelve datos vacíos.
@@ -79,6 +81,7 @@ Opciones en `data-settings`:
   - `next` (String, default: `'Siguiente'`): Texto del botón siguiente de la paginación.
   - `actions` (String, default: `'Acciones'`): Texto del encabezado de la columna de acciones.
   - `bulkDelete` (String, default: `'Eliminar seleccionados'`): Texto del botón de eliminación masiva. El número de elementos seleccionados se añade automáticamente entre paréntesis.
+  - `perPage` (String, default: `'Filas por página:'`): Etiqueta del selector de elementos por página.
 
 Ejemplo con formulario de filtros y botón de reset:
 ```html
@@ -109,12 +112,13 @@ El servidor recibirá una petición `DELETE /api/users/bulk-delete` con el sigui
 { "ids": ["3", "7", "12"] }
 ```
 
-Ejemplo de personalización de labels en inglés:
+Ejemplo de personalización de labels en inglés y selector de página reducido:
 ```html
 <div data-component="data-table"
      data-url="/api/items"
      data-columns='[{"key":"name","label":"Name"}]'
      data-settings='{
+       "pageSizeOptions": [10, 25, 50],
        "labels": {
          "total": "Showing {from} - {to} of {total} results",
          "noResults": "No results found.",
@@ -122,7 +126,8 @@ Ejemplo de personalización de labels en inglés:
          "previous": "Previous",
          "next": "Next",
          "actions": "Actions",
-         "bulkDelete": "Delete selected"
+         "bulkDelete": "Delete selected",
+         "perPage": "Rows per page:"
        }
      }'>
 </div>
