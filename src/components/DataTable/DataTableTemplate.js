@@ -266,12 +266,15 @@ export default class DataTableTemplate {
         if (config.pageSizeOptions && config.pageSizeOptions.length > 0) {
             const wrapper = document.createElement('div');
             wrapper.className = 'd-flex align-items-center gap-2';
+            const selectId = `datatable-per-page-${Math.random().toString(36).slice(2, 11)}`;
 
             const label = document.createElement('label');
             label.className = 'form-label mb-0 small text-muted';
+            label.htmlFor = selectId;
             label.textContent = labels.perPage;
 
             const select = document.createElement('select');
+            select.id = selectId;
             select.className = 'form-select form-select-sm w-auto';
             select.setAttribute('data-per-page', '');
 

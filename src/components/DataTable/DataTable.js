@@ -157,7 +157,11 @@ export default class DataTable extends Component {
         this._onRootChange = (e) => {
             const perPageSelect = e.target.closest('[data-per-page]');
             if (perPageSelect) {
-                this.handlePerPageChange(parseInt(perPageSelect.value));
+                const perPage = Number(perPageSelect.value);
+                if (!Number.isFinite(perPage) || !Number.isInteger(perPage) || perPage <= 0) {
+                    return;
+                }
+                this.handlePerPageChange(perPage);
             }
         };
 
@@ -352,8 +356,15 @@ export default class DataTable extends Component {
     }
 
     handlePerPageChange(perPage) {
+        const normalizedPerPage = Number(perPage);
+        if (!Number.isFinite(normalizedPerPage) || !Number.isInteger(normalizedPerPage) || normalizedPerPage <= 0) {
+            return;
+        }
+        if (normalizedPerPage === this.state.meta.perPage) {
+            return;
+        }
         this.#setState({
-            meta: { ...this.state.meta, perPage: perPage, page: 1 }
+            meta: { ...this.state.meta, perPage: normalizedPerPage, page: 1 }
         });
         const top = this.root.getBoundingClientRect().top + window.scrollY - this.config.scrollOffset;
         window.scrollTo({ top, behavior: 'smooth' });
