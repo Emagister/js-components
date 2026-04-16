@@ -252,22 +252,58 @@ export default class DataTableTemplate {
         const { page, lastPage, total, perPage } = meta;
         const { labels } = config;
 
+        paginationContainer.className = 'mt-3 d-flex align-items-center justify-content-between flex-wrap gap-2';
+
+        // Grupo izquierdo: selector de filas por página + contador de resultados
+        const leftGroup = document.createElement('div');
+        leftGroup.className = 'd-flex align-items-center gap-3';
+
+        if (config.pageSizeOptions && config.pageSizeOptions.length > 0) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex align-items-center gap-2';
+
+            const label = document.createElement('label');
+            label.className = 'form-label mb-0 small text-muted';
+            label.textContent = labels.perPage;
+
+            const select = document.createElement('select');
+            select.className = 'form-select form-select-sm w-auto';
+            select.setAttribute('data-per-page', '');
+
+            for (const size of config.pageSizeOptions) {
+                const option = document.createElement('option');
+                option.value = size;
+                option.textContent = size;
+                if (size === perPage) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            }
+
+            wrapper.appendChild(label);
+            wrapper.appendChild(select);
+            leftGroup.appendChild(wrapper);
+        }
+
         if (total > 0) {
             const from = (page - 1) * perPage + 1;
             const to = Math.min(page * perPage, total);
             const totalEl = document.createElement('p');
-            totalEl.className = 'text-center text-muted small mb-2 datatable-total';
+            totalEl.className = 'text-muted small mb-0 datatable-total';
             totalEl.textContent = labels.total
                 .replace('{from}', from)
                 .replace('{to}', to)
                 .replace('{total}', total);
-            paginationContainer.appendChild(totalEl);
+            leftGroup.appendChild(totalEl);
         }
+
+        paginationContainer.appendChild(leftGroup);
 
         if (lastPage <= 1) {
             return;
         }
 
+        // Paginación a la derecha
         let pages = [];
         for (let i = 1; i <= lastPage; i++) {
             if (i === 1 || i === lastPage || (i >= page - 2 && i <= page + 2)) {
