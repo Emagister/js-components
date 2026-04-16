@@ -22,6 +22,8 @@ export default class DataTable extends Component {
             headerClass: settings.headerClass || null,
             scrollOffset: parseInt(settings.scrollOffset, 10) || 0,
             bulkDeleteUrl: settings.bulkDeleteUrl || this.root.dataset.bulkDeleteUrl || null,
+            pageSizeOptions: settings.pageSizeOptions || [10, 25, 50, 100],
+            actionsWidth: settings.actionsWidth ?? '80px',
             labels: {
                 total: settings.labels?.total ?? 'Mostrando {from} - {to} de {total} resultados',
                 noResults: settings.labels?.noResults ?? 'No se encontraron resultados.',
@@ -30,6 +32,7 @@ export default class DataTable extends Component {
                 next: settings.labels?.next ?? 'Siguiente',
                 actions: settings.labels?.actions ?? 'Acciones',
                 bulkDelete: settings.labels?.bulkDelete ?? 'Eliminar seleccionados',
+                perPage: settings.labels?.perPage ?? 'Filas por página:',
             },
         };
 
@@ -151,7 +154,19 @@ export default class DataTable extends Component {
         this._onLoaderShow = () => this.loader.show();
         this._onLoaderHide = () => this.loader.hide();
 
+        this._onRootChange = (e) => {
+            const perPageSelect = e.target.closest('[data-per-page]');
+            if (perPageSelect) {
+                const perPage = Number(perPageSelect.value);
+                if (!Number.isFinite(perPage) || !Number.isInteger(perPage) || perPage <= 0) {
+                    return;
+                }
+                this.handlePerPageChange(perPage);
+            }
+        };
+
         this.root.addEventListener('click', this._onRootClick);
+        this.root.addEventListener('change', this._onRootChange);
         this.root.addEventListener('emg-jsc:datatable:refresh', this._onRefresh);
         this.root.addEventListener('emg-jsc:datatable:loader:show', this._onLoaderShow);
         this.root.addEventListener('emg-jsc:datatable:loader:hide', this._onLoaderHide);
@@ -340,6 +355,22 @@ export default class DataTable extends Component {
         this.#fetchData();
     }
 
+    handlePerPageChange(perPage) {
+        const normalizedPerPage = Number(perPage);
+        if (!Number.isFinite(normalizedPerPage) || !Number.isInteger(normalizedPerPage) || normalizedPerPage <= 0) {
+            return;
+        }
+        if (normalizedPerPage === this.state.meta.perPage) {
+            return;
+        }
+        this.#setState({
+            meta: { ...this.state.meta, perPage: normalizedPerPage, page: 1 }
+        });
+        const top = this.root.getBoundingClientRect().top + window.scrollY - this.config.scrollOffset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        this.#fetchData();
+    }
+
     handleAction(action, id) {
         const event = new CustomEvent('emg-jsc:datatable:action', {
             bubbles: true,
@@ -364,6 +395,7 @@ export default class DataTable extends Component {
 
     #destroy() {
         this.root.removeEventListener('click', this._onRootClick);
+        this.root.removeEventListener('change', this._onRootChange);
         this.root.removeEventListener('emg-jsc:datatable:refresh', this._onRefresh);
         this.root.removeEventListener('emg-jsc:datatable:loader:show', this._onLoaderShow);
         this.root.removeEventListener('emg-jsc:datatable:loader:hide', this._onLoaderHide);
