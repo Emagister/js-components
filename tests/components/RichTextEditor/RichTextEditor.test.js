@@ -48,11 +48,10 @@ const { mockEditorInstance, mockChain, MockEditor } = vi.hoisted(() => {
 
 vi.mock('@tiptap/core', () => ({ Editor: MockEditor }));
 vi.mock('@tiptap/starter-kit', () => ({ default: { configure: vi.fn(() => ({})) } }));
-vi.mock('@tiptap/extension-link', () => ({ default: { configure: vi.fn(() => ({})) } }));
 vi.mock('../../../src/components/RichTextEditor/_rich-text-editor.scss', () => ({}));
 
 import RichTextEditor from '../../../src/components/RichTextEditor/RichTextEditor.js';
-import Link from '@tiptap/extension-link';
+import StarterKit from '@tiptap/starter-kit';
 
 describe('RichTextEditor', () => {
     let element;
@@ -424,17 +423,17 @@ describe('RichTextEditor', () => {
     });
 
     describe('configuración de la extensión Link (settings.link)', () => {
-        it('llama a Link.configure con openOnClick: false por defecto', () => {
+        it('configura StarterKit con link.openOnClick: false por defecto', () => {
             rte.init();
-            expect(Link.configure).toHaveBeenCalledWith(
-                expect.objectContaining({ openOnClick: false })
+            expect(StarterKit.configure).toHaveBeenCalledWith(
+                expect.objectContaining({ link: expect.objectContaining({ openOnClick: false }) })
             );
         });
 
-        it('pasa HTMLAttributes vacío por defecto', () => {
+        it('configura StarterKit con link.HTMLAttributes vacío por defecto', () => {
             rte.init();
-            expect(Link.configure).toHaveBeenCalledWith(
-                expect.objectContaining({ HTMLAttributes: {} })
+            expect(StarterKit.configure).toHaveBeenCalledWith(
+                expect.objectContaining({ link: expect.objectContaining({ HTMLAttributes: {} }) })
             );
         });
 
@@ -443,21 +442,23 @@ describe('RichTextEditor', () => {
             rte = new RichTextEditor(element);
             rte.init();
 
-            expect(Link.configure).toHaveBeenCalledWith(
-                expect.objectContaining({ openOnClick: true })
+            expect(StarterKit.configure).toHaveBeenCalledWith(
+                expect.objectContaining({ link: expect.objectContaining({ openOnClick: true }) })
             );
         });
 
-        it('pasa htmlAttributes de settings.link como HTMLAttributes a Link.configure', () => {
+        it('pasa htmlAttributes de settings.link como HTMLAttributes a StarterKit link', () => {
             element.dataset.settings = JSON.stringify({
                 link: { htmlAttributes: { target: null, rel: 'noopener noreferrer' } }
             });
             rte = new RichTextEditor(element);
             rte.init();
 
-            expect(Link.configure).toHaveBeenCalledWith(
+            expect(StarterKit.configure).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    HTMLAttributes: { target: null, rel: 'noopener noreferrer' }
+                    link: expect.objectContaining({
+                        HTMLAttributes: { target: null, rel: 'noopener noreferrer' }
+                    })
                 })
             );
         });
@@ -469,8 +470,10 @@ describe('RichTextEditor', () => {
             rte = new RichTextEditor(element);
             rte.init();
 
-            expect(Link.configure).toHaveBeenCalledWith(
-                expect.objectContaining({ openOnClick: false, HTMLAttributes: { target: '_blank' } })
+            expect(StarterKit.configure).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    link: expect.objectContaining({ openOnClick: false, HTMLAttributes: { target: '_blank' } })
+                })
             );
         });
 
@@ -481,8 +484,10 @@ describe('RichTextEditor', () => {
             rte = new RichTextEditor(element);
             rte.init();
 
-            expect(Link.configure).toHaveBeenCalledWith(
-                expect.objectContaining({ openOnClick: true, HTMLAttributes: { rel: 'nofollow' } })
+            expect(StarterKit.configure).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    link: expect.objectContaining({ openOnClick: true, HTMLAttributes: { rel: 'nofollow' } })
+                })
             );
         });
     });

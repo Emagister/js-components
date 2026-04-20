@@ -18,7 +18,7 @@ npm install bootstrap bootstrap-icons
 npm install flatpickr
 
 # Para RichTextEditor
-npm install @tiptap/core @tiptap/starter-kit @tiptap/extension-link
+npm install @tiptap/core @tiptap/starter-kit
 ```
 
 ## Uso Principal: ComponentManager
@@ -253,10 +253,10 @@ if (confirmed) { /* ... */ }
 ### `rich-text-editor`
 Editor de texto enriquecido basado en [TipTap](https://tiptap.dev). Permite editar HTML básico con barra de herramientas de formato.
 
-**Peer dependencies requeridas**: `@tiptap/core ^3.0.0`, `@tiptap/starter-kit ^3.0.0` y `@tiptap/extension-link ^3.0.0`.
+**Peer dependencies requeridas**: `@tiptap/core ^3.0.0` y `@tiptap/starter-kit ^3.0.0` (el mark `Link` está incluido en StarterKit v3).
 
 ```bash
-npm install @tiptap/core @tiptap/starter-kit @tiptap/extension-link
+npm install @tiptap/core @tiptap/starter-kit
 ```
 
 Uso básico en formulario (sincroniza automáticamente el HTML generado al `textarea`):

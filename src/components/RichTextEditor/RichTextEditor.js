@@ -1,7 +1,6 @@
 import Component from "../Component";
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
 import "./_rich-text-editor.scss";
 
 const DEFAULT_LABELS = {
@@ -81,9 +80,11 @@ export default class RichTextEditor extends Component {
 
         this.editor = new Editor({
             element: this.editorEl,
-            extensions: [StarterKit.configure({ link: false }), Link.configure({
-                openOnClick: this.settings.link.openOnClick,
-                HTMLAttributes: this.settings.link.htmlAttributes,
+            extensions: [StarterKit.configure({
+                link: {
+                    openOnClick: this.settings.link.openOnClick,
+                    HTMLAttributes: this.settings.link.htmlAttributes,
+                },
             })],
             content: initialContent,
             onUpdate: ({ editor }) => {
