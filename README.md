@@ -268,8 +268,7 @@ Uso básico en formulario (sincroniza automáticamente el HTML generado al `text
 
 Uso standalone (sin formulario):
 ```html
-<div data-component="rich-text-editor" id="my-editor"
-     data-settings='{"placeholder": "Escribe aquí..."}'>
+<div data-component="rich-text-editor" id="my-editor">
 </div>
 ```
 
