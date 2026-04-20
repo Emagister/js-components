@@ -8,6 +8,7 @@ const ComponentRegistry = {
     'datepicker': () => import('./components/DatePicker/DatePicker'),
     'modal': () => import('./components/Modal/Modal'),
     'confirm': () => import('./components/Confirm/Confirm'),
+    'rich-text-editor': () => import('./components/RichTextEditor/RichTextEditor'),
 };
 
 export default ComponentRegistry;

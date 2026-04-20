@@ -98,8 +98,11 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <label for="form-message" class="form-label">Mensaje</label>
-                                <textarea class="form-control" id="form-message" name="message" rows="3"></textarea>
+                                <label id="form-message-label" class="form-label">Mensaje</label>
+                                <div data-component="rich-text-editor" aria-labelledby="form-message-label"
+                                    data-settings='{"toolbar": ["toggleBold", "toggleItalic", "toggleLink", "undo", "redo"], "link": { "htmlAttributes": { "rel": null } } }'>
+                                    <textarea name="message"></textarea>
+                                </div>
                             </div>
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="form-terms" name="terms">
@@ -223,6 +226,37 @@
                 </div>
                 <button type="button" class="btn-close btn-close me-2 m-auto" data-bs-dismiss="toast"
                     aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RichTextEditor Example -->
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">RichTextEditor Component</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="rte-example-form">
+                            <div class="mb-3">
+                                <label class="form-label">Descripción (editor de texto enriquecido)</label>
+                                <div data-component="rich-text-editor"
+                                    data-settings='{}'>
+                                    <textarea name="description"><p>Escribe aquí tu contenido HTML.</p></textarea>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-secondary" id="rte-get-html-btn">Ver
+                                    HTML</button>
+                                <button type="button" class="btn btn-outline-primary" id="rte-set-html-btn">Insertar
+                                    HTML</button>
+                            </div>
+                            <pre id="rte-html-output" class="mt-3 p-3 bg-light rounded border small d-none"></pre>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -8,6 +8,19 @@ Una librería de componentes reutilizables en Javascript para proyectos de Emagi
 npm install @emagister/js-components
 ```
 
+La librería tiene **peer dependencies** opcionales según los componentes que uses:
+
+```bash
+# Para componentes Bootstrap (Modal, Tooltip, Dropdown, Confirm, MessageToast)
+npm install bootstrap bootstrap-icons
+
+# Para DatePicker
+npm install flatpickr
+
+# Para RichTextEditor
+npm install @tiptap/core @tiptap/starter-kit
+```
+
 ## Uso Principal: ComponentManager
 
 La forma más eficiente de usar la librería es a través de la clase `ComponentManager`. Esta clase gestiona automáticamente la detección de componentes en el HTML e importa dinámicamente solo el código necesario (Lazy Loading).
@@ -235,6 +248,116 @@ Uso desde JS:
 ```javascript
 const confirmed = await window.confirmCustom('¿Eliminar este elemento?', 'Confirmar eliminación');
 if (confirmed) { /* ... */ }
+```
+
+### `rich-text-editor`
+Editor de texto enriquecido basado en [TipTap](https://tiptap.dev). Permite editar HTML básico con barra de herramientas de formato.
+
+**Peer dependencies requeridas**: `@tiptap/core ^3.0.0` y `@tiptap/starter-kit ^3.0.0` (el mark `Link` está incluido en StarterKit v3).
+
+```bash
+npm install @tiptap/core @tiptap/starter-kit
+```
+
+Uso básico en formulario (sincroniza automáticamente el HTML generado al `textarea`):
+```html
+<div data-component="rich-text-editor">
+  <textarea name="body"><p>Contenido inicial</p></textarea>
+</div>
+```
+
+Uso standalone (sin formulario):
+```html
+<div data-component="rich-text-editor" id="my-editor">
+</div>
+```
+
+Opciones en `data-settings`:
+- `toolbar` (Array|null, default: `null`): Lista de acciones visibles en la barra de herramientas. `null` muestra todas. Los separadores se ajustan automáticamente (no aparecen al inicio, al final ni consecutivos).
+
+  Acciones disponibles: `toggleBold`, `toggleItalic`, `toggleStrike`, `toggleHeadingH2`, `toggleHeadingH3`, `toggleBulletList`, `toggleOrderedList`, `toggleBlockquote`, `toggleCodeBlock`, `toggleLink`, `undo`, `redo`.
+
+  > Para `toggleHeading`, usa las claves `toggleHeadingH2` / `toggleHeadingH3` al especificar el toolbar.
+
+  ```html
+  <!-- Solo negrita, cursiva y deshacer/rehacer -->
+  <div data-component="rich-text-editor"
+       data-settings='{"toolbar": ["toggleBold", "toggleItalic", "undo", "redo"]}'>
+    <textarea name="body"></textarea>
+  </div>
+  ```
+
+- `labels` (Object): Permite personalizar los textos de los tooltips de la barra de herramientas. Solo es necesario indicar las claves que se quieren sobreescribir; el resto mantiene los valores por defecto en español.
+
+  Claves disponibles y valores por defecto:
+  | Clave | Valor por defecto |
+  |---|---|
+  | `toggleBold` | `Negrita` |
+  | `toggleItalic` | `Cursiva` |
+  | `toggleStrike` | `Tachado` |
+  | `toggleHeadingH2` | `Título 2` |
+  | `toggleHeadingH3` | `Título 3` |
+  | `toggleBulletList` | `Lista` |
+  | `toggleOrderedList` | `Lista ordenada` |
+  | `toggleBlockquote` | `Cita` |
+  | `toggleCodeBlock` | `Bloque de código` |
+  | `toggleLink` | `Enlace` |
+  | `linkPrompt` | `Introduce la URL:` |
+  | `undo` | `Deshacer` |
+  | `redo` | `Rehacer` |
+
+  ```html
+  <div data-component="rich-text-editor"
+       data-settings='{
+         "labels": {
+           "toggleBold": "Bold",
+           "toggleItalic": "Italic",
+           "undo": "Undo",
+           "redo": "Redo"
+         }
+       }'>
+    <textarea name="body"></textarea>
+  </div>
+  ```
+
+- `link` (Object): Configuración de la extensión de enlaces. Todas las opciones relacionadas con links se agrupan aquí.
+  - `openOnClick` (Boolean, default: `false`): Si es `true`, los enlaces son clicables directamente en el editor.
+  - `htmlAttributes` (Object, default: `{}`): Atributos HTML que TipTap añade a las etiquetas `<a>` generadas por el editor. Se pasa directamente a `Link.configure({ HTMLAttributes: ... })`. Usa `null` para eliminar un atributo que la extensión añade por defecto.
+
+  ```html
+  <!-- Los enlaces abren en la misma pestaña sin rel nofollow -->
+  <div data-component="rich-text-editor"
+       data-settings='{
+         "link": {
+           "openOnClick": false,
+           "htmlAttributes": {
+             "target": null,
+             "rel": "noopener noreferrer"
+           }
+         }
+       }'>
+    <textarea name="body"></textarea>
+  </div>
+  ```
+
+La barra de herramientas por defecto incluye: **Negrita**, *Cursiva*, ~~Tachado~~, Título H2/H3, Lista, Lista ordenada, Cita, Bloque de código, Enlace, Deshacer/Rehacer.
+
+API expuesta en `element.richTextEditor`:
+- `getHTML()` — devuelve el HTML del editor.
+- `setHTML(html)` — establece el contenido.
+- `focus()` — enfoca el editor.
+- `destroy()` — destruye la instancia.
+
+Evento emitido:
+- `emg-jsc:richTextEditor:initialized` — cuando el editor está listo.
+
+Ejemplo de uso programático:
+```javascript
+const editor = document.querySelector('[data-component="rich-text-editor"]');
+editor.addEventListener('emg-jsc:richTextEditor:initialized', () => {
+  console.log(editor.richTextEditor.getHTML()); // '<p></p>'
+  editor.richTextEditor.setHTML('<p>Nuevo contenido</p>');
+});
 ```
 
 ### `tooltip`

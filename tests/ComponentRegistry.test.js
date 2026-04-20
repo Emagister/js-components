@@ -11,6 +11,7 @@ const EXPECTED_COMPONENTS = [
     'datepicker',
     'modal',
     'confirm',
+    'rich-text-editor',
 ];
 
 describe('ComponentRegistry', () => {

@@ -39,16 +39,20 @@
   "author": "Emagister",
   "license": "ISC",
   "peerDependencies": {
+    "@tiptap/core": "^3.0.0",
+    "@tiptap/starter-kit": "^3.0.0",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.11.0",
     "flatpickr": "^4.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@tiptap/core": "^3.22.4",
+    "@tiptap/starter-kit": "^3.22.4",
     "@vitest/coverage-v8": "^4.1.2",
-    "eslint": "^9.0.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
+    "eslint": "^9.0.0",
     "flatpickr": "^4.6.13",
     "happy-dom": "^20.8.9",
     "sass": "^1.98.0",
