@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.5.0](https://github.com/Emagister/js-components/compare/v1.4.0...v1.5.0) (2026-04-20)
+
+
+### Features
+
+* **rich-text-editor:** add RichTextEditor component based on TipTap v3 ([89adcbd](https://github.com/Emagister/js-components/commit/89adcbd3a4ece30d8da6cf16c33628a77e2d9449))
+
+
+### Bug Fixes
+
+* **rich-text-editor:** address PR review comments ([5f903db](https://github.com/Emagister/js-components/commit/5f903dbcf58f81b32da9765cf00bd6ca8020eea9))
+* **rich-text-editor:** remove placeholder from examples and README ([ce24bc5](https://github.com/Emagister/js-components/commit/ce24bc56f74c56b1b5f6f3d6a4b909e238350f3f))
+
+
+### Code Refactoring
+
+* **rich-text-editor:** use StarterKit built-in Link mark (TipTap v3) ([bc0f465](https://github.com/Emagister/js-components/commit/bc0f46520b53444d4375f4f47e620b5d16987d3b))
+
+
+
+
 ## [1.4.0](https://github.com/Emagister/js-components/compare/v1.3.0...v1.4.0) (2026-04-16)
 
 
