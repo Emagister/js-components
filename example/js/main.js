@@ -140,6 +140,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // RichTextEditor
+    const rteContainer = document.querySelector('[data-component="rich-text-editor"]');
+    if (rteContainer) {
+        rteContainer.addEventListener('emg-jsc:richTextEditor:initialized', () => {
+            document.getElementById('rte-get-html-btn')?.addEventListener('click', () => {
+                const html = rteContainer.richTextEditor.getHTML();
+                const output = document.getElementById('rte-html-output');
+                output.textContent = html;
+                output.classList.remove('d-none');
+            });
+
+            document.getElementById('rte-set-html-btn')?.addEventListener('click', () => {
+                rteContainer.richTextEditor.setHTML('<h2>Título de ejemplo</h2><p>Este contenido fue insertado <strong>programáticamente</strong> desde el botón.</p><ul><li>Punto uno</li><li>Punto dos</li></ul>');
+            });
+        });
+    }
+
     // AsyncForm custom handlers
     const asyncFormEl = document.getElementById('example-async-form');
     // We wait for the component to be initialized by the manager
