@@ -274,7 +274,6 @@ Uso standalone (sin formulario):
 ```
 
 Opciones en `data-settings`:
-- `placeholder` (String, default: `''`): Texto de marcador de posición.
 - `toolbar` (Array|null, default: `null`): Lista de acciones visibles en la barra de herramientas. `null` muestra todas. Los separadores se ajustan automáticamente (no aparecen al inicio, al final ni consecutivos).
 
   Acciones disponibles: `toggleBold`, `toggleItalic`, `toggleStrike`, `toggleHeadingH2`, `toggleHeadingH3`, `toggleBulletList`, `toggleOrderedList`, `toggleBlockquote`, `toggleCodeBlock`, `toggleLink`, `undo`, `redo`.

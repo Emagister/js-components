@@ -52,7 +52,6 @@ export default class RichTextEditor extends Component {
         const settings = JSON.parse(this.root.dataset.settings || '{}');
         const linkSettings = settings.link ?? {};
         this.settings = {
-            placeholder: settings.placeholder || '',
             toolbar: settings.toolbar ?? null,
             labels: { ...DEFAULT_LABELS, ...settings.labels },
             link: {
@@ -68,6 +67,7 @@ export default class RichTextEditor extends Component {
         const initialContent = this.textarea?.value || '';
 
         if (this.textarea) {
+            this._textareaOriginalDisplay = this.textarea.style.display;
             this.textarea.style.display = 'none';
         }
 
@@ -119,7 +119,7 @@ export default class RichTextEditor extends Component {
                 if (result.length > 0 && result[result.length - 1].type !== 'separator') {
                     result.push(item);
                 }
-            } else if (allowed.has(item.action)) {
+            } else if (allowed.has(item.labelKey)) {
                 result.push(item);
             }
         }
@@ -147,7 +147,9 @@ export default class RichTextEditor extends Component {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'rte-toolbar-btn';
-            btn.title = this.settings.labels[item.labelKey] ?? '';
+            const label = this.settings.labels[item.labelKey] ?? '';
+            btn.title = label;
+            btn.setAttribute('aria-label', label);
             btn.dataset.action = item.action;
 
             if (item.args) {
@@ -187,9 +189,12 @@ export default class RichTextEditor extends Component {
         }
 
         const url = window.prompt(this.settings.labels.linkPrompt);
-        if (url && url.trim()) {
-            this.editor.chain().focus().setLink({ href: url.trim() }).run();
-        }
+        if (!url || !url.trim()) return;
+
+        const trimmed = url.trim();
+        if (!/^(https?:\/\/|mailto:|tel:|\/|\.\.?\/|#)/i.test(trimmed)) return;
+
+        this.editor.chain().focus().setLink({ href: trimmed }).run();
     }
 
     #updateToolbarState() {
@@ -223,7 +228,7 @@ export default class RichTextEditor extends Component {
         }
 
         if (this.textarea) {
-            this.textarea.style.display = '';
+            this.textarea.style.display = this._textareaOriginalDisplay ?? '';
         }
 
         delete this.root.richTextEditor;

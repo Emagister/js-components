@@ -210,6 +210,21 @@ describe('RichTextEditor', () => {
 
             expect(textarea.style.display).toBe('');
         });
+
+        it('destroy() preserva el valor de display original del textarea', () => {
+            const el = document.createElement('div');
+            const textarea = document.createElement('textarea');
+            textarea.style.display = 'flex';
+            el.appendChild(textarea);
+            document.body.appendChild(el);
+
+            const instance = new RichTextEditor(el);
+            instance.init();
+            expect(textarea.style.display).toBe('none');
+
+            el.richTextEditor.destroy();
+            expect(textarea.style.display).toBe('flex');
+        });
     });
 
     describe('toolbar', () => {
@@ -218,6 +233,12 @@ describe('RichTextEditor', () => {
         it('el toolbar contiene botones de formato con data-action', () => {
             const buttons = element.querySelectorAll('.rte-toolbar-btn[data-action]');
             expect(buttons.length).toBeGreaterThan(0);
+        });
+
+        it('los botones del toolbar tienen aria-label con el mismo texto que title', () => {
+            const btn = element.querySelector('[data-action="toggleBold"]');
+            expect(btn.getAttribute('aria-label')).toBe(btn.title);
+            expect(btn.getAttribute('aria-label')).toBe('Negrita');
         });
 
         it('existe un botón para toggleBold', () => {
@@ -279,10 +300,16 @@ describe('RichTextEditor', () => {
     });
 
     describe('enlace (toggleLink)', () => {
+        const originalPrompt = window.prompt;
+
         beforeEach(() => {
             // happy-dom no define window.prompt, lo creamos como mock
             window.prompt = vi.fn(() => null);
             rte.init();
+        });
+
+        afterEach(() => {
+            window.prompt = originalPrompt;
         });
 
         it('existe un botón para toggleLink en el toolbar', () => {
@@ -327,6 +354,42 @@ describe('RichTextEditor', () => {
             element.querySelector('[data-action="toggleLink"]').click();
 
             expect(mockChain.setLink).not.toHaveBeenCalled();
+        });
+
+        it('no aplica el enlace si la URL usa el protocolo javascript:', () => {
+            window.prompt.mockReturnValue('javascript:alert(1)');
+            mockEditorInstance.isActive.mockReturnValue(false);
+
+            element.querySelector('[data-action="toggleLink"]').click();
+
+            expect(mockChain.setLink).not.toHaveBeenCalled();
+        });
+
+        it('no aplica el enlace si la URL usa el protocolo data:', () => {
+            window.prompt.mockReturnValue('data:text/html,<script>alert(1)</script>');
+            mockEditorInstance.isActive.mockReturnValue(false);
+
+            element.querySelector('[data-action="toggleLink"]').click();
+
+            expect(mockChain.setLink).not.toHaveBeenCalled();
+        });
+
+        it('aplica el enlace con URL mailto:', () => {
+            window.prompt.mockReturnValue('mailto:test@example.com');
+            mockEditorInstance.isActive.mockReturnValue(false);
+
+            element.querySelector('[data-action="toggleLink"]').click();
+
+            expect(mockChain.setLink).toHaveBeenCalledWith({ href: 'mailto:test@example.com' });
+        });
+
+        it('aplica el enlace con URL relativa', () => {
+            window.prompt.mockReturnValue('/ruta/relativa');
+            mockEditorInstance.isActive.mockReturnValue(false);
+
+            element.querySelector('[data-action="toggleLink"]').click();
+
+            expect(mockChain.setLink).toHaveBeenCalledWith({ href: '/ruta/relativa' });
         });
 
         it('el label por defecto del botón de enlace es "Enlace"', () => {
@@ -425,18 +488,6 @@ describe('RichTextEditor', () => {
     });
 
     describe('settings', () => {
-        it('lee placeholder desde data-settings', () => {
-            element.dataset.settings = JSON.stringify({ placeholder: 'Escribe aquí...' });
-            rte = new RichTextEditor(element);
-            rte.init();
-            expect(rte.settings.placeholder).toBe('Escribe aquí...');
-        });
-
-        it('usa placeholder vacío por defecto', () => {
-            rte.init();
-            expect(rte.settings.placeholder).toBe('');
-        });
-
         describe('toolbar personalizada', () => {
             it('muestra solo los botones indicados en settings.toolbar', () => {
                 element.dataset.settings = JSON.stringify({ toolbar: ['toggleBold', 'toggleItalic'] });
@@ -503,6 +554,37 @@ describe('RichTextEditor', () => {
 
                 const hasSeparator = element.querySelector('.rte-toolbar .rte-toolbar-sep') !== null;
                 expect(hasSeparator).toBe(true);
+            });
+
+            it('muestra solo H2 cuando settings.toolbar incluye toggleHeadingH2', () => {
+                element.dataset.settings = JSON.stringify({ toolbar: ['toggleHeadingH2'] });
+                rte = new RichTextEditor(element);
+                rte.init();
+
+                const btns = element.querySelectorAll('.rte-toolbar-btn[data-action]');
+                expect(btns.length).toBe(1);
+                expect(JSON.parse(btns[0].dataset.args).level).toBe(2);
+            });
+
+            it('muestra solo H3 cuando settings.toolbar incluye toggleHeadingH3', () => {
+                element.dataset.settings = JSON.stringify({ toolbar: ['toggleHeadingH3'] });
+                rte = new RichTextEditor(element);
+                rte.init();
+
+                const btns = element.querySelectorAll('.rte-toolbar-btn[data-action]');
+                expect(btns.length).toBe(1);
+                expect(JSON.parse(btns[0].dataset.args).level).toBe(3);
+            });
+
+            it('puede incluir H2 y H3 de forma independiente en settings.toolbar', () => {
+                element.dataset.settings = JSON.stringify({ toolbar: ['toggleHeadingH2', 'toggleHeadingH3'] });
+                rte = new RichTextEditor(element);
+                rte.init();
+
+                const btns = element.querySelectorAll('.rte-toolbar-btn[data-action]');
+                expect(btns.length).toBe(2);
+                expect(JSON.parse(btns[0].dataset.args).level).toBe(2);
+                expect(JSON.parse(btns[1].dataset.args).level).toBe(3);
             });
         });
 
