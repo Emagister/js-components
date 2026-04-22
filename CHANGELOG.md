@@ -1,5 +1,15 @@
 # Changelog
 
+### [1.5.1](https://github.com/Emagister/js-components/compare/v1.5.0...v1.5.1) (2026-04-22)
+
+
+### Bug Fixes
+
+* **ci:** tag release commit instead of merge commit ([7d62218](https://github.com/Emagister/js-components/commit/7d622180171a319cd7143d739b5502cfe542fba7))
+
+
+
+
 ## [1.5.0](https://github.com/Emagister/js-components/compare/v1.4.0...v1.5.0) (2026-04-20)
 
 
