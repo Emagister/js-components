@@ -1,0 +1,53 @@
+@use "../../../scss/variables";
+
+@import 'tom-select/dist/css/tom-select.bootstrap5.css';
+
+.ts-wrapper.multi .ts-control .item {
+    background-color: var(--emg-brand-color, #{variables.$emg-brand-color});
+    color: #fff;
+    border: none;
+
+    &.active {
+        background-color: var(--emg-brand-color, #{variables.$emg-brand-color});
+        filter: brightness(0.88);
+    }
+}
+
+.ts-wrapper.plugin-remove_button .ts-control .item .remove {
+    border-left-color: rgba(255, 255, 255, 0.35);
+    color: inherit;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.12);
+    }
+}
+
+.ts-wrapper .ts-control {
+    border-color: var(--emg-border-color, #{variables.$emg-border-color});
+}
+
+.ts-dropdown .spinner::after {
+    border-color: rgba(0, 0, 0, 0.1) transparent rgba(0, 0, 0, 0.1) transparent;
+    border-top-color: var(--emg-brand-color, #{variables.$emg-brand-color});
+    animation-name: emg-spin;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-duration: 0.8s;
+}
+
+.ts-dropdown {
+    .option.selected {
+        background-color: var(--emg-brand-color, #{variables.$emg-brand-color});
+        color: #fff;
+    }
+
+    .option.active {
+        background-color: rgba(76, 183, 172, 0.15);
+        color: var(--emg-dark-grey, #{variables.$emg-dark-grey});
+    }
+}
+
+.rms-no-results {
+    padding: 0.5rem 1rem;
+    color: var(--emg-dark-grey, #{variables.$emg-dark-grey});
+    font-style: italic;
+}
