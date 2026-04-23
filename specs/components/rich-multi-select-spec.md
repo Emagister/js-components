@@ -25,7 +25,7 @@ date: 2026-04-23
 
 ### 2.2 Decisión
 
-Se elige **Tom Select** (`tomselect`) como dependencia base por los siguientes motivos:
+Se elige **Tom Select** (`tom-select`) como dependencia base por los siguientes motivos:
 
 - Sin dependencia de jQuery, compatible con el stack actual.
 - API declarativa y extensible mediante plugins.
@@ -122,6 +122,7 @@ El componente emite eventos nativos sobre el `<select>` original para facilitar 
 | `emg-jsc:richMultiSelect:item-remove` | Al eliminar un ítem seleccionado | `{ value: string }` |
 | `emg-jsc:richMultiSelect:focus` | Al abrir el desplegable | — |
 | `emg-jsc:richMultiSelect:blur` | Al cerrar el desplegable | — |
+| `emg-jsc:richMultiSelect:load-error` | Cuando falla una petición de carga remota (HTTP no ok o error de red) | — |
 
 ### 4.6 Carga Remota (AJAX)
 
@@ -188,7 +189,7 @@ Respuesta esperada (array JSON):
 | **AC-3** | La carga remota se activa con ≥ 2 caracteres e incluye debounce de 300 ms. |
 | **AC-4** | Al alcanzar `maxItems`, no se pueden añadir más ítems y se muestra feedback visual. |
 | **AC-5** | El control es completamente operable por teclado y pasa auditoría axe sin errores críticos. |
-| **AC-6** | El evento `rms:change` se dispara correctamente en add y remove. |
+| **AC-6** | El evento `emg-jsc:richMultiSelect:change` se dispara correctamente en add y remove. |
 | **AC-7** | Destruir el componente restaura el `<select>` original al estado previo a la inicialización. |
 | **AC-8** | El estilo es coherente con Bootstrap 5 y el tema de Dharma sin regresiones visuales. |
 

@@ -444,6 +444,7 @@ Eventos emitidos sobre el `<select>` original:
 | `emg-jsc:richMultiSelect:item-remove` | Al eliminar un ítem seleccionado | `{ value }` |
 | `emg-jsc:richMultiSelect:focus` | Al abrir el desplegable | — |
 | `emg-jsc:richMultiSelect:blur` | Al cerrar el desplegable | — |
+| `emg-jsc:richMultiSelect:load-error` | Cuando falla la carga remota (HTTP no ok o error de red) | — |
 | `emg-jsc:richMultiSelect:initialized` | Cuando el componente está listo | — |
 
 ### `tooltip`

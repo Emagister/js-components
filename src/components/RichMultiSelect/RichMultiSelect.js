@@ -36,8 +36,12 @@ export default class RichMultiSelect extends Component {
             create: s.create ?? false,
             plugins: ['remove_button'],
             render: {
-                no_results: () =>
-                    `<div class="rms-no-results">${s.noResultsText ?? 'Sin resultados'}</div>`
+                no_results: () => {
+                    const el = document.createElement('div');
+                    el.className = 'rms-no-results';
+                    el.textContent = s.noResultsText ?? 'Sin resultados';
+                    return el.outerHTML;
+                }
             },
             onChange: (values) => {
                 this.root.dispatchEvent(
@@ -86,6 +90,7 @@ export default class RichMultiSelect extends Component {
                 try {
                     const response = await fetch(`${url}?q=${encodeURIComponent(query)}`);
                     if (!response.ok) {
+                        this.root.dispatchEvent(new CustomEvent('emg-jsc:richMultiSelect:load-error'));
                         callback([]);
                         return;
                     }
@@ -95,6 +100,7 @@ export default class RichMultiSelect extends Component {
                         text: item[labelField]
                     })));
                 } catch {
+                    this.root.dispatchEvent(new CustomEvent('emg-jsc:richMultiSelect:load-error'));
                     callback([]);
                 }
             }, 300);

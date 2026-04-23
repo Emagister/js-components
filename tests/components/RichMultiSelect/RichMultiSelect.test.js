@@ -301,6 +301,21 @@ describe('RichMultiSelect', () => {
             expect(callback).toHaveBeenCalledWith([]);
         });
 
+        it('emite load-error cuando la respuesta HTTP no es ok', async () => {
+            element.dataset.settings = JSON.stringify({ remoteUrl: '/api/search' });
+            new RichMultiSelect(element).init();
+
+            global.fetch.mockResolvedValue({ ok: false });
+
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:richMultiSelect:load-error', handler);
+
+            getTsConfig().load('madrid', vi.fn());
+            await vi.advanceTimersByTimeAsync(300);
+
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
         it('llama a callback con [] cuando la petición lanza un error de red', async () => {
             element.dataset.settings = JSON.stringify({ remoteUrl: '/api/search' });
             new RichMultiSelect(element).init();
@@ -312,6 +327,21 @@ describe('RichMultiSelect', () => {
             await vi.advanceTimersByTimeAsync(300);
 
             expect(callback).toHaveBeenCalledWith([]);
+        });
+
+        it('emite load-error cuando la petición lanza un error de red', async () => {
+            element.dataset.settings = JSON.stringify({ remoteUrl: '/api/search' });
+            new RichMultiSelect(element).init();
+
+            global.fetch.mockRejectedValue(new Error('Network error'));
+
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:richMultiSelect:load-error', handler);
+
+            getTsConfig().load('madrid', vi.fn());
+            await vi.advanceTimersByTimeAsync(300);
+
+            expect(handler).toHaveBeenCalledOnce();
         });
     });
 });
