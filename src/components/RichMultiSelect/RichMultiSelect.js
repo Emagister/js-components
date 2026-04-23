@@ -4,6 +4,7 @@ import TomSelect from "tom-select";
 export default class RichMultiSelect extends Component {
     #tomSelect = null;
     #settings = {};
+    #debounceTimer = null;
 
     constructor(element) {
         super(element);
@@ -75,14 +76,13 @@ export default class RichMultiSelect extends Component {
     }
 
     #buildLoadFn(url, valueField, labelField) {
-        let debounceTimer = null;
         return (query, callback) => {
             if (query.length < 2) {
                 callback([]);
                 return;
             }
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(async () => {
+            clearTimeout(this.#debounceTimer);
+            this.#debounceTimer = setTimeout(async () => {
                 try {
                     const response = await fetch(`${url}?q=${encodeURIComponent(query)}`);
                     if (!response.ok) {
@@ -102,6 +102,7 @@ export default class RichMultiSelect extends Component {
     }
 
     #destroy() {
+        clearTimeout(this.#debounceTimer);
         if (this.#tomSelect) {
             this.#tomSelect.destroy();
             this.#tomSelect = null;
