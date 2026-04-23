@@ -22,10 +22,6 @@
     }
 }
 
-.ts-wrapper .ts-control {
-    border-color: var(--emg-border-color, #{variables.$emg-border-color});
-}
-
 .ts-dropdown .spinner::after {
     border-color: rgba(0, 0, 0, 0.1) transparent rgba(0, 0, 0, 0.1) transparent;
     border-top-color: var(--emg-brand-color, #{variables.$emg-brand-color});
