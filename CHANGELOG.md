@@ -1,5 +1,25 @@
 # Changelog
 
+### [1.5.2](https://github.com/Emagister/js-components/compare/v1.5.1...v1.5.2) (2026-04-27)
+
+
+### Bug Fixes
+
+* **datatable:** redirigir a última página válida cuando la página actual queda fuera de rango tras recargar ([61fd737](https://github.com/Emagister/js-components/commit/61fd73717397d572135ca37e3e74bf5756c93bc1))
+
+
+### Tests
+
+* **datatable:** corregir fixture y aserción duplicada en tests de corrección de página ([9c0e75b](https://github.com/Emagister/js-components/commit/9c0e75b6c5213b6234f6114eb6c04549c5ff7366))
+
+
+### Code Refactoring
+
+* **datatable:** eliminar doble setState y mutación directa de estado en tests ([3750a8b](https://github.com/Emagister/js-components/commit/3750a8bc8bd22eabbf117f1d2e9000b58f892f75))
+
+
+
+
 ### [1.5.1](https://github.com/Emagister/js-components/compare/v1.5.0...v1.5.1) (2026-04-22)
 
 
