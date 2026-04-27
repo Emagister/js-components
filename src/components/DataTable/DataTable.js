@@ -311,15 +311,23 @@ export default class DataTable extends Component {
             const result = await response.json();
 
             // Expected format: { data: [...], meta: { page: 1, total: 100, perPage: 10 } }
+            const lastPage = result.meta.perPage != 0 ? Math.ceil(result.meta.total / result.meta.perPage) : 0;
+
             this.#setState({
                 data: result.data,
                 meta: {
                     ...this.state.meta,
                     ...result.meta,
-                    lastPage: result.meta.perPage != 0 ? Math.ceil(result.meta.total / result.meta.perPage) : 0
+                    lastPage
                 },
                 isLoading: false
             });
+
+            if (lastPage >= 1 && this.state.meta.page > lastPage) {
+                this.#setState({ meta: { ...this.state.meta, page: lastPage } });
+                this.#fetchData();
+                return;
+            }
 
             this.loader.hide();
             this.#render();
