@@ -37,6 +37,27 @@ window.fetch = async (url, options) => {
         });
     }
 
+    // Simulation for RichMultiSelect remote search
+    if (urlObj.pathname === '/api/centers/search') {
+        await delay(400);
+        const q = (urlObj.searchParams.get('q') || '').toLowerCase();
+        const centers = [
+            { id: '1', name: 'Centro Madrid Norte' },
+            { id: '2', name: 'Centro Madrid Sur' },
+            { id: '3', name: 'Centro Barcelona' },
+            { id: '4', name: 'Centro Valencia' },
+            { id: '5', name: 'Centro Sevilla' },
+            { id: '6', name: 'Centro Bilbao' },
+            { id: '7', name: 'Centro Zaragoza' },
+            { id: '8', name: 'Centro Málaga' },
+        ];
+        const results = centers.filter(c => c.name.toLowerCase().includes(q));
+        return new Response(JSON.stringify(results), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
     // Simulation for DataTable Bulk Delete
     if (urlObj.pathname.includes('bulkDelete')) {
         await delay(600);
@@ -156,6 +177,48 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // RichMultiSelect
+    const rmsStatic = document.getElementById('rms-static');
+    const rmsOutput = document.getElementById('rms-output');
+    const rmsEventLog = document.getElementById('rms-event-log');
+
+    const logEvent = (msg) => {
+        const placeholder = rmsEventLog.querySelector('.fst-italic');
+        if (placeholder) placeholder.remove();
+        const li = document.createElement('li');
+        li.className = 'list-group-item small font-monospace py-1';
+        li.textContent = `${new Date().toLocaleTimeString()} — ${msg}`;
+        rmsEventLog.prepend(li);
+    };
+
+    rmsStatic.addEventListener('emg-jsc:richMultiSelect:initialized', () => {
+        document.getElementById('rms-get-value-btn').addEventListener('click', () => {
+            const values = rmsStatic.richMultiSelect.getValue();
+            rmsOutput.textContent = JSON.stringify(values);
+            rmsOutput.classList.remove('d-none');
+        });
+
+        document.getElementById('rms-set-value-btn').addEventListener('click', () => {
+            rmsStatic.richMultiSelect.setValue(['1', '3']);
+        });
+
+        document.getElementById('rms-add-option-btn').addEventListener('click', () => {
+            rmsStatic.richMultiSelect.addOption({ value: '99', text: 'Centro Nuevo (dinámico)' });
+        });
+
+        document.getElementById('rms-clear-btn').addEventListener('click', () => {
+            rmsStatic.richMultiSelect.clear();
+        });
+    });
+
+    ['emg-jsc:richMultiSelect:change', 'emg-jsc:richMultiSelect:item-add', 'emg-jsc:richMultiSelect:item-remove',
+        'emg-jsc:richMultiSelect:focus', 'emg-jsc:richMultiSelect:blur'].forEach(evt => {
+            rmsStatic.addEventListener(evt, (e) => {
+                const detail = e.detail ? ` ${JSON.stringify(e.detail)}` : '';
+                logEvent(`${e.type}${detail}`);
+            });
+        });
 
     // AsyncForm custom handlers
     const asyncFormEl = document.getElementById('example-async-form');

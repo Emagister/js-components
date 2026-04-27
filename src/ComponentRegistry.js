@@ -9,6 +9,7 @@ const ComponentRegistry = {
     'modal': () => import('./components/Modal/Modal'),
     'confirm': () => import('./components/Confirm/Confirm'),
     'rich-text-editor': () => import('./components/RichTextEditor/RichTextEditor'),
+    'rich-multi-select': () => import('./components/RichMultiSelect/RichMultiSelect'),
 };
 
 export default ComponentRegistry;
