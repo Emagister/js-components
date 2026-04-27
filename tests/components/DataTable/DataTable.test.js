@@ -295,14 +295,18 @@ describe('DataTable', () => {
             global.fetch = vi.fn().mockImplementation(() => {
                 callCount++;
                 if (callCount === 1) {
-                    // init fetch: 11 elementos, 2 páginas, estamos en página 1
-                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 11, perPage: 10 } }) });
+                    // fetch inicial: 11 elementos, 2 páginas
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: Array(10).fill({}), meta: { page: 1, total: 11, perPage: 10 } }) });
                 }
                 if (callCount === 2) {
-                    // refresh tras borrar: ahora hay 10 elementos (1 página), pero el state.meta.page sigue en 2
+                    // fetch al navegar a página 2 via handlePageChange
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [{ id: 1 }], meta: { page: 2, total: 11, perPage: 10 } }) });
+                }
+                if (callCount === 3) {
+                    // refresh tras borrar: ahora hay 10 elementos (1 página), la página 2 queda fuera de rango
                     return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [{ id: 1 }], meta: { page: 2, total: 10, perPage: 10 } }) });
                 }
-                // tercer fetch: pedimos página 1 (la corrección automática)
+                // cuarto fetch: corrección automática a página 1
                 return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [{ id: 1 }], meta: { page: 1, total: 10, perPage: 10 } }) });
             });
 
@@ -310,17 +314,17 @@ describe('DataTable', () => {
             dt.init();
             await vi.waitFor(() => expect(dt.state.isLoading).toBe(false));
 
-            // Simulamos que el usuario estaba en página 2
-            dt.state.meta.page = 2;
-            dt.state.isLoading = false;
+            // Navegar a página 2 usando la API pública
+            dt.handlePageChange(2);
+            await vi.waitFor(() => expect(dt.state.isLoading).toBe(false));
 
-            // Dispara el refresh (como si se hubiera borrado un elemento)
+            // Dispara el refresh (como si se hubiera borrado el único elemento de la página 2)
             element.dispatchEvent(new Event('emg-jsc:datatable:refresh'));
 
-            // Debe haberse lanzado un tercer fetch corrigiendo la página a 1
-            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(3));
+            // Debe haberse lanzado un cuarto fetch corrigiendo la página a 1
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(4));
 
-            // Y la página final debe ser 1
+            // La página final debe ser 1
             expect(dt.state.meta.page).toBe(1);
         });
 
@@ -333,7 +337,6 @@ describe('DataTable', () => {
             const dt = new DataTable(element);
             dt.init();
             await vi.waitFor(() => expect(dt.state.isLoading).toBe(false));
-            dt.state.isLoading = false;
 
             element.dispatchEvent(new Event('emg-jsc:datatable:refresh'));
             await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
