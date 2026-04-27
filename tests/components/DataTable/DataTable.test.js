@@ -303,8 +303,8 @@ describe('DataTable', () => {
                     return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [{ id: 1 }], meta: { page: 2, total: 11, perPage: 10 } }) });
                 }
                 if (callCount === 3) {
-                    // refresh tras borrar: ahora hay 10 elementos (1 página), la página 2 queda fuera de rango
-                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [{ id: 1 }], meta: { page: 2, total: 10, perPage: 10 } }) });
+                    // refresh tras borrar: ahora hay 10 elementos (1 página), la página 2 queda fuera de rango → sin datos
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 2, total: 10, perPage: 10 } }) });
                 }
                 // cuarto fetch: corrección automática a página 1
                 return Promise.resolve({ ok: true, json: () => Promise.resolve({ data: [{ id: 1 }], meta: { page: 1, total: 10, perPage: 10 } }) });
@@ -339,10 +339,9 @@ describe('DataTable', () => {
             await vi.waitFor(() => expect(dt.state.isLoading).toBe(false));
 
             element.dispatchEvent(new Event('emg-jsc:datatable:refresh'));
-            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
 
             // Solo 2 fetches: el inicial y el refresh — sin fetch extra de corrección
-            expect(fetch).toHaveBeenCalledTimes(2);
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
             expect(dt.state.meta.page).toBe(1);
         });
     });
