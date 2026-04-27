@@ -343,5 +343,66 @@ describe('RichMultiSelect', () => {
 
             expect(handler).toHaveBeenCalledOnce();
         });
+
+        it('no emite load-error ni llama a callback tras destroy con fetch en vuelo', async () => {
+            element.dataset.settings = JSON.stringify({ remoteUrl: '/api/search' });
+            const instance = new RichMultiSelect(element);
+            instance.init();
+
+            let resolveFetch;
+            global.fetch.mockReturnValue(new Promise(resolve => { resolveFetch = resolve; }));
+
+            const callback = vi.fn();
+            const errorHandler = vi.fn();
+            element.addEventListener('emg-jsc:richMultiSelect:load-error', errorHandler);
+
+            getTsConfig().load('madrid', callback);
+            await vi.advanceTimersByTimeAsync(300);
+
+            element.richMultiSelect.destroy();
+
+            resolveFetch({ ok: false });
+            await Promise.resolve();
+
+            expect(errorHandler).not.toHaveBeenCalled();
+            expect(callback).not.toHaveBeenCalled();
+        });
+
+        it('no llama a callback con resultados tras destroy con fetch en vuelo', async () => {
+            element.dataset.settings = JSON.stringify({ remoteUrl: '/api/search' });
+            const instance = new RichMultiSelect(element);
+            instance.init();
+
+            let resolveFetch;
+            global.fetch.mockReturnValue(new Promise(resolve => { resolveFetch = resolve; }));
+
+            const callback = vi.fn();
+            getTsConfig().load('madrid', callback);
+            await vi.advanceTimersByTimeAsync(300);
+
+            element.richMultiSelect.destroy();
+
+            resolveFetch({
+                ok: true,
+                json: async () => [{ id: '1', name: 'Centro Madrid' }]
+            });
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(callback).not.toHaveBeenCalledWith([{ value: '1', text: 'Centro Madrid' }]);
+        });
+    });
+
+    // ─── constructor ──────────────────────────────────────────────────────────
+
+    describe('constructor()', () => {
+        it('usa {} como settings cuando data-settings contiene JSON malformado', () => {
+            const el = document.createElement('select');
+            el.setAttribute('multiple', '');
+            el.dataset.settings = '{invalid json}';
+            const instance = new RichMultiSelect(el);
+            instance.init();
+            expect(getTsConfig().placeholder).toBe('Seleccionar…');
+        });
     });
 });

@@ -5,10 +5,15 @@ export default class RichMultiSelect extends Component {
     #tomSelect = null;
     #settings = {};
     #debounceTimer = null;
+    #destroyed = false;
 
     constructor(element) {
         super(element);
-        this.#settings = JSON.parse(element.dataset.settings || '{}');
+        try {
+            this.#settings = JSON.parse(element.dataset.settings || '{}');
+        } catch {
+            this.#settings = {};
+        }
     }
 
     init() {
@@ -89,6 +94,7 @@ export default class RichMultiSelect extends Component {
             this.#debounceTimer = setTimeout(async () => {
                 try {
                     const response = await fetch(`${url}?q=${encodeURIComponent(query)}`);
+                    if (this.#destroyed) return;
                     if (!response.ok) {
                         this.root.dispatchEvent(new CustomEvent('emg-jsc:richMultiSelect:load-error'));
                         callback([]);
@@ -100,6 +106,7 @@ export default class RichMultiSelect extends Component {
                         text: item[labelField]
                     })));
                 } catch {
+                    if (this.#destroyed) return;
                     this.root.dispatchEvent(new CustomEvent('emg-jsc:richMultiSelect:load-error'));
                     callback([]);
                 }
@@ -108,6 +115,7 @@ export default class RichMultiSelect extends Component {
     }
 
     #destroy() {
+        this.#destroyed = true;
         clearTimeout(this.#debounceTimer);
         if (this.#tomSelect) {
             this.#tomSelect.destroy();
