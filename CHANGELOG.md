@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.6.0](https://github.com/Emagister/js-components/compare/v1.5.2...v1.6.0) (2026-04-28)
+
+
+### Features
+
+* **datatable:** añadir opción fetchOnInit para diferir la carga inicial de datos ([e499530](https://github.com/Emagister/js-components/commit/e499530d27d6ebb8979e3b4cdf2642eae5355852))
+
+
+### Tests
+
+* **datatable:** improve assertions in fetchOnInit tests based on Copilot review ([ab43827](https://github.com/Emagister/js-components/commit/ab43827437b0a2c925e8412a8bfdb1a36c7f654e))
+
+
+
+
 ### [1.5.2](https://github.com/Emagister/js-components/compare/v1.5.1...v1.5.2) (2026-04-27)
 
 
