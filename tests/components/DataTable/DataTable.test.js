@@ -96,6 +96,17 @@ describe('DataTable', () => {
             const dt = new DataTable(element);
             expect(dt.state.isLoading).toBe(false);
         });
+
+        it('usa fetchOnInit true por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.fetchOnInit).toBe(true);
+        });
+
+        it('lee fetchOnInit false desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ fetchOnInit: false });
+            const dt = new DataTable(element);
+            expect(dt.config.fetchOnInit).toBe(false);
+        });
     });
 
     describe('init()', () => {
@@ -1022,6 +1033,80 @@ describe('DataTable', () => {
                 await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
                 expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('reset-btn'));
             });
+        });
+    });
+
+    describe('fetchOnInit: false', () => {
+        beforeEach(() => {
+            element.dataset.settings = JSON.stringify({ fetchOnInit: false });
+        });
+
+        it('no llama a fetch durante init()', () => {
+            const dt = new DataTable(element);
+            dt.init();
+            expect(fetch).not.toHaveBeenCalled();
+        });
+
+        it('emite el evento initialized igualmente', () => {
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:datatable:initialized', handler);
+            const dt = new DataTable(element);
+            dt.init();
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('crea el contentWrapper dentro del elemento raíz', () => {
+            const dt = new DataTable(element);
+            dt.init();
+            expect(dt.contentWrapper).toBeTruthy();
+            expect(element.contains(dt.contentWrapper)).toBe(true);
+        });
+
+        it('expone la API pública en el elemento', () => {
+            const dt = new DataTable(element);
+            dt.init();
+            expect(typeof element.dataTable.destroy).toBe('function');
+        });
+
+        it('llama a fetch cuando se invoca setFilters()', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            dt.setFilters({ q: 'test' });
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+            expect(fetch.mock.calls[0][0]).toContain('/api/data');
+        });
+
+        it('pasa los filtros en la petición al usar setFilters()', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            dt.setFilters({ q: 'hello' });
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+            expect(fetch.mock.calls[0][0]).toContain('q=hello');
+        });
+
+        it('llama a fetch cuando se hace submit del formulario de filtros', async () => {
+            const form = document.createElement('form');
+            form.id = 'search-form';
+            const input = document.createElement('input');
+            input.name = 'q';
+            input.value = 'vitest';
+            form.appendChild(input);
+            document.body.appendChild(form);
+
+            element.dataset.settings = JSON.stringify({ fetchOnInit: false, filterFormId: 'search-form' });
+            const dt = new DataTable(element);
+            dt.init();
+
+            form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+            expect(fetch.mock.calls[0][0]).toContain('q=vitest');
+        });
+
+        it('llama a fetch cuando se recibe el evento refresh', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            element.dispatchEvent(new CustomEvent('emg-jsc:datatable:refresh'));
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
         });
     });
 });

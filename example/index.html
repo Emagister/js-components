@@ -55,6 +55,42 @@
             </div>
         </div>
 
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">DataTable con búsqueda diferida (<code>fetchOnInit: false</code>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">La tabla no carga datos hasta que el usuario envía el formulario.</p>
+                        <!-- Formulario de búsqueda -->
+                        <form id="deferred-filter-form" class="row g-2 mb-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control form-control-sm" name="q"
+                                    placeholder="Escribe tu búsqueda...">
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-sm btn-primary">Buscar</button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    id="deferred-filter-reset">Limpiar</button>
+                            </div>
+                        </form>
+                        <!-- DataTable con fetchOnInit: false -->
+                        <div data-component="data-table" id="deferred-datatable" class="data-table-container"
+                            data-url="http://localhost:5173/example/datatableData.json"
+                            data-columns='[{"key":"id", "label":"ID", "width": "5%"}, {"key":"name", "label":"Nombre", "sortable":true}, {"key":"email", "label":"Email"}]'
+                            data-settings='{
+                                "fetchOnInit": false,
+                                "perPage": 3,
+                                "pageSizeOptions": [3, 5, 10],
+                                "filterForm": { "id": "deferred-filter-form", "resetButtonId": "deferred-filter-reset" }
+                            }'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-12 mb-4">
                 <div class="card shadow-sm">
