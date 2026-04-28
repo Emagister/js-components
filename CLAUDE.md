@@ -59,6 +59,10 @@ All new features must be implemented following the TDD red-green-refactor cycle:
 
 Tests go in `tests/` mirroring the `src/` structure. Run tests via Docker as shown above.
 
+### Commit Messages
+
+Always write commit messages in English. Use the conventional commits format (`feat`, `fix`, `test`, `refactor`, `chore`, etc.).
+
 ### Documentation and Examples
 
 After every functional change to a component (new feature, new setting, behavior change), always update:

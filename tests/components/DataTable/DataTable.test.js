@@ -1041,10 +1041,9 @@ describe('DataTable', () => {
             element.dataset.settings = JSON.stringify({ fetchOnInit: false });
         });
 
-        it('no llama a fetch durante init()', async () => {
+        it('no llama a fetch durante init()', () => {
             const dt = new DataTable(element);
             dt.init();
-            await new Promise(r => setTimeout(r, 50));
             expect(fetch).not.toHaveBeenCalled();
         });
 
@@ -1059,7 +1058,8 @@ describe('DataTable', () => {
         it('crea el contentWrapper dentro del elemento raíz', () => {
             const dt = new DataTable(element);
             dt.init();
-            expect(element.querySelector('div')).not.toBeNull();
+            expect(dt.contentWrapper).toBeTruthy();
+            expect(element.contains(dt.contentWrapper)).toBe(true);
         });
 
         it('expone la API pública en el elemento', () => {
