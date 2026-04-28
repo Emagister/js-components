@@ -59,6 +59,13 @@ All new features must be implemented following the TDD red-green-refactor cycle:
 
 Tests go in `tests/` mirroring the `src/` structure. Run tests via Docker as shown above.
 
+### Documentation and Examples
+
+After every functional change to a component (new feature, new setting, behavior change), always update:
+
+- **`README.md`** — document the new option or behavior in the relevant component section, including a usage example if it adds a new setting or changes the public API.
+- **`example/index.html`** — add or update an example that demonstrates the change visually.
+
 ## Release Process
 
 Releases are manual: trigger the `publish` workflow via GitHub Actions `workflow_dispatch`. It auto-bumps the version (semver from commit messages), updates `CHANGELOG.md`, tags, creates a GitHub Release, and publishes to npm. Requires `BOT_APP_ID` and `BOT_PRIVATE_KEY` secrets (GitHub App) to bypass the main branch ruleset.

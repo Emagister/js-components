@@ -25,6 +25,7 @@ export default class DataTable extends Component {
             bulkDeleteUrl: settings.bulkDeleteUrl || this.root.dataset.bulkDeleteUrl || null,
             pageSizeOptions: settings.pageSizeOptions || [10, 25, 50, 100],
             actionsWidth: settings.actionsWidth ?? '80px',
+            fetchOnInit: settings.fetchOnInit !== undefined ? settings.fetchOnInit : true,
             labels: {
                 total: settings.labels?.total ?? 'Mostrando {from} - {to} de {total} resultados',
                 noResults: settings.labels?.noResults ?? 'No se encontraron resultados.',
@@ -66,7 +67,7 @@ export default class DataTable extends Component {
         this.root.appendChild(this.contentWrapper);
 
         this.#initializeFilters();
-        this.#fetchData();
+        if (this.config.fetchOnInit) this.#fetchData();
         this.#bindEvents();
         this.#bindFilterForm();
 

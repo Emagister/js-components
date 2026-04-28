@@ -86,6 +86,7 @@ Opciones en `data-settings`:
 - `bulkDeleteUrl` (String, default: `null`): URL del endpoint para la eliminación masiva de registros. **Si no se indica, la funcionalidad queda completamente desactivada** (no aparecen checkboxes ni el botón de eliminar). Cuando está activo, se añade una columna de checkboxes al inicio de la tabla y un botón "Eliminar seleccionados" al pie. Al pulsar el botón, se envía `POST` a esta URL con `{ ids: ["1", "2", ...] }` como cuerpo JSON. Tras la respuesta exitosa, la tabla se refresca automáticamente.
 - `pageSizeOptions` (Array, default: `[10, 25, 50, 100]`): Opciones disponibles en el selector de filas por página. Se renderiza como un `<select>` junto al contador de resultados. El valor activo en cada momento refleja el `perPage` en uso. Al cambiar la selección, la tabla vuelve a la primera página y lanza una nueva petición. Para ocultar el selector, pasa un array vacío: `[]`.
 - `actionsWidth` (String, default: `'80px'`): Ancho fijo de la columna de acciones (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Se genera automáticamente un `<colgroup>` con el ancho indicado para dicha columna, aunque ninguna columna de datos tenga `width`.
+- `fetchOnInit` (Boolean, default: `true`): Controla si el componente realiza la petición inicial al cargar. Ponlo a `false` para que la tabla permanezca vacía hasta que el usuario interactúe con el formulario de búsqueda.
 - `labels` (Object): Textos del componente. Permite traducir o personalizar todos los literales:
   - `total` (String, default: `'Mostrando {from} - {to} de {total} resultados'`): Contador de resultados mostrado sobre la paginación. Soporta los placeholders `{from}`, `{to}` y `{total}`, que se sustituyen automáticamente con el rango de la página actual y el total de registros.
   - `noResults` (String, default: `'No se encontraron resultados.'`): Mensaje cuando la respuesta devuelve datos vacíos.
@@ -123,6 +124,24 @@ Ejemplo con eliminación masiva activada:
 El servidor recibirá una petición `DELETE /api/users/bulk-delete` con el siguiente cuerpo:
 ```json
 { "ids": ["3", "7", "12"] }
+```
+
+Tabla con búsqueda diferida (`fetchOnInit: false`): la tabla no carga datos hasta que el usuario envía el formulario. Ideal cuando la búsqueda debe ser siempre explícita:
+```html
+<form id="search-form">
+  <input type="text" name="q" placeholder="Escribe tu búsqueda...">
+  <button type="submit">Buscar</button>
+  <button type="button" id="search-reset">Limpiar</button>
+</form>
+
+<div data-component="data-table"
+     data-url="/api/users"
+     data-columns='[{"key":"name","label":"Nombre"}]'
+     data-settings='{
+       "fetchOnInit": false,
+       "filterForm": { "id": "search-form", "resetButtonId": "search-reset" }
+     }'>
+</div>
 ```
 
 Ejemplo de personalización de labels en inglés y selector de página reducido:
