@@ -186,6 +186,22 @@ Eventos emitidos por el componente:
 - `emg-jsc:datatable:action` — al pulsar un botón de acción. `detail: { action, id, row }`.
 - `emg-jsc:datatable:bulk-delete:success` — tras una eliminación masiva exitosa. `detail: { count }` (número de registros eliminados).
 - `emg-jsc:datatable:bulk-delete:error` — si el endpoint de eliminación masiva responde con error. `detail: { error }`.
+- `emg-jsc:datatable:fetch:unauthorized` — cuando el servidor responde con HTTP 401. `detail: { status: 401 }`. El componente muestra el mensaje de error habitual además de emitir este evento.
+- `emg-jsc:datatable:fetch:redirect` — cuando el servidor redirige la petición (p.ej. a una página de login tras expirar la sesión). `detail: { url }` donde `url` es la URL de destino de la redirección. El componente muestra el mensaje de error habitual además de emitir este evento.
+
+Ejemplo de gestión de sesión caducada:
+```javascript
+const table = document.querySelector('[data-component="data-table"]');
+
+table.addEventListener('emg-jsc:datatable:fetch:unauthorized', () => {
+    window.location.href = '/login';
+});
+
+table.addEventListener('emg-jsc:datatable:fetch:redirect', (e) => {
+    // e.detail.url contiene la URL de destino de la redirección (p.ej. la página de login)
+    window.location.href = e.detail.url;
+});
+```
 
 Ejemplo de escucha de eventos de eliminación masiva:
 ```javascript

@@ -185,6 +185,86 @@ describe('DataTable', () => {
         });
     });
 
+    describe('eventos de autenticación fallida en fetch', () => {
+        it('despacha emg-jsc:datatable:fetch:unauthorized cuando el servidor responde 401', async () => {
+            global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401, redirected: false });
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:datatable:fetch:unauthorized', handler);
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(handler).toHaveBeenCalled());
+            expect(handler.mock.calls[0][0].detail).toEqual({ status: 401 });
+        });
+
+        it('sigue mostrando el mensaje de error en el DOM cuando responde 401', async () => {
+            global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401, redirected: false });
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() =>
+                expect(element.textContent).toContain('Ocurrió un error al cargar los datos.')
+            );
+        });
+
+        it('despacha emg-jsc:datatable:fetch:redirect con la URL de destino cuando la respuesta fue redirigida', async () => {
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                redirected: true,
+                url: 'https://example.com/login',
+                json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }),
+            });
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:datatable:fetch:redirect', handler);
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(handler).toHaveBeenCalled());
+            expect(handler.mock.calls[0][0].detail).toEqual({ url: 'https://example.com/login' });
+        });
+
+        it('sigue mostrando el mensaje de error en el DOM cuando la respuesta fue redirigida', async () => {
+            global.fetch = vi.fn().mockResolvedValue({
+                ok: true,
+                redirected: true,
+                url: 'https://example.com/login',
+                json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }),
+            });
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() =>
+                expect(element.textContent).toContain('Ocurrió un error al cargar los datos.')
+            );
+        });
+
+        it('no despacha emg-jsc:datatable:fetch:unauthorized para otros errores HTTP (p.ej. 500)', async () => {
+            global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, redirected: false });
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:datatable:fetch:unauthorized', handler);
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() =>
+                expect(element.textContent).toContain('Ocurrió un error al cargar los datos.')
+            );
+            expect(handler).not.toHaveBeenCalled();
+        });
+
+        it('no despacha emg-jsc:datatable:fetch:redirect para respuestas no redirigidas', async () => {
+            global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, redirected: false });
+            vi.spyOn(console, 'error').mockImplementation(() => {});
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:datatable:fetch:redirect', handler);
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() =>
+                expect(element.textContent).toContain('Ocurrió un error al cargar los datos.')
+            );
+            expect(handler).not.toHaveBeenCalled();
+        });
+    });
+
     describe('handleSort()', () => {
         it('cambia sortOrder a desc al ordenar por la misma columna que ya está en asc', async () => {
             const dt = new DataTable(element);

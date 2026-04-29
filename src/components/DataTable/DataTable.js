@@ -305,7 +305,21 @@ export default class DataTable extends Component {
                 }
             });
 
+            if (response.redirected) {
+                this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:fetch:redirect', {
+                    bubbles: true,
+                    detail: { url: response.url }
+                }));
+                throw new Error('Redirected to login');
+            }
+
             if (!response.ok) {
+                if (response.status === 401) {
+                    this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:fetch:unauthorized', {
+                        bubbles: true,
+                        detail: { status: 401 }
+                    }));
+                }
                 throw new Error('Network response was not ok');
             }
 
