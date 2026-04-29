@@ -85,6 +85,14 @@ document.addEventListener('emg-jsc:datatable:bulk-delete:error', () => {
         detail: { message: 'Error al eliminar los registros seleccionados', type: MessageToastType.ERROR, duration: 3000 }
     }));
 });
+document.addEventListener('emg-jsc:datatable:fetch:unauthorized', () => {
+    // In a real app: window.location.href = '/login';
+    console.warn('DataTable: sesión caducada (401). Redirigir al login.');
+});
+document.addEventListener('emg-jsc:datatable:fetch:redirect', (e) => {
+    // In a real app: window.location.href = e.detail.url;
+    console.warn('DataTable: petición redirigida a', e.detail.url);
+});
 
 // Custom logic for the example page
 document.addEventListener('DOMContentLoaded', () => {
