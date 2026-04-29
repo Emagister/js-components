@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.7.0](https://github.com/Emagister/js-components/compare/v1.6.0...v1.7.0) (2026-04-29)
+
+
+### Features
+
+* **datatable:** emit auth events on 401 and redirect responses ([86865ee](https://github.com/Emagister/js-components/commit/86865eed9919605a648aee6b56eee03afc36654b))
+
+
+
+
 ## [1.6.0](https://github.com/Emagister/js-components/compare/v1.5.2...v1.6.0) (2026-04-28)
 
 
