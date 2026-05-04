@@ -889,6 +889,12 @@ describe('DataTable', () => {
             expect(dt.config.pageSizeOptions).toEqual([5, 10, 20, 50]);
         });
 
+        it('no añade perPage si pageSizeOptions es [] (selector oculto)', () => {
+            element.dataset.settings = JSON.stringify({ pageSizeOptions: [] });
+            const dt = new DataTable(element);
+            expect(dt.config.pageSizeOptions).toEqual([]);
+        });
+
         it('tiene actionsWidth "80px" por defecto', () => {
             const dt = new DataTable(element);
             expect(dt.config.actionsWidth).toBe('80px');
