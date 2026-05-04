@@ -871,6 +871,30 @@ describe('DataTable', () => {
             expect(dt.config.pageSizeOptions).toEqual([5, 10, 20]);
         });
 
+        it('añade perPage a pageSizeOptions si no está incluido, ordenado', () => {
+            element.dataset.settings = JSON.stringify({ perPage: 20, pageSizeOptions: [10, 25, 50, 100] });
+            const dt = new DataTable(element);
+            expect(dt.config.pageSizeOptions).toEqual([10, 20, 25, 50, 100]);
+        });
+
+        it('no duplica perPage si ya está en pageSizeOptions', () => {
+            element.dataset.settings = JSON.stringify({ perPage: 25, pageSizeOptions: [10, 25, 50, 100] });
+            const dt = new DataTable(element);
+            expect(dt.config.pageSizeOptions).toEqual([10, 25, 50, 100]);
+        });
+
+        it('añade perPage por defecto (10) a pageSizeOptions personalizadas si no está incluido', () => {
+            element.dataset.settings = JSON.stringify({ pageSizeOptions: [5, 20, 50] });
+            const dt = new DataTable(element);
+            expect(dt.config.pageSizeOptions).toEqual([5, 10, 20, 50]);
+        });
+
+        it('no añade perPage si pageSizeOptions es [] (selector oculto)', () => {
+            element.dataset.settings = JSON.stringify({ pageSizeOptions: [] });
+            const dt = new DataTable(element);
+            expect(dt.config.pageSizeOptions).toEqual([]);
+        });
+
         it('tiene actionsWidth "80px" por defecto', () => {
             const dt = new DataTable(element);
             expect(dt.config.actionsWidth).toBe('80px');

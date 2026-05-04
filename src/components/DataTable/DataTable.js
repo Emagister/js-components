@@ -38,6 +38,10 @@ export default class DataTable extends Component {
             },
         };
 
+        if (this.config.pageSizeOptions.length > 0 && !this.config.pageSizeOptions.includes(this.config.perPage)) {
+            this.config.pageSizeOptions = [...this.config.pageSizeOptions, this.config.perPage].sort((a, b) => a - b);
+        }
+
         this.state = {
             data: [],
             meta: {
