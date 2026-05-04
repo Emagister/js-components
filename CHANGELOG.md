@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.8.0](https://github.com/Emagister/js-components/compare/v1.7.0...v1.8.0) (2026-05-04)
+
+
+### Features
+
+* **datatable:** auto-include perPage value in pageSizeOptions if missing ([ccd8038](https://github.com/Emagister/js-components/commit/ccd8038a068696c8378dbf6f34982696dff78d14))
+
+
+### Bug Fixes
+
+* **datatable:** skip perPage auto-insert when pageSizeOptions is [] ([11e333f](https://github.com/Emagister/js-components/commit/11e333f9bd028176ee76134a0920d9f55eb46642))
+
+
+
+
 ## [1.7.0](https://github.com/Emagister/js-components/compare/v1.6.0...v1.7.0) (2026-04-29)
 
 
