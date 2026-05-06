@@ -20,20 +20,22 @@ export default class ComponentManager {
     /**
      * Internal initialization
      */
-    init() {
-        this.#mountAll(document.body);
+    async init() {
+        await this.#mountAll(document.body);
         this.#observeDOM();
         this.#listenScanEvent();
 
         window.dispatchEvent(new CustomEvent('emg-jsc:initialized'));
     }
 
-    #mountAll(root) {
+    async #mountAll(root) {
+        const promises = [];
         Object.keys(this.registry).forEach((name) => {
             root.querySelectorAll(`[data-component~="${name}"]`).forEach((element) => {
-                this.#checkAndMount(element, name);
+                promises.push(this.#checkAndMount(element, name));
             });
         });
+        await Promise.all(promises);
     }
 
     #mount(element, ComponentClass) {

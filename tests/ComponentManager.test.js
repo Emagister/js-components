@@ -104,12 +104,33 @@ describe('ComponentManager', () => {
     });
 
     describe('init()', () => {
-        it('emite el evento emg-jsc:initialized en window', () => {
+        it('emite el evento emg-jsc:initialized en window', async () => {
             const handler = vi.fn();
             window.addEventListener('emg-jsc:initialized', handler);
-            manager.init();
+            await manager.init();
             window.removeEventListener('emg-jsc:initialized', handler);
             expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('emite emg-jsc:initialized solo después de que todos los componentes estén montados', async () => {
+            const MockClass = createMockComponentClass();
+            const { default: registry } = await import('../src/ComponentRegistry.js');
+
+            let resolveLoader;
+            registry['loader'].mockReturnValue(new Promise(r => { resolveLoader = r; }));
+
+            document.body.innerHTML = '<div data-component="loader"></div>';
+
+            let mountedWhenEventFired = false;
+            window.addEventListener('emg-jsc:initialized', () => {
+                mountedWhenEventFired = MockClass.mock.calls.length > 0;
+            }, { once: true });
+
+            const initPromise = manager.init();
+            resolveLoader({ default: MockClass });
+            await initPromise;
+
+            expect(mountedWhenEventFired).toBe(true);
         });
     });
 
@@ -170,7 +191,7 @@ describe('ComponentManager', () => {
             const { default: registry } = await import('../src/ComponentRegistry.js');
             registry['loader'].mockResolvedValue({ default: MockClass });
 
-            manager.init();
+            await manager.init();
 
             // Insertar el nodo sin data-component para que el MutationObserver
             // no lo monte. El observer solo escucha childList, no atributos.
