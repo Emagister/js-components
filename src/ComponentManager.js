@@ -10,30 +10,37 @@ export default class ComponentManager {
      * Bootstraps the application by scanning the DOM for components
      */
     start() {
+        const run = () => void this.init().catch((error) => {
+            console.error('ComponentManager initialization failed:', error);
+        });
+
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
+            document.addEventListener('DOMContentLoaded', run);
         } else {
-            this.init();
+            run();
         }
     }
 
     /**
      * Internal initialization
      */
-    init() {
-        this.#mountAll(document.body);
+    async init() {
         this.#observeDOM();
         this.#listenScanEvent();
+
+        await this.#mountAll(document.body);
 
         window.dispatchEvent(new CustomEvent('emg-jsc:initialized'));
     }
 
-    #mountAll(root) {
+    async #mountAll(root) {
+        const promises = [];
         Object.keys(this.registry).forEach((name) => {
             root.querySelectorAll(`[data-component~="${name}"]`).forEach((element) => {
-                this.#checkAndMount(element, name);
+                promises.push(this.#checkAndMount(element, name));
             });
         });
+        await Promise.all(promises);
     }
 
     #mount(element, ComponentClass) {
