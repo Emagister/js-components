@@ -1,5 +1,16 @@
 # Changelog
 
+### [1.8.1](https://github.com/Emagister/js-components/compare/v1.8.0...v1.8.1) (2026-05-06)
+
+
+### Bug Fixes
+
+* **component-manager:** address review comments on async init ([ed5d890](https://github.com/Emagister/js-components/commit/ed5d89059d8e9d53cb6d34d1b9dfd6d1e65d0c1f))
+* **component-manager:** await all mounts before emitting emg-jsc:initialized ([dfeea29](https://github.com/Emagister/js-components/commit/dfeea2966cf817b2715eb134eaaf1b72291a9aae))
+
+
+
+
 ## [1.8.0](https://github.com/Emagister/js-components/compare/v1.7.0...v1.8.0) (2026-05-04)
 
 
