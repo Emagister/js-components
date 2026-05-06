@@ -10,10 +10,14 @@ export default class ComponentManager {
      * Bootstraps the application by scanning the DOM for components
      */
     start() {
+        const run = () => void this.init().catch((error) => {
+            console.error('ComponentManager initialization failed:', error);
+        });
+
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.init());
+            document.addEventListener('DOMContentLoaded', run);
         } else {
-            this.init();
+            run();
         }
     }
 
@@ -21,9 +25,10 @@ export default class ComponentManager {
      * Internal initialization
      */
     async init() {
-        await this.#mountAll(document.body);
         this.#observeDOM();
         this.#listenScanEvent();
+
+        await this.#mountAll(document.body);
 
         window.dispatchEvent(new CustomEvent('emg-jsc:initialized'));
     }

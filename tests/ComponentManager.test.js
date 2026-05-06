@@ -77,14 +77,14 @@ describe('ComponentManager', () => {
 
     describe('start()', () => {
         it('llama a init() si el DOM ya está cargado', () => {
-            const initSpy = vi.spyOn(manager, 'init').mockImplementation(() => {});
+            const initSpy = vi.spyOn(manager, 'init').mockResolvedValue(undefined);
             // En happy-dom readyState es 'complete'
             manager.start();
             expect(initSpy).toHaveBeenCalledOnce();
         });
 
         it('espera al evento DOMContentLoaded si el DOM aún está cargando', () => {
-            const initSpy = vi.spyOn(manager, 'init').mockImplementation(() => {});
+            const initSpy = vi.spyOn(manager, 'init').mockResolvedValue(undefined);
             Object.defineProperty(document, 'readyState', {
                 configurable: true,
                 get: () => 'loading',
@@ -179,9 +179,9 @@ describe('ComponentManager', () => {
             });
         });
 
-        it('no lanza error si el componente no existe en el registry', () => {
+        it('no lanza error si el componente no existe en el registry', async () => {
             document.body.innerHTML = '<div data-component="componente-inexistente"></div>';
-            expect(() => manager.init()).not.toThrow();
+            await expect(manager.init()).resolves.toBeUndefined();
         });
     });
 
