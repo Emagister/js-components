@@ -12,6 +12,7 @@ const EXPECTED_COMPONENTS = [
     'modal',
     'confirm',
     'rich-text-editor',
+    'rich-multi-select',
 ];
 
 describe('ComponentRegistry', () => {

@@ -1,0 +1,27 @@
+@use "../../../scss/variables";
+
+.ts-wrapper {
+    &.multi .ts-control {
+        gap: 0.25rem;
+    }
+
+    .ts-control {
+        border-color: variables.$emg-border-color;
+        font-family: var(--emg-font-family-base);
+    }
+
+    .ts-control,
+    .ts-dropdown {
+        font-family: var(--emg-font-family-base);
+    }
+
+    .ts-dropdown .active {
+        background-color: variables.$emg-brand-color;
+        color: #fff;
+    }
+
+    &.focus .ts-control {
+        border-color: variables.$emg-brand-color;
+        box-shadow: 0 0 0 0.2rem rgba(76, 183, 172, 0.25);
+    }
+}

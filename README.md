@@ -395,6 +395,73 @@ editor.addEventListener('emg-jsc:richTextEditor:initialized', () => {
 });
 ```
 
+### `rich-multi-select`
+
+Control de selección múltiple enriquecido basado en [Tom Select](https://tom-select.github.io/). Permite búsqueda textual en tiempo real, ítems seleccionados como tags eliminables y carga remota de opciones vía AJAX.
+
+**Peer dependency requerida:** `tom-select >= 2.3`
+
+```html
+<select
+  id="centers"
+  name="centers[]"
+  multiple
+  data-component="rich-multi-select"
+  data-settings='{
+    "placeholder": "Buscar centros…",
+    "maxItems": 10
+  }'
+>
+  <option value="1">Centro Madrid</option>
+  <option value="2" selected>Centro Barcelona</option>
+</select>
+```
+
+#### Opciones (`data-settings`)
+
+| Propiedad | Tipo | Default | Descripción |
+| :--- | :--- | :--- | :--- |
+| `placeholder` | string | `"Seleccionar…"` | Texto del input cuando no hay selección. |
+| `maxItems` | number\|null | `null` | Máximo de ítems seleccionables. `null` = ilimitado. |
+| `searchField` | string | `"text"` | Campo(s) por los que buscar (p.ej. `"text,value"`). |
+| `remoteUrl` | string | — | Si se indica, carga opciones por AJAX enviando `?q=<término>`. |
+| `remoteValueField` | string | `"id"` | Campo del JSON remoto usado como `value`. |
+| `remoteLabelField` | string | `"name"` | Campo del JSON remoto usado como etiqueta visible. |
+| `noResultsText` | string | `"Sin resultados"` | Mensaje cuando la búsqueda no encuentra coincidencias. |
+| `create` | boolean | `false` | Permite crear opciones nuevas no existentes. |
+
+#### API pública (`element.richMultiSelect`)
+
+```javascript
+const rms = document.getElementById('centers').richMultiSelect;
+
+rms.getValue();                          // → ['1', '3']
+rms.setValue(['2', '4']);
+rms.addOption({ value: '99', text: 'Centro Nuevo' });
+rms.clear();
+rms.destroy();
+```
+
+#### Eventos
+
+| Evento | `event.detail` |
+| :--- | :--- |
+| `emg-jsc:richMultiSelect:change` | `{ values: string[] }` |
+| `emg-jsc:richMultiSelect:item-add` | `{ value: string, text: string }` |
+| `emg-jsc:richMultiSelect:item-remove` | `{ value: string }` |
+| `emg-jsc:richMultiSelect:focus` | — |
+| `emg-jsc:richMultiSelect:blur` | — |
+| `emg-jsc:richMultiSelect:load-error` | — |
+
+#### Carga remota
+
+Cuando `remoteUrl` está definida, el componente realiza peticiones `GET` con el término de búsqueda como parámetro `q`. La búsqueda se activa con un mínimo de **2 caracteres** y tiene un debounce de **300 ms**.
+
+```
+GET /api/centers/search?q=mad
+→ [{ "id": "1", "name": "Centro Madrid Norte" }, ...]
+```
+
 ### `tooltip`
 Wrapper del Tooltip de Bootstrap. Usa el atributo estándar `title` para el texto.
 

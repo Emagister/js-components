@@ -43,12 +43,14 @@
     "@tiptap/starter-kit": "^3.0.0",
     "bootstrap": "^5.3.0",
     "bootstrap-icons": "^1.11.0",
-    "flatpickr": "^4.0.0"
+    "flatpickr": "^4.0.0",
+    "tom-select": "^2.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "@tiptap/core": "^3.22.4",
     "@tiptap/starter-kit": "^3.22.4",
+    "tom-select": "^2.3.0",
     "@vitest/coverage-v8": "^4.1.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",

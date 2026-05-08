@@ -297,6 +297,91 @@
         </div>
     </div>
 
+    <!-- RichMultiSelect Component -->
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">RichMultiSelect Component</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Básico: opciones en el DOM -->
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Selección con opciones en DOM</h6>
+                            <label for="select-cities" class="form-label">Ciudades</label>
+                            <select
+                                id="select-cities"
+                                name="cities[]"
+                                multiple
+                                data-component="rich-multi-select"
+                                data-settings='{"placeholder": "Buscar ciudades…", "maxItems": 3}'
+                            >
+                                <option value="1">Madrid</option>
+                                <option value="2" selected>Barcelona</option>
+                                <option value="3">Valencia</option>
+                                <option value="4">Sevilla</option>
+                                <option value="5">Bilbao</option>
+                                <option value="6">Zaragoza</option>
+                            </select>
+                            <p class="form-text">Máximo 3 ítems seleccionables.</p>
+                        </div>
+
+                        <!-- Con create habilitado -->
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Con creación de opciones</h6>
+                            <label for="select-tags" class="form-label">Etiquetas</label>
+                            <select
+                                id="select-tags"
+                                name="tags[]"
+                                multiple
+                                data-component="rich-multi-select"
+                                data-settings='{"placeholder": "Añadir etiquetas…", "create": true, "noResultsText": "No encontrado. Pulsa Enter para crear."}'
+                            >
+                                <option value="frontend">Frontend</option>
+                                <option value="backend">Backend</option>
+                                <option value="devops" selected>DevOps</option>
+                            </select>
+                            <p class="form-text">Escribe y pulsa Enter para crear una opción nueva.</p>
+                        </div>
+
+                        <!-- Eventos -->
+                        <div class="col-12">
+                            <h6 class="text-muted mb-2">Registro de eventos (<code>emg-jsc:richMultiSelect:*</code>)</h6>
+                            <div id="rms-event-log" class="border rounded p-2 bg-light font-monospace small" style="min-height:4rem; max-height:8rem; overflow-y:auto;">
+                                <span class="text-muted">Los eventos aparecerán aquí…</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        document.addEventListener('emg-jsc:richMultiSelect:change', (e) => {
+            const log = document.getElementById('rms-event-log');
+            const entry = document.createElement('div');
+            entry.textContent = `[change] values: ${JSON.stringify(e.detail.values)}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        });
+        document.addEventListener('emg-jsc:richMultiSelect:item-add', (e) => {
+            const log = document.getElementById('rms-event-log');
+            const entry = document.createElement('div');
+            entry.textContent = `[item-add] value: ${e.detail.value}, text: "${e.detail.text}"`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        });
+        document.addEventListener('emg-jsc:richMultiSelect:item-remove', (e) => {
+            const log = document.getElementById('rms-event-log');
+            const entry = document.createElement('div');
+            entry.textContent = `[item-remove] value: ${e.detail.value}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        });
+    </script>
+
     <!-- App Entry Point -->
     <script type="module" src="./js/main.js"></script>
 </body>
