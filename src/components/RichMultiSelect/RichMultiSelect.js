@@ -33,7 +33,7 @@ export default class RichMultiSelect extends Component {
             },
             onChange: (values) => {
                 this.root.dispatchEvent(new CustomEvent('emg-jsc:richMultiSelect:change', {
-                    detail: { values: Array.isArray(values) ? values : (values ? [values] : []) },
+                    detail: { values: this.#toArray(values) },
                 }));
             },
             onItemAdd: (value, $item) => {
@@ -65,10 +65,7 @@ export default class RichMultiSelect extends Component {
         this.instance = new TomSelect(this.root, tsConfig);
 
         this.root.richMultiSelect = {
-            getValue: () => {
-                const val = this.instance.getValue();
-                return Array.isArray(val) ? val : (val ? [val] : []);
-            },
+            getValue: () => this.#toArray(this.instance.getValue()),
             setValue: (values) => this.instance.setValue(values),
             addOption: (option) => this.instance.addOption(option),
             clear: () => this.instance.clear(),
@@ -97,6 +94,10 @@ export default class RichMultiSelect extends Component {
                     callback();
                 });
         };
+    }
+
+    #toArray(val) {
+        return Array.isArray(val) ? val : (val ? [val] : []);
     }
 
     #destroy() {
