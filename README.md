@@ -19,6 +19,9 @@ npm install flatpickr
 
 # Para RichTextEditor
 npm install @tiptap/core @tiptap/starter-kit
+
+# Para RichMultiSelect
+npm install tom-select
 ```
 
 ## Uso Principal: ComponentManager
@@ -395,6 +398,90 @@ editor.addEventListener('emg-jsc:richTextEditor:initialized', () => {
 });
 ```
 
+### `rich-multi-select`
+Control de selección múltiple enriquecido basado en [Tom Select](https://tom-select.js.org). Muestra los ítems seleccionados como tags con botón de eliminación, soporta búsqueda en tiempo real y carga remota via AJAX.
+
+**Peer dependency requerida**: `tom-select ^2.3`. Los estilos del tema Bootstrap 5 se incluyen automáticamente en el bundle CSS de la librería.
+
+```bash
+npm install tom-select
+```
+
+Uso básico con opciones estáticas:
+```html
+<select name="centers[]" multiple
+        data-component="rich-multi-select"
+        data-settings='{"placeholder": "Selecciona centros…", "maxItems": 3}'>
+  <option value="1">Centro Madrid</option>
+  <option value="2" selected>Centro Barcelona</option>
+  <option value="3">Centro Valencia</option>
+</select>
+```
+
+Opciones en `data-settings`:
+
+| Propiedad | Tipo | Default | Descripción |
+|---|---|---|---|
+| `placeholder` | String | `"Seleccionar…"` | Texto del input cuando no hay selección. |
+| `maxItems` | Number \| null | `null` | Máximo de ítems seleccionables. `null` es ilimitado. |
+| `searchField` | String | `"text"` | Campo(s) sobre los que buscar. |
+| `create` | Boolean | `false` | Permite crear opciones nuevas no existentes. |
+| `noResultsText` | String | `"Sin resultados"` | Mensaje cuando la búsqueda no devuelve coincidencias. |
+| `remoteUrl` | String | — | Si se indica, activa la carga remota vía AJAX (ver más abajo). |
+| `remoteValueField` | String | `"id"` | Campo del JSON de respuesta usado como `value`. |
+| `remoteLabelField` | String | `"name"` | Campo del JSON de respuesta usado como etiqueta visible. |
+
+Carga remota (AJAX):
+
+Cuando se define `remoteUrl`, el componente hace `GET {remoteUrl}?q={término}` al escribir en el input. Debounce de 300 ms, mínimo 2 caracteres para activar la búsqueda.
+
+```html
+<select name="centers[]" multiple
+        data-component="rich-multi-select"
+        data-settings='{
+          "placeholder": "Buscar centros…",
+          "remoteUrl": "/api/centers/search"
+        }'>
+</select>
+```
+
+El servidor debe responder con un array JSON:
+```json
+[
+  { "id": "1", "name": "Centro Madrid Norte" },
+  { "id": "2", "name": "Centro Madrid Sur" }
+]
+```
+
+Los campos `id` y `name` son los valores por defecto; se pueden cambiar con `remoteValueField` y `remoteLabelField`.
+
+API expuesta en `element.richMultiSelect`:
+- `getValue()` — devuelve un array con los valores seleccionados.
+- `setValue(values)` — establece la selección programáticamente.
+- `addOption({ value, text })` — añade una opción dinámica al control.
+- `clear()` — limpia toda la selección.
+- `destroy()` — destruye la instancia y restaura el `<select>` original.
+
+```javascript
+const select = document.getElementById('my-select');
+select.addEventListener('emg-jsc:richMultiSelect:initialized', () => {
+  select.richMultiSelect.setValue(['1', '3']);
+  console.log(select.richMultiSelect.getValue()); // ['1', '3']
+});
+```
+
+Eventos emitidos sobre el `<select>` original:
+
+| Evento | Cuándo | `event.detail` |
+|---|---|---|
+| `emg-jsc:richMultiSelect:change` | Al añadir o eliminar un ítem | `{ values: string[] }` |
+| `emg-jsc:richMultiSelect:item-add` | Al seleccionar un nuevo ítem | `{ value, text }` |
+| `emg-jsc:richMultiSelect:item-remove` | Al eliminar un ítem seleccionado | `{ value }` |
+| `emg-jsc:richMultiSelect:focus` | Al abrir el desplegable | — |
+| `emg-jsc:richMultiSelect:blur` | Al cerrar el desplegable | — |
+| `emg-jsc:richMultiSelect:load-error` | Cuando falla la carga remota (HTTP no ok o error de red) | — |
+| `emg-jsc:richMultiSelect:initialized` | Cuando el componente está listo | — |
+
 ### `tooltip`
 Wrapper del Tooltip de Bootstrap. Usa el atributo estándar `title` para el texto.
 
@@ -447,6 +534,7 @@ Dado que el ejemplo es puramente frontend, algunos componentes (`DataTable` y `A
 
 - **DataTable**: Carga datos desde `example/datatableData.json` y simula la paginación dinámica mediante el interceptor de peticiones.
 - **AsyncForm**: Utiliza un interceptor de `fetch` en `example/js/main.js` para simular errores 422 (con feedback por campo) y éxitos mediante parámetros en la URL (ej: `?simulate-error`). Incluye retardos artificiales para visualizar los estados de carga.
+- **RichMultiSelect**: El ejemplo de carga remota intercepta `GET /api/centers/search?q=` y devuelve una lista de centros filtrados con 400 ms de retardo artificial para visualizar el spinner de carga.
 
 Esto permite probar el comportamiento de validación y los estados de carga de los componentes sin necesidad de un backend activo durante el desarrollo.
 
