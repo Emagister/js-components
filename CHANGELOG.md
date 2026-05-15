@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.9.0](https://github.com/Emagister/js-components/compare/v1.8.1...v1.9.0) (2026-05-15)
+
+
+### Features
+
+* **rich-multi-select:** add RichMultiSelect component ([d9b9645](https://github.com/Emagister/js-components/commit/d9b9645ab9f25a8d16fd14f39cc8bfdc557be949))
+
+
+### Bug Fixes
+
+* **rich-multi-select:** address PR review comments ([1b16cd7](https://github.com/Emagister/js-components/commit/1b16cd7afe677bd0ff7acf34cbd51f66e6219235))
+* **rich-multi-select:** guard stale fetch after destroy and handle malformed settings ([497f042](https://github.com/Emagister/js-components/commit/497f042d100a4f4318d694069e265e5e51ad46fc))
+* **rich-multi-select:** prevent stale fetch after destroy and fix hardcoded color ([8d624f2](https://github.com/Emagister/js-components/commit/8d624f2ca5151ec006ac478aa3f113b877c5cd84))
+* **rich-multi-select:** remove border-color override to match Bootstrap form controls ([075e800](https://github.com/Emagister/js-components/commit/075e8004751e6963d967e9ed25b22c19b0da3b23))
+* **rich-multi-select:** sync package-lock.json to match package.json ([0245cc9](https://github.com/Emagister/js-components/commit/0245cc95ac5d9350dee096892ee49ca58deab848))
+
+
+### Styles
+
+* **rich-multi-select:** add missing newline at end of SCSS file ([06603c0](https://github.com/Emagister/js-components/commit/06603c0b4344287f177ce373d7ce6b9e385db087))
+
+
+
+
 ### [1.8.1](https://github.com/Emagister/js-components/compare/v1.8.0...v1.8.1) (2026-05-06)
 
 
