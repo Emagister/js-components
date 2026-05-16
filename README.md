@@ -171,7 +171,7 @@ Ejemplo de personalización de labels en inglés y selector de página reducido:
 Propiedades de `data-columns` (array de objetos):
 - `key` (String): Clave del campo en los datos.
 - `label` (String): Texto del encabezado.
-- `sortable` (Boolean): Activa la ordenación por esta columna.
+- `sortable` (Boolean): Activa la ordenación por esta columna. Al hacer click en la cabecera el ordenamiento cicla en tres estados: **ascendente → descendente → reset** (sin orden activo). Las cabeceras ordenables muestran siempre dos flechas indicadoras: la activa se resalta en color y la inactiva queda atenuada; en estado reset ambas flechas aparecen en gris.
 - `headerClass` (String): Clases CSS aplicadas al `<th>` de esta columna.
 - `link` (String): Clave del campo que contiene la URL para enlazar el valor.
 - `badge` (String): Clave del campo que determina el nivel del badge Bootstrap.

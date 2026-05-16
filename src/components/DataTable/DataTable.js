@@ -366,11 +366,11 @@ export default class DataTable extends Component {
 
     handleSort(columnKey) {
         const isSameColumn = this.state.sortBy === columnKey;
-        const newOrder = isSameColumn && this.state.sortOrder === 'asc' ? 'desc' : 'asc';
+        const isReset = isSameColumn && this.state.sortOrder === 'desc';
 
         this.#setState({
-            sortBy: columnKey,
-            sortOrder: newOrder,
+            sortBy: isReset ? null : columnKey,
+            sortOrder: isReset || !isSameColumn ? 'asc' : 'desc',
             meta: { ...this.state.meta, page: 1 }
         });
 
