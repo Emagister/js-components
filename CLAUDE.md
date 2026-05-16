@@ -63,6 +63,15 @@ Tests go in `tests/` mirroring the `src/` structure. Run tests via Docker as sho
 
 Always write commit messages in English. Use the conventional commits format (`feat`, `fix`, `test`, `refactor`, `chore`, etc.).
 
+### Resolving Pull Request Comments
+
+When addressing PR review comments:
+
+1. Fix the issue and push the commit.
+2. Reply to the comment on GitHub (via `gh pr comment` or the review thread) with a brief explanation of the resolution and the SHA of the fix commit, so the human reviewer can locate the change immediately without searching the history.
+
+Example reply format: `Fixed in <sha>: <one-line explanation of what was changed and why.>`
+
 ### Documentation and Examples
 
 After every functional change to a component (new feature, new setting, behavior change), always update:
