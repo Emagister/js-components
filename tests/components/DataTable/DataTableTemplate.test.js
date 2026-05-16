@@ -123,6 +123,26 @@ describe('DataTableTemplate', () => {
             expect(content.querySelector('thead th .sort-icon')).not.toBeNull();
         });
 
+        it('establece aria-sort="ascending" en la columna ordenada asc', () => {
+            const state = { ...baseState, sortBy: 'name', sortOrder: 'asc' };
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('thead th').getAttribute('aria-sort')).toBe('ascending');
+        });
+
+        it('establece aria-sort="descending" en la columna ordenada desc', () => {
+            const state = { ...baseState, sortBy: 'name', sortOrder: 'desc' };
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('thead th').getAttribute('aria-sort')).toBe('descending');
+        });
+
+        it('no establece aria-sort cuando sortBy es null (estado reset)', () => {
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(baseState, config);
+            expect(content.querySelector('thead th').hasAttribute('aria-sort')).toBe(false);
+        });
+
         it('aplica headerClass a la th cuando col.headerClass está definido', () => {
             const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', headerClass: 'text-end' }] };
             const content = template.createContent(baseState, config);

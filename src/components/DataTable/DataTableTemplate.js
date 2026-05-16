@@ -148,6 +148,7 @@ export default class DataTableTemplate {
             const isSorted = state.sortBy === col.key;
             if (isSorted) {
                 th.classList.add(state.sortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+                th.setAttribute('aria-sort', state.sortOrder === 'asc' ? 'ascending' : 'descending');
             }
         } else {
             th.textContent = col.label;
