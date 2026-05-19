@@ -65,6 +65,8 @@ export default class DataTable extends Component {
     }
 
     init() {
+        this.root.classList.add('data-table-container');
+
         this.loader = new Loader(this.root);
         this.loader.init();
 

@@ -135,6 +135,19 @@ describe('DataTable', () => {
             expect(element.querySelector('div')).not.toBeNull();
         });
 
+        it('añade la clase data-table-container al elemento raíz', () => {
+            const dt = new DataTable(element);
+            dt.init();
+            expect(element.classList.contains('data-table-container')).toBe(true);
+        });
+
+        it('no duplica la clase data-table-container si ya está presente', () => {
+            element.classList.add('data-table-container');
+            const dt = new DataTable(element);
+            dt.init();
+            expect(element.className.match(/data-table-container/g)).toHaveLength(1);
+        });
+
         it('llama a fetch con la URL configurada', async () => {
             const dt = new DataTable(element);
             dt.init();

@@ -66,7 +66,7 @@ Solo tienes que añadir el atributo `data-component` a tus elementos HTML. La li
 Todos los componentes se activan añadiendo `data-component="<nombre>"` al elemento HTML. La configuración se puede pasar mediante `data-settings='{"opcion": valor}'` o en algunos componentes directamente como atributos `data-*`.
 
 ### `data-table`
-Tabla dinámica con paginación y ordenación.
+Tabla dinámica con paginación y ordenación. Al inicializarse, el componente añade automáticamente la clase `data-table-container` al elemento raíz, que es la que activa todos sus estilos CSS.
 
 Atributos HTML:
 - `data-url` (String): URL de la API que devuelve los datos.

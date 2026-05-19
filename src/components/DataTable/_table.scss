@@ -8,7 +8,7 @@
     color: var(--emg-table-header-color, #{variables.$emg-table-header-color});
   }
 
-  tr:hover {
+  tbody tr:hover {
     background-color: var(--emg-table-row-hover-bg, #{variables.$emg-table-row-hover-bg});
   }
 
