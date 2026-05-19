@@ -14,6 +14,10 @@ $emg-table-border-color: transparent !default;
 $emg-table-header-bg: transparent !default;
 $emg-table-header-color: inherit !default;
 $emg-table-row-hover-bg: rgba(0, 0, 0, 0.05) !default;
+$emg-table-sortable-hover-bg: #d0edeb !default;
+$emg-table-sortable-active-color: $emg-brand-color !default;
+$emg-table-sort-arrow-default: #bbb !default;
+$emg-table-sort-arrow-muted: #ddd !default;
 
 // Toast Variables
 $emg-toast-success: #3c763d !default;

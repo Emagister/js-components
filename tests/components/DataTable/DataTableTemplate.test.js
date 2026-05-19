@@ -95,18 +95,52 @@ describe('DataTableTemplate', () => {
             expect(content.querySelector('thead th[data-sort]')).toBeNull();
         });
 
-        it('muestra ↑ en la columna actualmente ordenada asc', () => {
+        it('añade la clase sort-asc en la columna actualmente ordenada asc', () => {
             const state = { ...baseState, sortBy: 'name', sortOrder: 'asc' };
             const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
             const content = template.createContent(state, config);
-            expect(content.querySelector('thead th').textContent).toContain('↑');
+            expect(content.querySelector('thead th').classList.contains('sort-asc')).toBe(true);
         });
 
-        it('muestra ↓ en la columna actualmente ordenada desc', () => {
+        it('añade la clase sort-desc en la columna actualmente ordenada desc', () => {
             const state = { ...baseState, sortBy: 'name', sortOrder: 'desc' };
             const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
             const content = template.createContent(state, config);
-            expect(content.querySelector('thead th').textContent).toContain('↓');
+            expect(content.querySelector('thead th').classList.contains('sort-desc')).toBe(true);
+        });
+
+        it('no añade sort-asc ni sort-desc cuando sortBy es null (estado reset)', () => {
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(baseState, config);
+            const th = content.querySelector('thead th');
+            expect(th.classList.contains('sort-asc')).toBe(false);
+            expect(th.classList.contains('sort-desc')).toBe(false);
+        });
+
+        it('renderiza el elemento .sort-icon dentro de columnas sortable', () => {
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(baseState, config);
+            expect(content.querySelector('thead th .sort-icon')).not.toBeNull();
+        });
+
+        it('establece aria-sort="ascending" en la columna ordenada asc', () => {
+            const state = { ...baseState, sortBy: 'name', sortOrder: 'asc' };
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('thead th').getAttribute('aria-sort')).toBe('ascending');
+        });
+
+        it('establece aria-sort="descending" en la columna ordenada desc', () => {
+            const state = { ...baseState, sortBy: 'name', sortOrder: 'desc' };
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('thead th').getAttribute('aria-sort')).toBe('descending');
+        });
+
+        it('no establece aria-sort cuando sortBy es null (estado reset)', () => {
+            const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', sortable: true }] };
+            const content = template.createContent(baseState, config);
+            expect(content.querySelector('thead th').hasAttribute('aria-sort')).toBe(false);
         });
 
         it('aplica headerClass a la th cuando col.headerClass está definido', () => {

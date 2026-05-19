@@ -24,6 +24,10 @@
   --emg-table-header-bg: #{variables.$emg-table-header-bg};
   --emg-table-header-color: #{variables.$emg-table-header-color};
   --emg-table-row-hover-bg: #{variables.$emg-table-row-hover-bg};
+  --emg-table-sortable-hover-bg: #{variables.$emg-table-sortable-hover-bg};
+  --emg-table-sortable-active-color: #{variables.$emg-table-sortable-active-color};
+  --emg-table-sort-arrow-default: #{variables.$emg-table-sort-arrow-default};
+  --emg-table-sort-arrow-muted: #{variables.$emg-table-sort-arrow-muted};
 
   // MessageToast
   --emg-toast-success: #{variables.$emg-toast-success};
