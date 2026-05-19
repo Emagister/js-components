@@ -224,6 +224,20 @@ describe('DataTableTemplate', () => {
             const content = template.createContent(state, baseConfig);
             expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(false);
         });
+
+        it('aplica datatable-row--disabled con prefijo ! cuando el campo es falsy', () => {
+            const config = { ...baseConfig, disabledRow: '!is_active' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_active: false }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(true);
+        });
+
+        it('no aplica datatable-row--disabled con prefijo ! cuando el campo es truthy', () => {
+            const config = { ...baseConfig, disabledRow: '!is_active' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_active: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(false);
+        });
     });
 
     describe('acciones', () => {

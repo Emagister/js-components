@@ -195,8 +195,12 @@ export default class DataTableTemplate {
 
         for (const row of state.data) {
             const tr = this.#createTr(row.id);
-            if (config.disabledRow && row[config.disabledRow]) {
-                tr.classList.add('datatable-row--disabled');
+            if (config.disabledRow) {
+                const inverted = config.disabledRow.startsWith('!');
+                const field = inverted ? config.disabledRow.slice(1) : config.disabledRow;
+                if (inverted ? !row[field] : row[field]) {
+                    tr.classList.add('datatable-row--disabled');
+                }
             }
             this.#appendContentCells(row, config, tr, selectedIds);
             tableBody.appendChild(tr);
