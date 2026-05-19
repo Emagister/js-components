@@ -183,6 +183,18 @@ Propiedades de `data-actions` (array de objetos), renderizadas como iconos con t
 - `label` (String): Texto del tooltip.
 - `icon` (String): Clase del icono Bootstrap Icons (ej: `bi bi-pencil`).
 - `states` (Array): Estados condicionales. Cada estado admite `key` (campo del row que lo activa), `label` e `icon`.
+- `activeOnDisabledRow` (Boolean, default: `false`): Si es `true`, el botón de esta acción permanece interactivo aunque la fila esté marcada como desactivada (recibe la clase `datatable-action--active-on-disabled` que restaura `pointer-events`). Útil para incluir un botón de "Activar" en filas deshabilitadas.
+
+Ejemplo de uso con `disabledRow` y acción de activación:
+```json
+"disabledRow": "is_inactive"
+```
+```json
+[
+  { "name": "edit",     "label": "Editar",  "icon": "bi bi-pencil" },
+  { "name": "activate", "label": "Activar", "icon": "bi bi-check-circle", "activeOnDisabledRow": true }
+]
+```
 
 La API devuelta por el servidor debe tener el formato: `{ data: [...], meta: { page, total, perPage } }`.
 

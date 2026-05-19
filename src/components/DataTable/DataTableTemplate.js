@@ -231,6 +231,7 @@ export default class DataTableTemplate {
         }
 
         const td = document.createElement('td');
+        td.className = 'datatable-actions-cell';
 
         for (const action of config.actions) {
             const activeState = (action.states || []).find(state => !!row[state.key]);
@@ -245,6 +246,9 @@ export default class DataTableTemplate {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'btn btn-link p-0 me-2';
+            if (action.activeOnDisabledRow && tr.classList.contains('datatable-row--disabled')) {
+                button.classList.add('datatable-action--active-on-disabled');
+            }
             button.setAttribute('data-action', action.name);
             button.setAttribute('data-component', 'tooltip');
             button.setAttribute('title', label);

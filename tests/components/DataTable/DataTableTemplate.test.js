@@ -287,6 +287,49 @@ describe('DataTableTemplate', () => {
             expect(button).not.toBeNull();
             expect(button.getAttribute('title')).toBe('Aprobar');
         });
+
+        it('action con activeOnDisabledRow:true en fila desactivada recibe clase datatable-action--active-on-disabled', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'activate', label: 'Activar', icon: 'bi bi-check', activeOnDisabledRow: true }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            const button = content.querySelector('button[data-action="activate"]');
+            expect(button.classList.contains('datatable-action--active-on-disabled')).toBe(true);
+        });
+
+        it('action con activeOnDisabledRow:true en fila NO desactivada no recibe la clase', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'activate', label: 'Activar', icon: 'bi bi-check', activeOnDisabledRow: true }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: false }] };
+            const content = template.createContent(state, config);
+            const button = content.querySelector('button[data-action="activate"]');
+            expect(button.classList.contains('datatable-action--active-on-disabled')).toBe(false);
+        });
+
+        it('la <td> de acciones tiene la clase datatable-actions-cell', () => {
+            const config = { ...baseConfig, actions: [{ name: 'edit', label: 'Editar', icon: 'bi bi-pencil' }] };
+            const content = template.createContent(baseState, config);
+            const actionsTd = content.querySelector('tbody tr td:last-child');
+            expect(actionsTd.classList.contains('datatable-actions-cell')).toBe(true);
+        });
+
+        it('action sin activeOnDisabledRow en fila desactivada no recibe la clase', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'edit', label: 'Editar', icon: 'bi bi-pencil' }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            const button = content.querySelector('button[data-action="edit"]');
+            expect(button.classList.contains('datatable-action--active-on-disabled')).toBe(false);
+        });
     });
 
     describe('total de resultados', () => {

@@ -13,7 +13,20 @@
   }
 
   tr.datatable-row--disabled {
-    opacity: 0.45;
     pointer-events: none;
+
+    > td:not(.datatable-actions-cell) {
+      opacity: 0.45;
+    }
+
+    > td.datatable-actions-cell {
+      button:not(.datatable-action--active-on-disabled) {
+        opacity: 0.45;
+      }
+    }
+
+    .datatable-action--active-on-disabled {
+      pointer-events: auto;
+    }
   }
 }
