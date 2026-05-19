@@ -195,19 +195,22 @@ export default class DataTableTemplate {
 
         for (const row of state.data) {
             const tr = this.#createTr(row.id);
+            let rowDisabled = false;
             if (config.disabledRow) {
                 const inverted = config.disabledRow.startsWith('!');
                 const field = inverted ? config.disabledRow.slice(1) : config.disabledRow;
-                if (inverted ? !row[field] : row[field]) {
+                rowDisabled = inverted ? !row[field] : row[field];
+                if (rowDisabled) {
                     tr.classList.add('datatable-row--disabled');
+                    tr.setAttribute('aria-disabled', 'true');
                 }
             }
-            this.#appendContentCells(row, config, tr, selectedIds);
+            this.#appendContentCells(row, config, tr, selectedIds, rowDisabled);
             tableBody.appendChild(tr);
         }
     }
 
-    #appendContentCells(row, config, tr, selectedIds = new Set()) {
+    #appendContentCells(row, config, tr, selectedIds = new Set(), rowDisabled = false) {
         if (config.bulkDeleteUrl) {
             const td = document.createElement('td');
             const checkbox = document.createElement('input');
@@ -215,6 +218,7 @@ export default class DataTableTemplate {
             checkbox.className = 'form-check-input';
             checkbox.setAttribute('data-select-id', String(row.id));
             checkbox.checked = selectedIds.has(String(row.id));
+            if (rowDisabled) checkbox.disabled = true;
             td.appendChild(checkbox);
             tr.appendChild(td);
         }
@@ -222,10 +226,10 @@ export default class DataTableTemplate {
         for (const col of config.columns) {
             tr.appendChild(this.#createTd(row, col));
         }
-        this.#appendActions(row, config, tr);
+        this.#appendActions(row, config, tr, rowDisabled);
     }
 
-    #appendActions(row, config, tr) {
+    #appendActions(row, config, tr, rowDisabled = false) {
         if (!config.actions || !config.actions.length) {
             return;
         }
@@ -246,8 +250,12 @@ export default class DataTableTemplate {
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'btn btn-link p-0 me-2';
-            if (action.activeOnDisabledRow && tr.classList.contains('datatable-row--disabled')) {
-                button.classList.add('datatable-action--active-on-disabled');
+            if (rowDisabled) {
+                if (action.activeOnDisabledRow) {
+                    button.classList.add('datatable-action--active-on-disabled');
+                } else {
+                    button.disabled = true;
+                }
             }
             button.setAttribute('data-action', action.name);
             button.setAttribute('data-component', 'tooltip');
