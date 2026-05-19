@@ -11,4 +11,9 @@
   tr:hover {
     background-color: var(--emg-table-row-hover-bg, #{variables.$emg-table-row-hover-bg});
   }
+
+  tr.datatable-row--disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
 }

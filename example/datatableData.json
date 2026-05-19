@@ -85,6 +85,7 @@
             "email": "Julianne.OConner@kory.org",
             "status": "blocked",
             "statusLevel": "danger",
+            "is_disabled": true,
             "address": {
                 "street": "Hoeger Mall",
                 "suite": "Apt. 692",
@@ -163,6 +164,7 @@
             "email": "Telly.Hoeger@billy.biz",
             "status": "blocked",
             "statusLevel": "danger",
+            "is_disabled": true,
             "address": {
                 "street": "Rex Trail",
                 "suite": "Suite 280",
@@ -241,6 +243,7 @@
             "email": "Rey.Padberg@karina.biz",
             "status": "blocked",
             "statusLevel": "danger",
+            "is_disabled": true,
             "address": {
                 "street": "Kattie Turnpike",
                 "suite": "Suite 198",

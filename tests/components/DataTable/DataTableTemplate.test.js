@@ -204,6 +204,26 @@ describe('DataTableTemplate', () => {
             expect(i.classList.contains('bi-x-lg')).toBe(true);
             expect(i.classList.contains('text-danger')).toBe(true);
         });
+
+        it('aplica datatable-row--disabled al <tr> cuando el campo disabledRow es truthy', () => {
+            const config = { ...baseConfig, disabledRow: 'is_inactive' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(true);
+        });
+
+        it('no aplica datatable-row--disabled cuando el campo disabledRow es falsy', () => {
+            const config = { ...baseConfig, disabledRow: 'is_inactive' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: false }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(false);
+        });
+
+        it('no aplica datatable-row--disabled cuando disabledRow no está configurado', () => {
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, baseConfig);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(false);
+        });
     });
 
     describe('acciones', () => {

@@ -195,6 +195,9 @@ export default class DataTableTemplate {
 
         for (const row of state.data) {
             const tr = this.#createTr(row.id);
+            if (config.disabledRow && row[config.disabledRow]) {
+                tr.classList.add('datatable-row--disabled');
+            }
             this.#appendContentCells(row, config, tr, selectedIds);
             tableBody.appendChild(tr);
         }

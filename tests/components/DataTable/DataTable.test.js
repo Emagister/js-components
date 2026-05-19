@@ -107,6 +107,17 @@ describe('DataTable', () => {
             const dt = new DataTable(element);
             expect(dt.config.fetchOnInit).toBe(false);
         });
+
+        it('usa disabledRow null por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.disabledRow).toBeNull();
+        });
+
+        it('lee disabledRow desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ disabledRow: 'is_inactive' });
+            const dt = new DataTable(element);
+            expect(dt.config.disabledRow).toBe('is_inactive');
+        });
     });
 
     describe('init()', () => {
