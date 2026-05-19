@@ -8,7 +8,9 @@
     // Redefining component variables
     $emg-table-header-bg: #e7f3ff,
     $emg-table-header-color: #0056b3,
-    $emg-table-row-hover-bg: rgba(0, 123, 255, 0.1));
+    $emg-table-row-hover-bg: rgba(0, 123, 255, 0.1),
+    $emg-table-sortable-hover-bg: rgba(0, 123, 255, 0.15),
+    $emg-table-sortable-active-color: #0056b3);
 
 // Additional example styles
 body {

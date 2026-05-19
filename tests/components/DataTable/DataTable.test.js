@@ -317,6 +317,20 @@ describe('DataTable', () => {
             expect(dt.state.sortOrder).toBe('asc');
         });
 
+        it('resetea sortBy a null y sortOrder a asc al ordenar por la misma columna que ya está en desc', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+
+            dt.state.sortBy = 'name';
+            dt.state.sortOrder = 'desc';
+            dt.state.isLoading = false;
+
+            dt.handleSort('name');
+            expect(dt.state.sortBy).toBeNull();
+            expect(dt.state.sortOrder).toBe('asc');
+        });
+
         it('resetea la página a 1 al cambiar el orden', async () => {
             const dt = new DataTable(element);
             dt.init();

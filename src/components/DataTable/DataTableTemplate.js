@@ -122,19 +122,36 @@ export default class DataTableTemplate {
     #createTh(state, col) {
         const th = document.createElement('th');
 
-        const isSorted = state.sortBy === col.key;
-        const sortIcon = isSorted ? (state.sortOrder === 'asc' ? ' ↑' : ' ↓') : '';
-
-        th.textContent = col.label + sortIcon;
-
         if (col.headerClass) {
             th.className = col.headerClass;
         }
 
         if (col.sortable) {
+            const inner = document.createElement('span');
+            inner.className = 'th-inner';
+
+            const label = document.createElement('span');
+            label.textContent = col.label;
+
+            const icon = document.createElement('span');
+            icon.className = 'sort-icon';
+            icon.innerHTML = '<span class="arr-up"></span><span class="arr-dn"></span>';
+
+            inner.appendChild(label);
+            inner.appendChild(icon);
+            th.appendChild(inner);
+
             th.setAttribute('data-sort', col.key);
             th.style.cursor = 'pointer';
             th.classList.add('sortable-header');
+
+            const isSorted = state.sortBy === col.key;
+            if (isSorted) {
+                th.classList.add(state.sortOrder === 'asc' ? 'sort-asc' : 'sort-desc');
+                th.setAttribute('aria-sort', state.sortOrder === 'asc' ? 'ascending' : 'descending');
+            }
+        } else {
+            th.textContent = col.label;
         }
 
         return th;
