@@ -8,7 +8,7 @@
     color: var(--emg-table-header-color, #{variables.$emg-table-header-color});
   }
 
-  tr:hover {
+  tbody tr:hover {
     background-color: var(--emg-table-row-hover-bg, #{variables.$emg-table-row-hover-bg});
   }
 
@@ -53,8 +53,13 @@
       color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color});
 
       .sort-icon {
-        .arr-up { border-bottom-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color}); }
-        .arr-dn { border-top-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color}); }
+        .arr-up {
+          border-bottom-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color});
+        }
+
+        .arr-dn {
+          border-top-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color});
+        }
       }
     }
 
@@ -63,8 +68,13 @@
       color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color});
 
       .sort-icon {
-        .arr-up { border-bottom-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color}); }
-        .arr-dn { border-top-color: var(--emg-table-sort-arrow-muted, #{variables.$emg-table-sort-arrow-muted}); }
+        .arr-up {
+          border-bottom-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color});
+        }
+
+        .arr-dn {
+          border-top-color: var(--emg-table-sort-arrow-muted, #{variables.$emg-table-sort-arrow-muted});
+        }
       }
     }
 
@@ -73,9 +83,32 @@
       color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color});
 
       .sort-icon {
-        .arr-up { border-bottom-color: var(--emg-table-sort-arrow-muted, #{variables.$emg-table-sort-arrow-muted}); }
-        .arr-dn { border-top-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color}); }
+        .arr-up {
+          border-bottom-color: var(--emg-table-sort-arrow-muted, #{variables.$emg-table-sort-arrow-muted});
+        }
+
+        .arr-dn {
+          border-top-color: var(--emg-table-sortable-active-color, #{variables.$emg-table-sortable-active-color});
+        }
       }
+    }
+  }
+
+  tr.datatable-row--disabled {
+    pointer-events: none;
+
+    >td:not(.datatable-actions-cell) {
+      opacity: 0.45;
+    }
+
+    >td.datatable-actions-cell {
+      button:not(.datatable-action--active-on-disabled) {
+        opacity: 0.45;
+      }
+    }
+
+    .datatable-action--active-on-disabled {
+      pointer-events: auto;
     }
   }
 }

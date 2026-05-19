@@ -42,12 +42,12 @@
                             </div>
                         </form>
                         <!-- DataTable Example: haz click en "Nombre" para ver el ciclo asc → desc → reset -->
-                        <div data-component="data-table" id="example-datatable" class="data-table-container"
+                        <div data-component="data-table" id="example-datatable"
                             data-url="http://localhost:5173/example/datatableData.json"
                             data-bulk-delete-url="http://localhost:5173/example/bulkDelete"
                             data-columns='[{"key":"id", "label":"ID", "width": "5%"}, {"key":"name", "label":"Nombre", "sortable":true}, {"key":"email", "label":"Email", "width": "30%"}, {"key":"phone", "label":"Teléfono"}, {"key":"status", "label":"Estado", "badge": "statusLevel"}]'
-                            data-actions='[{"name": "delete", "states": [{"key": "deleteUrl", "label": "Eliminar", "icon": "bi-trash"}]} ]'
-                            data-settings='{ "perPage": 3, "striped": false, "pageSizeOptions": [3, 5, 10], "filterForm": { "id": "datatable-filter-form", "resetButtonId": "datatable-filter-reset" } }'>
+                            data-actions='[{"name": "delete", "states": [{"key": "deleteUrl", "label": "Eliminar", "icon": "bi-trash"}]}, {"name": "activate", "label": "Activar", "icon": "bi bi-check-circle", "activeOnDisabledRow": true}]'
+                            data-settings='{ "perPage": 3, "striped": false, "pageSizeOptions": [3, 5, 10], "disabledRow": "is_disabled", "filterForm": { "id": "datatable-filter-form", "resetButtonId": "datatable-filter-reset" } }'>
                             <!-- Library will inject content here -->
                         </div>
                     </div>
@@ -62,7 +62,8 @@
                         <h5 class="mb-0">DataTable con búsqueda diferida (<code>fetchOnInit: false</code>)</h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted small mb-3">La tabla no carga datos hasta que el usuario envía el formulario.</p>
+                        <p class="text-muted small mb-3">La tabla no carga datos hasta que el usuario envía el
+                            formulario.</p>
                         <!-- Formulario de búsqueda -->
                         <form id="deferred-filter-form" class="row g-2 mb-3">
                             <div class="col-md-4">
@@ -76,7 +77,7 @@
                             </div>
                         </form>
                         <!-- DataTable con fetchOnInit: false -->
-                        <div data-component="data-table" id="deferred-datatable" class="data-table-container"
+                        <div data-component="data-table" id="deferred-datatable"
                             data-url="http://localhost:5173/example/datatableData.json"
                             data-columns='[{"key":"id", "label":"ID", "width": "5%"}, {"key":"name", "label":"Nombre", "sortable":true}, {"key":"email", "label":"Email"}]'
                             data-settings='{
@@ -169,8 +170,7 @@
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <label for="rms-static" class="form-label">Selección estática (máx. 3)</label>
-                                <select id="rms-static" name="centers[]" multiple
-                                    data-component="rich-multi-select"
+                                <select id="rms-static" name="centers[]" multiple data-component="rich-multi-select"
                                     data-settings='{"placeholder": "Selecciona centros…", "maxItems": 3}'>
                                     <option value="1">Centro Madrid Norte</option>
                                     <option value="2" selected>Centro Madrid Sur</option>
@@ -180,17 +180,20 @@
                                     <option value="6">Centro Bilbao</option>
                                 </select>
                                 <div class="d-flex gap-2 mt-3 flex-wrap">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" id="rms-get-value-btn">getValue()</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="rms-set-value-btn">setValue(['1','3'])</button>
-                                    <button type="button" class="btn btn-sm btn-outline-info" id="rms-add-option-btn">addOption()</button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" id="rms-clear-btn">clear()</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                        id="rms-get-value-btn">getValue()</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        id="rms-set-value-btn">setValue(['1','3'])</button>
+                                    <button type="button" class="btn btn-sm btn-outline-info"
+                                        id="rms-add-option-btn">addOption()</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                        id="rms-clear-btn">clear()</button>
                                 </div>
                                 <pre id="rms-output" class="mt-2 p-2 bg-light rounded border small d-none"></pre>
                             </div>
                             <div class="col-md-6">
                                 <label for="rms-remote" class="form-label">Carga remota AJAX (≥ 2 caracteres)</label>
-                                <select id="rms-remote" name="remote[]" multiple
-                                    data-component="rich-multi-select"
+                                <select id="rms-remote" name="remote[]" multiple data-component="rich-multi-select"
                                     data-settings='{"placeholder": "Escribe para buscar…", "remoteUrl": "/api/centers/search"}'>
                                 </select>
                                 <small class="text-muted d-block mt-1">
@@ -202,7 +205,8 @@
                             <label class="form-label fw-semibold">Registro de eventos</label>
                             <ul id="rms-event-log" class="list-group list-group-flush border rounded"
                                 style="max-height: 140px; overflow-y: auto;">
-                                <li class="list-group-item text-muted small fst-italic">Los eventos aparecerán aquí…</li>
+                                <li class="list-group-item text-muted small fst-italic">Los eventos aparecerán aquí…
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -329,8 +333,7 @@
                         <form id="rte-example-form">
                             <div class="mb-3">
                                 <label class="form-label">Descripción (editor de texto enriquecido)</label>
-                                <div data-component="rich-text-editor"
-                                    data-settings='{}'>
+                                <div data-component="rich-text-editor" data-settings='{}'>
                                     <textarea name="description"><p>Escribe aquí tu contenido HTML.</p></textarea>
                                 </div>
                             </div>

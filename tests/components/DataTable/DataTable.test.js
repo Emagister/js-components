@@ -107,6 +107,17 @@ describe('DataTable', () => {
             const dt = new DataTable(element);
             expect(dt.config.fetchOnInit).toBe(false);
         });
+
+        it('usa disabledRow null por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.disabledRow).toBeNull();
+        });
+
+        it('lee disabledRow desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ disabledRow: 'is_inactive' });
+            const dt = new DataTable(element);
+            expect(dt.config.disabledRow).toBe('is_inactive');
+        });
     });
 
     describe('init()', () => {
@@ -122,6 +133,19 @@ describe('DataTable', () => {
             const dt = new DataTable(element);
             dt.init();
             expect(element.querySelector('div')).not.toBeNull();
+        });
+
+        it('añade la clase data-table-container al elemento raíz', () => {
+            const dt = new DataTable(element);
+            dt.init();
+            expect(element.classList.contains('data-table-container')).toBe(true);
+        });
+
+        it('no duplica la clase data-table-container si ya está presente', () => {
+            element.classList.add('data-table-container');
+            const dt = new DataTable(element);
+            dt.init();
+            expect(element.className.match(/data-table-container/g)).toHaveLength(1);
         });
 
         it('llama a fetch con la URL configurada', async () => {

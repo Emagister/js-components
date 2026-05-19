@@ -238,6 +238,54 @@ describe('DataTableTemplate', () => {
             expect(i.classList.contains('bi-x-lg')).toBe(true);
             expect(i.classList.contains('text-danger')).toBe(true);
         });
+
+        it('aplica datatable-row--disabled al <tr> cuando el campo disabledRow es truthy', () => {
+            const config = { ...baseConfig, disabledRow: 'is_inactive' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(true);
+        });
+
+        it('no aplica datatable-row--disabled cuando el campo disabledRow es falsy', () => {
+            const config = { ...baseConfig, disabledRow: 'is_inactive' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: false }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(false);
+        });
+
+        it('no aplica datatable-row--disabled cuando disabledRow no está configurado', () => {
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, baseConfig);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(false);
+        });
+
+        it('aplica datatable-row--disabled con prefijo ! cuando el campo es falsy', () => {
+            const config = { ...baseConfig, disabledRow: '!is_active' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_active: false }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(true);
+        });
+
+        it('no aplica datatable-row--disabled con prefijo ! cuando el campo es truthy', () => {
+            const config = { ...baseConfig, disabledRow: '!is_active' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_active: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').classList.contains('datatable-row--disabled')).toBe(false);
+        });
+
+        it('el <tr> de una fila deshabilitada tiene aria-disabled="true"', () => {
+            const config = { ...baseConfig, disabledRow: 'is_inactive' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').getAttribute('aria-disabled')).toBe('true');
+        });
+
+        it('el <tr> de una fila no deshabilitada no tiene aria-disabled', () => {
+            const config = { ...baseConfig, disabledRow: 'is_inactive' };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: false }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('tbody tr').getAttribute('aria-disabled')).toBeNull();
+        });
     });
 
     describe('acciones', () => {
@@ -286,6 +334,71 @@ describe('DataTableTemplate', () => {
             const button = content.querySelector('button[data-action="approve"]');
             expect(button).not.toBeNull();
             expect(button.getAttribute('title')).toBe('Aprobar');
+        });
+
+        it('action con activeOnDisabledRow:true en fila desactivada recibe clase datatable-action--active-on-disabled', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'activate', label: 'Activar', icon: 'bi bi-check', activeOnDisabledRow: true }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            const button = content.querySelector('button[data-action="activate"]');
+            expect(button.classList.contains('datatable-action--active-on-disabled')).toBe(true);
+        });
+
+        it('action con activeOnDisabledRow:true en fila NO desactivada no recibe la clase', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'activate', label: 'Activar', icon: 'bi bi-check', activeOnDisabledRow: true }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: false }] };
+            const content = template.createContent(state, config);
+            const button = content.querySelector('button[data-action="activate"]');
+            expect(button.classList.contains('datatable-action--active-on-disabled')).toBe(false);
+        });
+
+        it('la <td> de acciones tiene la clase datatable-actions-cell', () => {
+            const config = { ...baseConfig, actions: [{ name: 'edit', label: 'Editar', icon: 'bi bi-pencil' }] };
+            const content = template.createContent(baseState, config);
+            const actionsTd = content.querySelector('tbody tr td:last-child');
+            expect(actionsTd.classList.contains('datatable-actions-cell')).toBe(true);
+        });
+
+        it('action sin activeOnDisabledRow en fila desactivada no recibe la clase', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'edit', label: 'Editar', icon: 'bi bi-pencil' }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            const button = content.querySelector('button[data-action="edit"]');
+            expect(button.classList.contains('datatable-action--active-on-disabled')).toBe(false);
+        });
+
+        it('el botón de acción en fila deshabilitada tiene el atributo disabled', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'edit', label: 'Editar', icon: 'bi bi-pencil' }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('button[data-action="edit"]').disabled).toBe(true);
+        });
+
+        it('el botón con activeOnDisabledRow en fila deshabilitada no tiene el atributo disabled', () => {
+            const config = {
+                ...baseConfig,
+                disabledRow: 'is_inactive',
+                actions: [{ name: 'activate', label: 'Activar', icon: 'bi bi-check', activeOnDisabledRow: true }],
+            };
+            const state = { ...baseState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('button[data-action="activate"]').disabled).toBe(false);
         });
     });
 
@@ -600,6 +713,20 @@ describe('DataTableTemplate', () => {
         it('el checkbox de fila no está marcado cuando el id no está en selectedIds', () => {
             const content = template.createContent(bulkState, bulkConfig);
             expect(content.querySelector('[data-select-id="1"]').checked).toBe(false);
+        });
+
+        it('el checkbox de una fila deshabilitada tiene el atributo disabled', () => {
+            const config = { ...bulkConfig, disabledRow: 'is_inactive' };
+            const state = { ...bulkState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: true }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('[data-select-id="1"]').disabled).toBe(true);
+        });
+
+        it('el checkbox de una fila no deshabilitada no tiene el atributo disabled', () => {
+            const config = { ...bulkConfig, disabledRow: 'is_inactive' };
+            const state = { ...bulkState, data: [{ id: 1, name: 'Alice', age: 30, is_inactive: false }] };
+            const content = template.createContent(state, config);
+            expect(content.querySelector('[data-select-id="1"]').disabled).toBe(false);
         });
 
         it('el colspan del "sin resultados" incluye la columna de checkbox', () => {

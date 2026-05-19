@@ -66,7 +66,7 @@ Solo tienes que añadir el atributo `data-component` a tus elementos HTML. La li
 Todos los componentes se activan añadiendo `data-component="<nombre>"` al elemento HTML. La configuración se puede pasar mediante `data-settings='{"opcion": valor}'` o en algunos componentes directamente como atributos `data-*`.
 
 ### `data-table`
-Tabla dinámica con paginación y ordenación.
+Tabla dinámica con paginación y ordenación. Al inicializarse, el componente añade automáticamente la clase `data-table-container` al elemento raíz, que es la que activa todos sus estilos CSS.
 
 Atributos HTML:
 - `data-url` (String): URL de la API que devuelve los datos.
@@ -90,6 +90,7 @@ Opciones en `data-settings`:
 - `pageSizeOptions` (Array, default: `[10, 25, 50, 100]`): Opciones disponibles en el selector de filas por página. Se renderiza como un `<select>` junto al contador de resultados. El valor activo en cada momento refleja el `perPage` en uso. Al cambiar la selección, la tabla vuelve a la primera página y lanza una nueva petición. Para ocultar el selector, pasa un array vacío: `[]` (en ese caso no se añade `perPage` automáticamente). Si el array no está vacío y el valor de `perPage` no está incluido, se añade automáticamente en la posición ordenada correcta.
 - `actionsWidth` (String, default: `'80px'`): Ancho fijo de la columna de acciones (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Se genera automáticamente un `<colgroup>` con el ancho indicado para dicha columna, aunque ninguna columna de datos tenga `width`.
 - `fetchOnInit` (Boolean, default: `true`): Controla si el componente realiza la petición inicial al cargar. Ponlo a `false` para que la tabla permanezca vacía hasta que el usuario interactúe con el formulario de búsqueda.
+- `disabledRow` (String, default: `null`): Nombre del campo en cada fila que indica si debe mostrarse como desactivada. Cuando el valor del campo es truthy, el `<tr>` recibe la clase `datatable-row--disabled`, que aplica opacidad reducida y desactiva los eventos de ratón. Ejemplo: con `"disabledRow": "is_inactive"`, cualquier fila cuyo campo `is_inactive` sea `true` se renderizará visualmente atenuada. Para lógica invertida (campo que indica que el registro está activo), añade el prefijo `!`: con `"disabledRow": "!is_active"`, las filas cuyo campo `is_active` sea falsy se mostrarán desactivadas.
 - `labels` (Object): Textos del componente. Permite traducir o personalizar todos los literales:
   - `total` (String, default: `'Mostrando {from} - {to} de {total} resultados'`): Contador de resultados mostrado sobre la paginación. Soporta los placeholders `{from}`, `{to}` y `{total}`, que se sustituyen automáticamente con el rango de la página actual y el total de registros.
   - `noResults` (String, default: `'No se encontraron resultados.'`): Mensaje cuando la respuesta devuelve datos vacíos.
@@ -182,6 +183,18 @@ Propiedades de `data-actions` (array de objetos), renderizadas como iconos con t
 - `label` (String): Texto del tooltip.
 - `icon` (String): Clase del icono Bootstrap Icons (ej: `bi bi-pencil`).
 - `states` (Array): Estados condicionales. Cada estado admite `key` (campo del row que lo activa), `label` e `icon`.
+- `activeOnDisabledRow` (Boolean, default: `false`): Si es `true`, el botón de esta acción permanece interactivo aunque la fila esté marcada como desactivada (recibe la clase `datatable-action--active-on-disabled` que restaura `pointer-events`). Útil para incluir un botón de "Activar" en filas deshabilitadas.
+
+Ejemplo de uso con `disabledRow` y acción de activación:
+```json
+"disabledRow": "is_inactive"
+```
+```json
+[
+  { "name": "edit",     "label": "Editar",  "icon": "bi bi-pencil" },
+  { "name": "activate", "label": "Activar", "icon": "bi bi-check-circle", "activeOnDisabledRow": true }
+]
+```
 
 La API devuelta por el servidor debe tener el formato: `{ data: [...], meta: { page, total, perPage } }`.
 

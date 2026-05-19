@@ -26,6 +26,7 @@ export default class DataTable extends Component {
             pageSizeOptions: settings.pageSizeOptions || [10, 25, 50, 100],
             actionsWidth: settings.actionsWidth ?? '80px',
             fetchOnInit: settings.fetchOnInit !== undefined ? settings.fetchOnInit : true,
+            disabledRow: settings.disabledRow || null,
             labels: {
                 total: settings.labels?.total ?? 'Mostrando {from} - {to} de {total} resultados',
                 noResults: settings.labels?.noResults ?? 'No se encontraron resultados.',
@@ -64,6 +65,8 @@ export default class DataTable extends Component {
     }
 
     init() {
+        this.root.classList.add('data-table-container');
+
         this.loader = new Loader(this.root);
         this.loader.init();
 
