@@ -249,6 +249,42 @@ describe('ChunkedUpload', () => {
             expect(subtitle).not.toBeNull();
             expect(subtitle.textContent).toBe('Máximo 500 MB');
         });
+
+        it('usa el texto por defecto en cu-browse-btn cuando no se configura labels.selectFileButton', () => {
+            component.init();
+            expect(element.querySelector('.cu-browse-btn').textContent.trim()).toBe('Seleccionar fichero');
+        });
+
+        it('usa labels.selectFileButton como texto del botón de selección', () => {
+            const el = createElement({ endpoint: '/files/', labels: { selectFileButton: 'Elige un archivo' } });
+            const c = new ChunkedUpload(el);
+            c.init();
+            expect(el.querySelector('.cu-browse-btn').textContent.trim()).toBe('Elige un archivo');
+        });
+
+        it('usa el texto por defecto en cu-upload-btn cuando no se configura labels.uploadFileButton', () => {
+            component.init();
+            expect(element.querySelector('.cu-upload-btn').textContent.trim()).toBe('Subir');
+        });
+
+        it('usa labels.uploadFileButton como texto del botón de subida', () => {
+            const el = createElement({ endpoint: '/files/', labels: { uploadFileButton: 'Enviar al servidor' } });
+            const c = new ChunkedUpload(el);
+            c.init();
+            expect(el.querySelector('.cu-upload-btn').textContent.trim()).toBe('Enviar al servidor');
+        });
+
+        it('usa el texto por defecto en cu-cancel-btn cuando no se configura labels.cancelButton', () => {
+            component.init();
+            expect(element.querySelector('.cu-cancel-btn').textContent.trim()).toBe('Cancelar');
+        });
+
+        it('usa labels.cancelButton como texto del botón de cancelación', () => {
+            const el = createElement({ endpoint: '/files/', labels: { cancelButton: 'Detener' } });
+            const c = new ChunkedUpload(el);
+            c.init();
+            expect(el.querySelector('.cu-cancel-btn').textContent.trim()).toBe('Detener');
+        });
     });
 
     // ─── Interacción UI ───────────────────────────────────────────────────────

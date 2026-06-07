@@ -110,6 +110,9 @@ export default class ChunkedUpload extends Component {
         const subtitle = s.labels.dropzoneSubtitle
             ? `<p class="cu-dropzone-subtitle text-muted small mb-2">${s.labels.dropzoneSubtitle}</p>`
             : '';
+        const selectFileButton = s.labels.selectFileButton || 'Seleccionar fichero';
+        const uploadFileButton = s.labels.uploadFileButton || 'Subir';
+        const cancelButton = s.labels.cancelButton || 'Cancelar';
 
         this.root.innerHTML = `
             <div class="chunked-upload">
@@ -118,14 +121,12 @@ export default class ChunkedUpload extends Component {
                     <i class="bi ${iconClass} fs-2 text-muted d-block mb-2"></i>
                     <p class="cu-dropzone-label text-muted mb-2">${dropzoneLabel}</p>
                     ${subtitle}
-                    <button type="button" class="btn btn-outline-primary btn-sm cu-browse-btn">Seleccionar fichero</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm cu-browse-btn">${selectFileButton}</button>
                 </div>
                 <ul class="cu-file-list list-unstyled mb-3 d-none"></ul>
                 <div class="cu-actions d-flex gap-2 d-none">
-                    <button type="button" class="btn btn-primary btn-sm cu-upload-btn">
-                        <i class="bi bi-upload me-1"></i>Subir
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm cu-cancel-btn">Cancelar</button>
+                    <button type="button" class="btn btn-primary btn-sm cu-upload-btn"><i class="bi bi-upload me-1"></i>${uploadFileButton}</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm cu-cancel-btn">${cancelButton}</button>
                 </div>
                 <div class="alert alert-danger cu-error-alert d-none mt-2" role="alert"></div>
             </div>
