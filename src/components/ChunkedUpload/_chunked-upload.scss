@@ -1,0 +1,22 @@
+@use "../../../scss/variables";
+
+.cu-dropzone {
+    border-color: var(--emg-border-color, #{variables.$emg-border-color}) !important;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+
+    &:hover,
+    &.is-dragging {
+        border-color: var(--emg-brand-color, #{variables.$emg-brand-color}) !important;
+        background-color: rgba(76, 183, 172, 0.05);
+    }
+}
+
+.cu-file-name {
+    max-width: 240px;
+}
+
+.cu-progress-bar {
+    background-color: var(--emg-brand-color, #{variables.$emg-brand-color});
+    transition: width 0.3s ease;
+}

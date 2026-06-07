@@ -13,6 +13,7 @@ const EXPECTED_COMPONENTS = [
     'confirm',
     'rich-text-editor',
     'rich-multi-select',
+    'chunked-upload',
 ];
 
 describe('ComponentRegistry', () => {

@@ -505,6 +505,87 @@ Wrapper del Tooltip de Bootstrap. Usa el atributo estándar `title` para el text
 ### `dropdown`
 Wrapper del Dropdown de Bootstrap. Expone la API en `element.dropdown`: `show()`, `hide()`, `toggle()`.
 
+### `chunked-upload`
+
+Componente para subir ficheros grandes (hasta 500 MB) dividiéndolos en chunks mediante el **protocolo Tus** ([tus.io](https://tus.io)). Requiere un servidor Tus en el endpoint configurado.
+
+**Peer dependencies:** `@uppy/core ^5.0.0`, `@uppy/tus ^5.0.0`
+
+```bash
+npm install @uppy/core @uppy/tus
+```
+
+**Servidor Tus para desarrollo local:**
+```bash
+docker run -p 1080:8080 tusproject/tusd
+```
+
+**HTML:**
+```html
+<div
+  data-component="chunked-upload"
+  data-settings='{
+    "endpoint": "https://your-server.com/files/",
+    "chunkSize": 52428800,
+    "maxFileSize": 524288000,
+    "allowedFileTypes": ["video/*", ".zip"],
+    "retryDelays": [0, 1000, 3000, 5000],
+    "parallelUploads": 1,
+    "autoProceed": false
+  }'
+></div>
+```
+
+**Opciones de configuración (`data-settings`):**
+
+| Opción | Tipo | Default | Descripción |
+|---|---|---|---|
+| `endpoint` | `string` | **requerido** | URL del servidor Tus |
+| `chunkSize` | `number` | `52428800` (50 MB) | Bytes por chunk |
+| `maxFileSize` | `number` | `524288000` (500 MB) | Tamaño máximo del fichero |
+| `allowedFileTypes` | `string[]` | `null` (todos) | MIME types o extensiones permitidas |
+| `retryDelays` | `number[]` | `[0,1000,3000,5000]` | Milisegundos entre reintentos |
+| `parallelUploads` | `number` | `1` | Uploads simultáneos |
+| `autoProceed` | `boolean` | `false` | Inicia la subida al seleccionar el fichero |
+| `labels` | `object` | *(ver abajo)* | Textos de UI sobreescribibles (`dropzone`) |
+
+**API pública (`element.chunkedUpload`):**
+
+Todos los métodos excepto `destroy()` retornan `element.chunkedUpload` para encadenamiento.
+
+```js
+const el = document.querySelector('[data-component="chunked-upload"]')
+
+el.chunkedUpload.upload()            // inicia la subida
+el.chunkedUpload.cancelAll()         // cancela la subida en curso
+el.chunkedUpload.reset()             // vuelve al estado inicial
+el.chunkedUpload.openFilePicker()    // abre el selector de ficheros del SO
+el.chunkedUpload.addFiles([file])    // añade File[] programáticamente
+el.chunkedUpload.destroy()           // limpieza completa
+```
+
+**Eventos DOM:**
+
+```js
+el.addEventListener('emg-jsc:chunkedUpload:initialized', () => {})
+el.addEventListener('emg-jsc:chunkedUpload:file-added', e => console.log(e.detail.file))
+el.addEventListener('emg-jsc:chunkedUpload:progress', e => {
+  const { file, progress } = e.detail
+  console.log(`${progress.percentage}%`)
+})
+el.addEventListener('emg-jsc:chunkedUpload:upload-success', e => {
+  console.log('URL:', e.detail.response.uploadURL)
+})
+el.addEventListener('emg-jsc:chunkedUpload:upload-error', e => {
+  console.error(e.detail.error)
+})
+el.addEventListener('emg-jsc:chunkedUpload:complete', e => {
+  console.log('Completados:', e.detail.successful.length)
+  console.log('Fallidos:', e.detail.failed.length)
+})
+el.addEventListener('emg-jsc:chunkedUpload:cancel-all', () => {})
+```
+
 ## Personalización de Estilos
 
 La librería permite una personalización profunda a dos niveles:

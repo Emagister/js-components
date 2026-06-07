@@ -351,6 +351,33 @@
         </div>
     </div>
 
+        <!-- ChunkedUpload Component -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">ChunkedUpload Component</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">
+                            Subida de ficheros grandes (hasta 500 MB) mediante chunks de 50 MB via protocolo Tus.
+                            Requiere un servidor Tus en el endpoint configurado.
+                            Para pruebas locales: <code>docker run -p 1080:8080 tusproject/tusd</code>
+                        </p>
+                        <div
+                            data-component="chunked-upload"
+                            data-settings='{
+                                "endpoint": "http://localhost:1080/files/",
+                                "chunkSize": 5242880,
+                                "maxFileSize": 524288000
+                            }'
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- App Entry Point -->
     <script type="module" src="./js/main.js"></script>
 </body>

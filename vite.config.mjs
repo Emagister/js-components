@@ -26,7 +26,7 @@ export default defineConfig({
     rollupOptions: {
       // Make sure to externalize deps that shouldn't be bundled
       // into your library
-      external: ['bootstrap', 'flatpickr', '@tiptap/core', '@tiptap/starter-kit', 'tom-select'],
+      external: ['bootstrap', 'flatpickr', '@tiptap/core', '@tiptap/starter-kit', 'tom-select', '@uppy/core', '@uppy/tus'],
       output: {
         // Provide global variables to use in the UMD build
         // for externalized deps
@@ -36,6 +36,8 @@ export default defineConfig({
           '@tiptap/core': 'Tiptap',
           '@tiptap/starter-kit': 'TiptapStarterKit',
           'tom-select': 'TomSelect',
+          '@uppy/core': 'Uppy',
+          '@uppy/tus': 'UppyTus',
         },
       },
     },

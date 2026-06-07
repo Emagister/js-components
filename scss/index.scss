@@ -6,6 +6,7 @@
 @use "../src/components/MessageToast/message-toast";
 @use "../src/components/RichTextEditor/rich-text-editor";
 @use "../src/components/RichMultiSelect/rich-multi-select";
+@use "../src/components/ChunkedUpload/chunked-upload";
 
 :root {
   // Global
