@@ -220,6 +220,35 @@ describe('ChunkedUpload', () => {
             const btn = el.querySelector('.cu-upload-btn');
             expect(btn.classList.contains('d-none')).toBe(true);
         });
+
+        it('usa el icono por defecto bi-cloud-upload cuando no se configura labels.icon', () => {
+            component.init();
+            const icon = element.querySelector('.cu-dropzone i');
+            expect(icon.classList.contains('bi-cloud-upload')).toBe(true);
+        });
+
+        it('usa labels.icon como clase del icono cuando se configura', () => {
+            const el = createElement({ endpoint: '/files/', labels: { icon: 'bi-file-earmark-arrow-up' } });
+            const c = new ChunkedUpload(el);
+            c.init();
+            const icon = el.querySelector('.cu-dropzone i');
+            expect(icon.classList.contains('bi-file-earmark-arrow-up')).toBe(true);
+            expect(icon.classList.contains('bi-cloud-upload')).toBe(false);
+        });
+
+        it('no renderiza .cu-dropzone-subtitle cuando no se configura labels.dropzoneSubtitle', () => {
+            component.init();
+            expect(element.querySelector('.cu-dropzone-subtitle')).toBeNull();
+        });
+
+        it('renderiza .cu-dropzone-subtitle cuando se configura labels.dropzoneSubtitle', () => {
+            const el = createElement({ endpoint: '/files/', labels: { dropzoneSubtitle: 'Máximo 500 MB' } });
+            const c = new ChunkedUpload(el);
+            c.init();
+            const subtitle = el.querySelector('.cu-dropzone-subtitle');
+            expect(subtitle).not.toBeNull();
+            expect(subtitle.textContent).toBe('Máximo 500 MB');
+        });
     });
 
     // ─── Interacción UI ───────────────────────────────────────────────────────

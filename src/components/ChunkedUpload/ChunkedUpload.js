@@ -106,13 +106,18 @@ export default class ChunkedUpload extends Component {
         const s = this.settings;
         const accept = s.allowedFileTypes?.length ? ` accept="${s.allowedFileTypes.join(',')}"` : '';
         const dropzoneLabel = s.labels.dropzone || 'Arrastra el fichero aquí o haz clic para seleccionar';
+        const iconClass = s.labels.icon || 'bi-cloud-upload';
+        const subtitle = s.labels.dropzoneSubtitle
+            ? `<p class="cu-dropzone-subtitle text-muted small mb-2">${s.labels.dropzoneSubtitle}</p>`
+            : '';
 
         this.root.innerHTML = `
             <div class="chunked-upload">
                 <div class="cu-dropzone border border-2 rounded-3 p-4 text-center mb-3">
                     <input type="file" class="cu-file-input visually-hidden"${accept}>
-                    <i class="bi bi-cloud-upload fs-2 text-muted d-block mb-2"></i>
+                    <i class="bi ${iconClass} fs-2 text-muted d-block mb-2"></i>
                     <p class="cu-dropzone-label text-muted mb-2">${dropzoneLabel}</p>
+                    ${subtitle}
                     <button type="button" class="btn btn-outline-primary btn-sm cu-browse-btn">Seleccionar fichero</button>
                 </div>
                 <ul class="cu-file-list list-unstyled mb-3 d-none"></ul>
