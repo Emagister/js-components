@@ -347,21 +347,30 @@ describe('ChunkedUpload', () => {
         describe('upload-success', () => {
             it('actualiza el badge a "Completado" con clase bg-success', () => {
                 uppyInstance._emit('file-added', fakeFile());
-                uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/file' });
+                uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc123' });
                 const badge = element.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
                 expect(badge.textContent).toBe('Completado');
                 expect(badge.classList.contains('bg-success')).toBe(true);
             });
 
-            it('despacha emg-jsc:chunkedUpload:upload-success', () => {
+            it('despacha emg-jsc:chunkedUpload:upload-success con file, response y uploadId', () => {
                 const handler = vi.fn();
                 element.addEventListener('emg-jsc:chunkedUpload:upload-success', handler);
                 const file = fakeFile();
-                const response = { uploadURL: 'https://example.com/file' };
+                const response = { uploadURL: 'https://example.com/files/abc123' };
                 uppyInstance._emit('file-added', file);
                 uppyInstance._emit('upload-success', file, response);
                 expect(handler).toHaveBeenCalledOnce();
-                expect(handler.mock.calls[0][0].detail).toEqual({ file, response });
+                expect(handler.mock.calls[0][0].detail).toEqual({ file, response, uploadId: 'abc123' });
+            });
+
+            it('incluye uploadId null si la response no tiene uploadURL', () => {
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:chunkedUpload:upload-success', handler);
+                const file = fakeFile();
+                uppyInstance._emit('file-added', file);
+                uppyInstance._emit('upload-success', file, {});
+                expect(handler.mock.calls[0][0].detail.uploadId).toBeNull();
             });
         });
 
