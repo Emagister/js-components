@@ -547,7 +547,44 @@ docker run -p 1080:8080 tusproject/tusd
 | `retryDelays` | `number[]` | `[0,1000,3000,5000]` | Milisegundos entre reintentos |
 | `parallelUploads` | `number` | `1` | Uploads simultáneos |
 | `autoProceed` | `boolean` | `false` | Inicia la subida al seleccionar el fichero |
-| `labels` | `object` | *(ver abajo)* | Textos de UI sobreescribibles (`dropzone`) |
+| `autoResetDelay` | `number` | `3000` | Ms tras los que el componente se resetea automáticamente después de un upload exitoso (solo aplica cuando `autoProceed: true`) |
+| `labels` | `object` | *(ver abajo)* | Textos e icono de UI sobreescribibles (ver tabla de labels) |
+
+**Labels disponibles (`labels`):**
+
+| Label | Default | Descripción |
+|---|---|---|
+| `icon` | `'bi-cloud-upload'` | Clase del icono Bootstrap Icons en el dropzone |
+| `dropzone` | `'Arrastra el fichero aquí'` | Título principal del dropzone (en negrita) |
+| `dropzoneSubtitle` | *(no se muestra)* | Texto secundario bajo el título (opcional) |
+| `uploadFileButton` | `'Subir'` | Texto del botón de inicio de subida |
+| `cancelButton` | `'Cancelar'` | Texto del botón de cancelación |
+| `statusQueued` | `'En cola'` | Badge cuando el fichero está en espera |
+| `statusUploading` | `'Subiendo…'` | Badge durante la subida |
+| `statusCompleted` | `'Completado'` | Badge cuando la subida finaliza con éxito |
+| `statusError` | `'Error'` | Badge cuando la subida falla |
+| `uploading` | `'Subiendo…'` | Texto accesible del spinner del overlay (visually-hidden) |
+
+```html
+<div
+  data-component="chunked-upload"
+  data-settings='{
+    "endpoint": "https://your-server.com/files/",
+    "allowedFileTypes": [".zip"],
+    "labels": {
+      "icon": "bi-file-earmark-zip",
+      "dropzone": "Arrastra tu archivo ZIP aquí",
+      "dropzoneSubtitle": "o haz clic para seleccionar",
+      "uploadFileButton": "Subir ZIP",
+      "cancelButton": "Detener"
+    }
+  }'
+></div>
+```
+
+**Comportamiento durante la subida:**
+
+Mientras hay ficheros en proceso de subida, el dropzone muestra un overlay con un spinner Bootstrap y bloquea las interacciones: no es posible hacer clic para abrir el selector de ficheros ni arrastrar y soltar nuevos ficheros. Al completarse la subida (o al cancelarla), el dropzone recupera su estado normal.
 
 **API pública (`element.chunkedUpload`):**
 

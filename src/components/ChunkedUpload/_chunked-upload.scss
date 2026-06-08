@@ -3,6 +3,8 @@
 .cu-dropzone {
     border-color: var(--emg-border-color, #{variables.$emg-border-color}) !important;
     cursor: pointer;
+    min-height: 140px;
+    position: relative;
     transition: border-color 0.2s ease, background-color 0.2s ease;
 
     &:hover,
@@ -10,6 +12,35 @@
         border-color: var(--emg-brand-color, #{variables.$emg-brand-color}) !important;
         background-color: rgba(76, 183, 172, 0.05);
     }
+
+    &.is-uploading {
+        cursor: default;
+
+        .cu-dropzone-content {
+            opacity: 0.25;
+            pointer-events: none;
+        }
+    }
+}
+
+.cu-dropzone-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .spinner-border {
+        color: var(--emg-brand-color, #{variables.$emg-brand-color});
+    }
+
+    &.d-none {
+        display: none !important;
+    }
+}
+
+.cu-dropzone-icon {
+    color: var(--emg-brand-color, #{variables.$emg-brand-color});
 }
 
 .cu-file-name {

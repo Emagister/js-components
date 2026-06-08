@@ -236,6 +236,19 @@ describe('ChunkedUpload', () => {
             expect(icon.classList.contains('bi-cloud-upload')).toBe(false);
         });
 
+        it('el icono tiene la clase cu-dropzone-icon', () => {
+            component.init();
+            const icon = element.querySelector('.cu-dropzone .cu-dropzone-icon');
+            expect(icon).not.toBeNull();
+        });
+
+        it('renderiza .cu-dropzone-label con clase fw-semibold', () => {
+            component.init();
+            const label = element.querySelector('.cu-dropzone-label');
+            expect(label).not.toBeNull();
+            expect(label.classList.contains('fw-semibold')).toBe(true);
+        });
+
         it('no renderiza .cu-dropzone-subtitle cuando no se configura labels.dropzoneSubtitle', () => {
             component.init();
             expect(element.querySelector('.cu-dropzone-subtitle')).toBeNull();
@@ -250,16 +263,9 @@ describe('ChunkedUpload', () => {
             expect(subtitle.textContent).toBe('Máximo 500 MB');
         });
 
-        it('usa el texto por defecto en cu-browse-btn cuando no se configura labels.selectFileButton', () => {
+        it('no renderiza .cu-browse-btn dentro del dropzone', () => {
             component.init();
-            expect(element.querySelector('.cu-browse-btn').textContent.trim()).toBe('Seleccionar fichero');
-        });
-
-        it('usa labels.selectFileButton como texto del botón de selección', () => {
-            const el = createElement({ endpoint: '/files/', labels: { selectFileButton: 'Elige un archivo' } });
-            const c = new ChunkedUpload(el);
-            c.init();
-            expect(el.querySelector('.cu-browse-btn').textContent.trim()).toBe('Elige un archivo');
+            expect(element.querySelector('.cu-browse-btn')).toBeNull();
         });
 
         it('usa el texto por defecto en cu-upload-btn cuando no se configura labels.uploadFileButton', () => {
@@ -292,10 +298,10 @@ describe('ChunkedUpload', () => {
     describe('Interacción UI', () => {
         beforeEach(() => component.init());
 
-        it('click en cu-browse-btn hace click en el file input', () => {
+        it('click en cu-dropzone hace click en el file input', () => {
             const input = element.querySelector('.cu-file-input');
             const clickSpy = vi.spyOn(input, 'click');
-            element.querySelector('.cu-browse-btn').click();
+            element.querySelector('.cu-dropzone').click();
             expect(clickSpy).toHaveBeenCalledOnce();
         });
 
@@ -357,10 +363,33 @@ describe('ChunkedUpload', () => {
                 expect(li.querySelector('.cu-file-name').textContent).toBe('video.mp4');
             });
 
+            it('muestra el badge con texto "En cola" por defecto', () => {
+                uppyInstance._emit('file-added', fakeFile());
+                const badge = element.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
+                expect(badge.textContent).toBe('En cola');
+            });
+
+            it('usa labels.statusQueued como texto del badge inicial', () => {
+                const el = createElement({ endpoint: '/files/', labels: { statusQueued: 'Pendiente' } });
+                const c = new ChunkedUpload(el);
+                c.init();
+                uppyInstance._emit('file-added', fakeFile());
+                const badge = el.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
+                expect(badge.textContent).toBe('Pendiente');
+            });
+
             it('hace visible cu-file-list y cu-actions', () => {
                 uppyInstance._emit('file-added', fakeFile());
                 expect(element.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
                 expect(element.querySelector('.cu-actions').classList.contains('d-none')).toBe(false);
+            });
+
+            it('no muestra cu-actions cuando autoProceed es true', () => {
+                const el = createElement({ endpoint: '/files/', autoProceed: true });
+                const c = new ChunkedUpload(el);
+                c.init();
+                uppyInstance._emit('file-added', fakeFile());
+                expect(el.querySelector('.cu-actions').classList.contains('d-none')).toBe(true);
             });
 
             it('despacha emg-jsc:chunkedUpload:file-added con el fichero', () => {
@@ -376,32 +405,49 @@ describe('ChunkedUpload', () => {
         describe('upload-progress', () => {
             it('muestra la barra de progreso del fichero', () => {
                 uppyInstance._emit('file-added', fakeFile());
-                uppyInstance._emit('upload-progress', fakeFile(), { percentage: 40 });
+                uppyInstance._emit('upload-progress', fakeFile(), { bytesUploaded: 20 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 });
                 const li = element.querySelector('[data-file-id="uppy-test-id"]');
                 const progress = li.querySelector('.progress');
                 expect(progress.classList.contains('d-none')).toBe(false);
             });
 
-            it('actualiza el ancho del progress-bar con el porcentaje', () => {
+            it('actualiza el ancho del progress-bar calculando el porcentaje desde bytesUploaded/bytesTotal', () => {
                 uppyInstance._emit('file-added', fakeFile());
-                uppyInstance._emit('upload-progress', fakeFile(), { percentage: 65 });
+                uppyInstance._emit('upload-progress', fakeFile(), { bytesUploaded: 325 * 1024 * 1024, bytesTotal: 500 * 1024 * 1024 });
                 const li = element.querySelector('[data-file-id="uppy-test-id"]');
                 expect(li.querySelector('.cu-progress-bar').style.width).toBe('65%');
             });
 
             it('actualiza el badge a "Subiendo…" con clase bg-primary', () => {
                 uppyInstance._emit('file-added', fakeFile());
-                uppyInstance._emit('upload-progress', fakeFile(), { percentage: 30 });
+                uppyInstance._emit('upload-progress', fakeFile(), { bytesUploaded: 15 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 });
                 const badge = element.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
                 expect(badge.textContent).toBe('Subiendo…');
                 expect(badge.classList.contains('bg-primary')).toBe(true);
+            });
+
+            it('usa labels.statusUploading como texto del badge durante la subida', () => {
+                const el = createElement({ endpoint: '/files/', labels: { statusUploading: 'Enviando…' } });
+                const c = new ChunkedUpload(el);
+                c.init();
+                uppyInstance._emit('file-added', fakeFile());
+                uppyInstance._emit('upload-progress', fakeFile(), { bytesUploaded: 25 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 });
+                const badge = el.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
+                expect(badge.textContent).toBe('Enviando…');
+            });
+
+            it('muestra 0% si bytesTotal es 0', () => {
+                uppyInstance._emit('file-added', fakeFile());
+                uppyInstance._emit('upload-progress', fakeFile(), { bytesUploaded: 0, bytesTotal: 0 });
+                const li = element.querySelector('[data-file-id="uppy-test-id"]');
+                expect(li.querySelector('.cu-progress-bar').style.width).toBe('0%');
             });
 
             it('despacha emg-jsc:chunkedUpload:progress con el detail correcto', () => {
                 const handler = vi.fn();
                 element.addEventListener('emg-jsc:chunkedUpload:progress', handler);
                 const file = fakeFile();
-                const progress = { percentage: 50 };
+                const progress = { bytesUploaded: 25 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 };
                 uppyInstance._emit('file-added', file);
                 uppyInstance._emit('upload-progress', file, progress);
                 expect(handler).toHaveBeenCalledOnce();
@@ -416,6 +462,16 @@ describe('ChunkedUpload', () => {
                 const badge = element.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
                 expect(badge.textContent).toBe('Completado');
                 expect(badge.classList.contains('bg-success')).toBe(true);
+            });
+
+            it('usa labels.statusCompleted como texto del badge en éxito', () => {
+                const el = createElement({ endpoint: '/files/', labels: { statusCompleted: 'Listo' } });
+                const c = new ChunkedUpload(el);
+                c.init();
+                uppyInstance._emit('file-added', fakeFile());
+                uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc123' });
+                const badge = el.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
+                expect(badge.textContent).toBe('Listo');
             });
 
             it('despacha emg-jsc:chunkedUpload:upload-success con file, response y uploadId', () => {
@@ -446,6 +502,16 @@ describe('ChunkedUpload', () => {
                 const badge = element.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
                 expect(badge.textContent).toBe('Error');
                 expect(badge.classList.contains('bg-danger')).toBe(true);
+            });
+
+            it('usa labels.statusError como texto del badge en error', () => {
+                const el = createElement({ endpoint: '/files/', labels: { statusError: 'Fallido' } });
+                const c = new ChunkedUpload(el);
+                c.init();
+                uppyInstance._emit('file-added', fakeFile());
+                uppyInstance._emit('upload-error', fakeFile(), new Error('Network error'));
+                const badge = el.querySelector('[data-file-id="uppy-test-id"] .cu-file-status');
+                expect(badge.textContent).toBe('Fallido');
             });
 
             it('despacha emg-jsc:chunkedUpload:upload-error', () => {
@@ -590,6 +656,188 @@ describe('ChunkedUpload', () => {
             element.addEventListener('emg-jsc:chunkedUpload:cancel-all', handler);
             element.querySelector('.cu-cancel-btn').click();
             expect(handler).toHaveBeenCalledOnce();
+        });
+    });
+
+    // ─── Auto-reset (autoProceed) ─────────────────────────────────────────────
+
+    describe('auto-reset tras upload-success con autoProceed', () => {
+        const fakeFile = (overrides = {}) => ({
+            id: 'uppy-test-id',
+            name: 'video.mp4',
+            size: 50 * 1024 * 1024,
+            type: 'video/mp4',
+            ...overrides,
+        });
+
+        beforeEach(() => {
+            vi.useFakeTimers();
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
+        it('aplica autoResetDelay por defecto de 3000 ms', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true });
+            const c = new ChunkedUpload(el);
+            expect(c.settings.autoResetDelay).toBe(3000);
+        });
+
+        it('respeta autoResetDelay personalizado desde data-settings', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true, autoResetDelay: 5000 });
+            const c = new ChunkedUpload(el);
+            expect(c.settings.autoResetDelay).toBe(5000);
+        });
+
+        it('oculta cu-file-list tras autoResetDelay ms después de upload-success', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true, autoResetDelay: 3000 });
+            const c = new ChunkedUpload(el);
+            c.init();
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            expect(el.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
+            vi.advanceTimersByTime(3000);
+            expect(el.querySelector('.cu-file-list').classList.contains('d-none')).toBe(true);
+        });
+
+        it('no oculta cu-file-list antes de que transcurra autoResetDelay', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true, autoResetDelay: 3000 });
+            const c = new ChunkedUpload(el);
+            c.init();
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            vi.advanceTimersByTime(2999);
+            expect(el.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
+        });
+
+        it('limpia el DOM de ficheros tras el auto-reset', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true });
+            const c = new ChunkedUpload(el);
+            c.init();
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            vi.advanceTimersByTime(3000);
+            expect(el.querySelector('.cu-file-list').children).toHaveLength(0);
+        });
+
+        it('no dispara auto-reset cuando autoProceed es false', () => {
+            component.init();
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            vi.advanceTimersByTime(10000);
+            expect(element.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
+        });
+
+        it('destroy() cancela el timer de auto-reset pendiente', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true });
+            const c = new ChunkedUpload(el);
+            c.init();
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            el.chunkedUpload.destroy();
+            expect(() => vi.advanceTimersByTime(3000)).not.toThrow();
+        });
+
+        it('reset() manual cancela el timer de auto-reset pendiente', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true });
+            const c = new ChunkedUpload(el);
+            c.init();
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            el.chunkedUpload.reset();
+            uppyInstance.cancelAll.mockClear();
+            vi.advanceTimersByTime(3000);
+            expect(uppyInstance.cancelAll).not.toHaveBeenCalled();
+        });
+    });
+
+    // ─── Estado de carga (uploading overlay) ─────────────────────────────────
+
+    describe('estado de carga (uploading overlay)', () => {
+        beforeEach(() => component.init());
+
+        it('renderiza .cu-dropzone-overlay oculto inicialmente', () => {
+            const overlay = element.querySelector('.cu-dropzone-overlay');
+            expect(overlay).not.toBeNull();
+            expect(overlay.classList.contains('d-none')).toBe(true);
+        });
+
+        it('el evento upload de Uppy añade is-uploading al dropzone', () => {
+            uppyInstance._emit('upload');
+            const dropzone = element.querySelector('.cu-dropzone');
+            expect(dropzone.classList.contains('is-uploading')).toBe(true);
+        });
+
+        it('el evento upload de Uppy muestra el overlay', () => {
+            uppyInstance._emit('upload');
+            const overlay = element.querySelector('.cu-dropzone-overlay');
+            expect(overlay.classList.contains('d-none')).toBe(false);
+        });
+
+        it('el evento complete quita is-uploading del dropzone', () => {
+            uppyInstance._emit('upload');
+            uppyInstance._emit('complete', { successful: [], failed: [] });
+            const dropzone = element.querySelector('.cu-dropzone');
+            expect(dropzone.classList.contains('is-uploading')).toBe(false);
+        });
+
+        it('el evento complete oculta el overlay', () => {
+            uppyInstance._emit('upload');
+            uppyInstance._emit('complete', { successful: [], failed: [] });
+            const overlay = element.querySelector('.cu-dropzone-overlay');
+            expect(overlay.classList.contains('d-none')).toBe(true);
+        });
+
+        it('click en dropzone mientras uploading no hace click en el file input', () => {
+            const input = element.querySelector('.cu-file-input');
+            const clickSpy = vi.spyOn(input, 'click');
+            uppyInstance._emit('upload');
+            element.querySelector('.cu-dropzone').click();
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        it('drop mientras uploading no llama a uppy.addFile', () => {
+            uppyInstance._emit('upload');
+            const dropzone = element.querySelector('.cu-dropzone');
+            const file = new File(['content'], 'blocked.txt', { type: 'text/plain' });
+            const event = new DragEvent('drop', { bubbles: true });
+            Object.defineProperty(event, 'dataTransfer', { value: { files: [file] } });
+            dropzone.dispatchEvent(event);
+            expect(uppyInstance.addFile).not.toHaveBeenCalled();
+        });
+
+        it('dragover mientras uploading no añade is-dragging', () => {
+            uppyInstance._emit('upload');
+            const dropzone = element.querySelector('.cu-dropzone');
+            dropzone.dispatchEvent(new DragEvent('dragover', { bubbles: true }));
+            expect(dropzone.classList.contains('is-dragging')).toBe(false);
+        });
+
+        it('cancelAll() de la API pública quita is-uploading', () => {
+            uppyInstance._emit('upload');
+            element.chunkedUpload.cancelAll();
+            const dropzone = element.querySelector('.cu-dropzone');
+            expect(dropzone.classList.contains('is-uploading')).toBe(false);
+        });
+
+        it('click en cu-cancel-btn quita is-uploading', () => {
+            uppyInstance._emit('upload');
+            element.querySelector('.cu-cancel-btn').click();
+            const dropzone = element.querySelector('.cu-dropzone');
+            expect(dropzone.classList.contains('is-uploading')).toBe(false);
+        });
+
+        it('reset() quita is-uploading', () => {
+            uppyInstance._emit('upload');
+            element.chunkedUpload.reset();
+            const dropzone = element.querySelector('.cu-dropzone');
+            expect(dropzone.classList.contains('is-uploading')).toBe(false);
+        });
+
+        it('el overlay contiene un spinner', () => {
+            const overlay = element.querySelector('.cu-dropzone-overlay');
+            expect(overlay.querySelector('.spinner-border')).not.toBeNull();
         });
     });
 });
