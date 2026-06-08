@@ -21,6 +21,7 @@ export default [
         clearTimeout: 'readonly',
         setTimeout: 'readonly',
         URL: 'readonly',
+        location: 'readonly',
       },
     },
     rules: {
@@ -35,6 +36,7 @@ export default [
         CustomEvent: 'readonly',
         MouseEvent: 'readonly',
         DragEvent: 'readonly',
+        KeyboardEvent: 'readonly',
         File: 'readonly',
         global: 'writable',
       },
