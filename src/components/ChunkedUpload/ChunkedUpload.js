@@ -15,6 +15,8 @@ export default class ChunkedUpload extends Component {
     #fileListEl = null;
     #actionsEl = null;
     #errorAlertEl = null;
+    #uploadBtnEl = null;
+    #cancelBtnEl = null;
     #fileItemMap = new Map();
     #autoResetTimer = null;
     #isUploading = false;
@@ -116,49 +118,82 @@ export default class ChunkedUpload extends Component {
 
     #buildUI() {
         const s = this.settings;
-        const accept = s.allowedFileTypes?.length ? ` accept="${s.allowedFileTypes.join(',')}"` : '';
-        const dropzoneLabel = s.labels.dropzone || 'Arrastra el fichero aquí';
-        const iconClass = s.labels.icon || 'bi-cloud-upload';
-        const subtitle = s.labels.dropzoneSubtitle
-            ? `<p class="cu-dropzone-subtitle text-muted small mb-0">${s.labels.dropzoneSubtitle}</p>`
-            : '';
-        const uploadFileButton = s.labels.uploadFileButton || 'Subir';
-        const cancelButton = s.labels.cancelButton || 'Cancelar';
 
-        this.root.innerHTML = `
-            <div class="chunked-upload">
-                <div class="cu-dropzone border border-2 rounded-3 mb-3 d-flex flex-column align-items-center justify-content-center">
-                    <input type="file" class="cu-file-input visually-hidden"${accept}>
-                    <div class="cu-dropzone-content text-center py-4">
-                        <i class="bi ${iconClass} fs-1 cu-dropzone-icon d-block mb-2"></i>
-                        <p class="cu-dropzone-label fw-semibold mb-1">${dropzoneLabel}</p>
-                        ${subtitle}
-                    </div>
-                    <div class="cu-dropzone-overlay d-none">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">${s.labels.uploading || 'Subiendo…'}</span>
-                        </div>
-                    </div>
-                </div>
-                <ul class="cu-file-list list-unstyled mb-3 d-none"></ul>
-                <div class="cu-actions d-flex gap-2 d-none">
-                    <button type="button" class="btn btn-primary btn-sm cu-upload-btn"><i class="bi bi-upload me-1"></i>${uploadFileButton}</button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm cu-cancel-btn">${cancelButton}</button>
-                </div>
-                <div class="alert alert-danger cu-error-alert d-none mt-2" role="alert"></div>
-            </div>
-        `;
+        this.#fileInputEl = document.createElement('input');
+        this.#fileInputEl.type = 'file';
+        this.#fileInputEl.className = 'cu-file-input visually-hidden';
+        if (s.allowedFileTypes?.length) {
+            this.#fileInputEl.accept = s.allowedFileTypes.join(',');
+        }
 
-        this.#dropzoneEl = this.root.querySelector('.cu-dropzone');
-        this.#fileInputEl = this.root.querySelector('.cu-file-input');
-        this.#overlayEl = this.root.querySelector('.cu-dropzone-overlay');
-        this.#fileListEl = this.root.querySelector('.cu-file-list');
-        this.#actionsEl = this.root.querySelector('.cu-actions');
-        this.#errorAlertEl = this.root.querySelector('.cu-error-alert');
+        const iconEl = document.createElement('i');
+        iconEl.className = `bi ${s.labels.icon || 'bi-cloud-upload'} fs-1 cu-dropzone-icon d-block mb-2`;
+
+        const dropzoneLabelEl = document.createElement('p');
+        dropzoneLabelEl.className = 'cu-dropzone-label fw-semibold mb-1';
+        dropzoneLabelEl.textContent = s.labels.dropzone || 'Arrastra el fichero aquí';
+
+        const contentEl = document.createElement('div');
+        contentEl.className = 'cu-dropzone-content text-center py-4';
+        contentEl.append(iconEl, dropzoneLabelEl);
+
+        if (s.labels.dropzoneSubtitle) {
+            const subtitleEl = document.createElement('p');
+            subtitleEl.className = 'cu-dropzone-subtitle text-muted small mb-0';
+            subtitleEl.textContent = s.labels.dropzoneSubtitle;
+            contentEl.appendChild(subtitleEl);
+        }
+
+        const spinnerLabelEl = document.createElement('span');
+        spinnerLabelEl.className = 'visually-hidden';
+        spinnerLabelEl.textContent = s.labels.uploading || 'Subiendo…';
+
+        const spinnerEl = document.createElement('div');
+        spinnerEl.className = 'spinner-border';
+        spinnerEl.setAttribute('role', 'status');
+        spinnerEl.appendChild(spinnerLabelEl);
+
+        this.#overlayEl = document.createElement('div');
+        this.#overlayEl.className = 'cu-dropzone-overlay d-none';
+        this.#overlayEl.appendChild(spinnerEl);
+
+        this.#dropzoneEl = document.createElement('div');
+        this.#dropzoneEl.className = 'cu-dropzone border border-2 rounded-3 mb-3 d-flex flex-column align-items-center justify-content-center';
+        this.#dropzoneEl.append(this.#fileInputEl, contentEl, this.#overlayEl);
+
+        this.#fileListEl = document.createElement('ul');
+        this.#fileListEl.className = 'cu-file-list list-unstyled mb-3 d-none';
+
+        const uploadBtnIcon = document.createElement('i');
+        uploadBtnIcon.className = 'bi bi-upload me-1';
+
+        this.#uploadBtnEl = document.createElement('button');
+        this.#uploadBtnEl.type = 'button';
+        this.#uploadBtnEl.className = 'btn btn-primary btn-sm cu-upload-btn';
+        this.#uploadBtnEl.append(uploadBtnIcon, s.labels.uploadFileButton || 'Subir');
 
         if (s.autoProceed) {
-            this.root.querySelector('.cu-upload-btn').classList.add('d-none');
+            this.#uploadBtnEl.classList.add('d-none');
         }
+
+        this.#cancelBtnEl = document.createElement('button');
+        this.#cancelBtnEl.type = 'button';
+        this.#cancelBtnEl.className = 'btn btn-outline-secondary btn-sm cu-cancel-btn';
+        this.#cancelBtnEl.textContent = s.labels.cancelButton || 'Cancelar';
+
+        this.#actionsEl = document.createElement('div');
+        this.#actionsEl.className = 'cu-actions d-flex gap-2 d-none';
+        this.#actionsEl.append(this.#uploadBtnEl, this.#cancelBtnEl);
+
+        this.#errorAlertEl = document.createElement('div');
+        this.#errorAlertEl.className = 'alert alert-danger cu-error-alert d-none mt-2';
+        this.#errorAlertEl.setAttribute('role', 'alert');
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'chunked-upload';
+        wrapper.append(this.#dropzoneEl, this.#fileListEl, this.#actionsEl, this.#errorAlertEl);
+
+        this.root.appendChild(wrapper);
     }
 
     #initUppy() {
@@ -194,8 +229,8 @@ export default class ChunkedUpload extends Component {
         this.#dropzoneEl?.addEventListener('dragover', this.#onDragOver);
         this.#dropzoneEl?.addEventListener('dragleave', this.#onDragLeave);
         this.#dropzoneEl?.addEventListener('drop', this.#onDrop);
-        this.root.querySelector('.cu-upload-btn')?.addEventListener('click', this.#onUploadBtnClick);
-        this.root.querySelector('.cu-cancel-btn')?.addEventListener('click', this.#onCancelBtnClick);
+        this.#uploadBtnEl?.addEventListener('click', this.#onUploadBtnClick);
+        this.#cancelBtnEl?.addEventListener('click', this.#onCancelBtnClick);
     }
 
     #onFileAdded(file) {
@@ -204,18 +239,40 @@ export default class ChunkedUpload extends Component {
         const li = document.createElement('li');
         li.className = 'cu-file-item d-flex align-items-center gap-2 mb-2';
         li.dataset.fileId = file.id;
-        li.innerHTML = `
-            <i class="bi bi-file-earmark text-muted"></i>
-            <span class="cu-file-name text-truncate flex-grow-1 small">${file.name}</span>
-            <span class="cu-file-size text-muted small">${this.#formatBytes(file.size)}</span>
-            <div class="progress flex-grow-1 d-none" style="height: 6px;">
-                <div class="progress-bar cu-progress-bar" role="progressbar" style="width: 0%"></div>
-            </div>
-            <span class="cu-file-status badge bg-secondary">${this.settings.labels.statusQueued || 'En cola'}</span>
-            <button type="button" class="btn-close btn-sm cu-file-remove" aria-label="Eliminar"></button>
-        `;
 
-        li.querySelector('.cu-file-remove').addEventListener('click', () => {
+        const icon = document.createElement('i');
+        icon.className = 'bi bi-file-earmark text-muted';
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'cu-file-name text-truncate flex-grow-1 small';
+        nameEl.textContent = file.name;
+
+        const sizeEl = document.createElement('span');
+        sizeEl.className = 'cu-file-size text-muted small';
+        sizeEl.textContent = this.#formatBytes(file.size);
+
+        const progressBarEl = document.createElement('div');
+        progressBarEl.className = 'progress-bar cu-progress-bar';
+        progressBarEl.setAttribute('role', 'progressbar');
+        progressBarEl.style.width = '0%';
+
+        const progressEl = document.createElement('div');
+        progressEl.className = 'progress flex-grow-1 d-none';
+        progressEl.style.height = '6px';
+        progressEl.appendChild(progressBarEl);
+
+        const statusEl = document.createElement('span');
+        statusEl.className = 'cu-file-status badge bg-secondary';
+        statusEl.textContent = this.settings.labels.statusQueued || 'En cola';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-close btn-sm cu-file-remove';
+        removeBtn.setAttribute('aria-label', 'Eliminar');
+
+        li.append(icon, nameEl, sizeEl, progressEl, statusEl, removeBtn);
+
+        removeBtn.addEventListener('click', () => {
             this.#uppy.removeFile(file.id);
             li.remove();
             this.#fileItemMap.delete(file.id);
@@ -226,7 +283,7 @@ export default class ChunkedUpload extends Component {
         });
 
         this.#fileListEl.appendChild(li);
-        this.#fileItemMap.set(file.id, li);
+        this.#fileItemMap.set(file.id, { li, progressEl, progressBarEl, statusEl });
         this.#fileListEl.classList.remove('d-none');
         if (!this.settings.autoProceed) {
             this.#actionsEl.classList.remove('d-none');
@@ -236,21 +293,15 @@ export default class ChunkedUpload extends Component {
     }
 
     #onUploadProgress(file, progress) {
-        const li = this.#fileItemMap.get(file.id);
-        if (li) {
-            li.querySelector('.progress')?.classList.remove('d-none');
-            const bar = li.querySelector('.cu-progress-bar');
-            if (bar) {
-                const pct = progress.bytesTotal
-                    ? Math.round((progress.bytesUploaded / progress.bytesTotal) * 100)
-                    : 0;
-                bar.style.width = `${pct}%`;
-            }
-            const badge = li.querySelector('.cu-file-status');
-            if (badge) {
-                badge.className = 'cu-file-status badge bg-primary';
-                badge.textContent = this.settings.labels.statusUploading || 'Subiendo…';
-            }
+        const item = this.#fileItemMap.get(file.id);
+        if (item) {
+            item.progressEl.classList.remove('d-none');
+            const pct = progress.bytesTotal
+                ? Math.round((progress.bytesUploaded / progress.bytesTotal) * 100)
+                : 0;
+            item.progressBarEl.style.width = `${pct}%`;
+            item.statusEl.className = 'cu-file-status badge bg-primary';
+            item.statusEl.textContent = this.settings.labels.statusUploading || 'Subiendo…';
         }
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:progress', {
@@ -259,15 +310,11 @@ export default class ChunkedUpload extends Component {
     }
 
     #onUploadSuccess(file, response) {
-        const li = this.#fileItemMap.get(file.id);
-        if (li) {
-            const bar = li.querySelector('.cu-progress-bar');
-            if (bar) bar.style.width = '100%';
-            const badge = li.querySelector('.cu-file-status');
-            if (badge) {
-                badge.className = 'cu-file-status badge bg-success';
-                badge.textContent = this.settings.labels.statusCompleted || 'Completado';
-            }
+        const item = this.#fileItemMap.get(file.id);
+        if (item) {
+            item.progressBarEl.style.width = '100%';
+            item.statusEl.className = 'cu-file-status badge bg-success';
+            item.statusEl.textContent = this.settings.labels.statusCompleted || 'Completado';
         }
 
         const uploadURL = response?.uploadURL;
@@ -288,13 +335,10 @@ export default class ChunkedUpload extends Component {
     }
 
     #onUploadError(file, error) {
-        const li = this.#fileItemMap.get(file.id);
-        if (li) {
-            const badge = li.querySelector('.cu-file-status');
-            if (badge) {
-                badge.className = 'cu-file-status badge bg-danger';
-                badge.textContent = this.settings.labels.statusError || 'Error';
-            }
+        const item = this.#fileItemMap.get(file.id);
+        if (item) {
+            item.statusEl.className = 'cu-file-status badge bg-danger';
+            item.statusEl.textContent = this.settings.labels.statusError || 'Error';
         }
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:upload-error', {
@@ -372,8 +416,8 @@ export default class ChunkedUpload extends Component {
         this.#dropzoneEl?.removeEventListener('dragover', this.#onDragOver);
         this.#dropzoneEl?.removeEventListener('dragleave', this.#onDragLeave);
         this.#dropzoneEl?.removeEventListener('drop', this.#onDrop);
-        this.root.querySelector('.cu-upload-btn')?.removeEventListener('click', this.#onUploadBtnClick);
-        this.root.querySelector('.cu-cancel-btn')?.removeEventListener('click', this.#onCancelBtnClick);
+        this.#uploadBtnEl?.removeEventListener('click', this.#onUploadBtnClick);
+        this.#cancelBtnEl?.removeEventListener('click', this.#onCancelBtnClick);
 
         this.#uppy?.destroy();
         this.#fileItemMap.clear();
