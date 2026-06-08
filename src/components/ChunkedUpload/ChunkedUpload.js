@@ -59,6 +59,12 @@ export default class ChunkedUpload extends Component {
         }
     };
 
+    #onDropzoneKeyDown = (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (this.#isUploading) return;
+        this.#fileInputEl?.click();
+    };
+
     #onUploadBtnClick = () => this.#uppy.upload();
 
     #onCancelBtnClick = () => {
@@ -159,6 +165,8 @@ export default class ChunkedUpload extends Component {
 
         this.#dropzoneEl = document.createElement('div');
         this.#dropzoneEl.className = 'cu-dropzone border border-2 rounded-3 mb-3 d-flex flex-column align-items-center justify-content-center';
+        this.#dropzoneEl.setAttribute('role', 'button');
+        this.#dropzoneEl.setAttribute('tabindex', '0');
         this.#dropzoneEl.append(this.#fileInputEl, contentEl, this.#overlayEl);
 
         this.#fileListEl = document.createElement('ul');
@@ -225,6 +233,7 @@ export default class ChunkedUpload extends Component {
 
     #attachDOMListeners() {
         this.#dropzoneEl?.addEventListener('click', this.#onDropzoneClick);
+        this.#dropzoneEl?.addEventListener('keydown', this.#onDropzoneKeyDown);
         this.#fileInputEl?.addEventListener('change', this.#onFileInputChange);
         this.#dropzoneEl?.addEventListener('dragover', this.#onDragOver);
         this.#dropzoneEl?.addEventListener('dragleave', this.#onDragLeave);
@@ -415,6 +424,7 @@ export default class ChunkedUpload extends Component {
             this.#autoResetTimer = null;
         }
         this.#dropzoneEl?.removeEventListener('click', this.#onDropzoneClick);
+        this.#dropzoneEl?.removeEventListener('keydown', this.#onDropzoneKeyDown);
         this.#fileInputEl?.removeEventListener('change', this.#onFileInputChange);
         this.#dropzoneEl?.removeEventListener('dragover', this.#onDragOver);
         this.#dropzoneEl?.removeEventListener('dragleave', this.#onDragLeave);

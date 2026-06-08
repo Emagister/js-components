@@ -342,6 +342,55 @@ describe('ChunkedUpload', () => {
         });
     });
 
+    // ─── Accesibilidad del dropzone ───────────────────────────────────────────
+
+    describe('accesibilidad del dropzone', () => {
+        beforeEach(() => component.init());
+
+        it('el dropzone tiene role="button"', () => {
+            const dropzone = element.querySelector('.cu-dropzone');
+            expect(dropzone.getAttribute('role')).toBe('button');
+        });
+
+        it('el dropzone tiene tabindex="0"', () => {
+            const dropzone = element.querySelector('.cu-dropzone');
+            expect(dropzone.getAttribute('tabindex')).toBe('0');
+        });
+
+        it('Enter sobre el dropzone abre el selector de fichero', () => {
+            const dropzone = element.querySelector('.cu-dropzone');
+            const input = element.querySelector('.cu-file-input');
+            const clickSpy = vi.spyOn(input, 'click');
+            dropzone.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+            expect(clickSpy).toHaveBeenCalledOnce();
+        });
+
+        it('Espacio sobre el dropzone abre el selector de fichero', () => {
+            const dropzone = element.querySelector('.cu-dropzone');
+            const input = element.querySelector('.cu-file-input');
+            const clickSpy = vi.spyOn(input, 'click');
+            dropzone.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+            expect(clickSpy).toHaveBeenCalledOnce();
+        });
+
+        it('otras teclas no abren el selector de fichero', () => {
+            const dropzone = element.querySelector('.cu-dropzone');
+            const input = element.querySelector('.cu-file-input');
+            const clickSpy = vi.spyOn(input, 'click');
+            dropzone.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+
+        it('Enter no abre el selector si el componente está subiendo', () => {
+            uppyInstance._emit('upload');
+            const dropzone = element.querySelector('.cu-dropzone');
+            const input = element.querySelector('.cu-file-input');
+            const clickSpy = vi.spyOn(input, 'click');
+            dropzone.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+            expect(clickSpy).not.toHaveBeenCalled();
+        });
+    });
+
     // ─── Eventos Uppy → DOM ───────────────────────────────────────────────────
 
     describe('Eventos Uppy → DOM', () => {
