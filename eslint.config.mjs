@@ -20,6 +20,7 @@ export default [
         navigator: 'readonly',
         clearTimeout: 'readonly',
         setTimeout: 'readonly',
+        URL: 'readonly',
       },
     },
     rules: {
@@ -33,6 +34,8 @@ export default [
         Event: 'readonly',
         CustomEvent: 'readonly',
         MouseEvent: 'readonly',
+        DragEvent: 'readonly',
+        File: 'readonly',
         global: 'writable',
       },
     },
