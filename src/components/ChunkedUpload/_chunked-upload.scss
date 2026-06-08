@@ -1,3 +1,4 @@
+@use "sass:string";
 @use "../../../scss/variables";
 
 .cu-dropzone {
@@ -10,7 +11,7 @@
     &:hover,
     &.is-dragging {
         border-color: var(--emg-brand-color, #{variables.$emg-brand-color}) !important;
-        background-color: rgba(76, 183, 172, 0.05);
+        background-color: string.unquote("color-mix(in srgb, var(--emg-brand-color, #{variables.$emg-brand-color}), #fff 95%)");
     }
 
     &.is-uploading {
