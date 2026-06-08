@@ -493,6 +493,28 @@ describe('ChunkedUpload', () => {
                 uppyInstance._emit('upload-success', file, {});
                 expect(handler.mock.calls[0][0].detail.uploadId).toBeNull();
             });
+
+            it('extrae uploadId de una uploadURL relativa sin lanzar excepción', () => {
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:chunkedUpload:upload-success', handler);
+                const file = fakeFile();
+                const response = { uploadURL: '/files/abc123' };
+                uppyInstance._emit('file-added', file);
+                uppyInstance._emit('upload-success', file, response);
+                expect(handler).toHaveBeenCalledOnce();
+                expect(handler.mock.calls[0][0].detail.uploadId).toBe('abc123');
+            });
+
+            it('despacha el evento aunque uploadURL no se pueda parsear', () => {
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:chunkedUpload:upload-success', handler);
+                const file = fakeFile();
+                uppyInstance._emit('file-added', file);
+                expect(() => {
+                    uppyInstance._emit('upload-success', file, { uploadURL: 'not a url at all  ' });
+                }).not.toThrow();
+                expect(handler).toHaveBeenCalledOnce();
+            });
         });
 
         describe('upload-error', () => {

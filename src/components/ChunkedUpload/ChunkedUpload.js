@@ -318,9 +318,12 @@ export default class ChunkedUpload extends Component {
         }
 
         const uploadURL = response?.uploadURL;
-        const uploadId = uploadURL
-            ? new URL(uploadURL).pathname.split('/').filter(Boolean).pop() ?? null
-            : null;
+        let uploadId = null;
+        if (uploadURL) {
+            try {
+                uploadId = new URL(uploadURL, location.href).pathname.split('/').filter(Boolean).pop() ?? null;
+            } catch { /* uploadId remains null if the URL cannot be parsed */ }
+        }
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:upload-success', {
             detail: { file, response, uploadId },
