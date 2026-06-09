@@ -50,9 +50,11 @@ export default class RichMultiSelect extends Component {
             },
             onChange: (values) => {
                 if (s.placeholderWithItems && this.#tomSelect) {
-                    this.#tomSelect.control_input.placeholder = values.length > 0
+                    const ph = values.length > 0
                         ? s.placeholderWithItems
                         : (s.placeholder ?? 'Seleccionar…');
+                    this.#tomSelect.settings.placeholder = ph;
+                    this.#tomSelect.control_input.placeholder = ph;
                 }
                 this.root.dispatchEvent(
                     new CustomEvent('emg-jsc:richMultiSelect:change', { detail: { values } })

@@ -20,6 +20,7 @@ describe('RichMultiSelect', () => {
 
         TomSelect.mockImplementation(function (el, config) {
             this._config = config;
+            this.settings = { placeholder: config.placeholder ?? 'Seleccionar…' };
             this.getValue = vi.fn(() => []);
             this.setValue = vi.fn();
             this.addOption = vi.fn();
@@ -429,6 +430,29 @@ describe('RichMultiSelect', () => {
             getTsConfig().onChange(['1']);
             getTsConfig().onChange([]);
             expect(ts.control_input.placeholder).toBe('Buscar centros…');
+        });
+
+        it('con placeholderWithItems, actualiza settings.placeholder al seleccionar ítems para que TomSelect no lo sobreescriba', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            expect(ts.settings.placeholder).toBe('Añadir más centros…');
+        });
+
+        it('con placeholderWithItems, restaura settings.placeholder al quitar todos los ítems', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            getTsConfig().onChange([]);
+            expect(ts.settings.placeholder).toBe('Buscar centros…');
         });
 
         it('con placeholderWithItems, mantiene el placeholder de ítems al añadir más de uno', () => {
