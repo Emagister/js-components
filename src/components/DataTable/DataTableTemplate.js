@@ -167,8 +167,10 @@ export default class DataTableTemplate {
 
     #applyTooltip(el, row, col) {
         if (!col.tooltip) return;
+        const text = row[col.tooltip];
+        if (text == null) return;
         el.setAttribute('data-component', 'tooltip');
-        el.setAttribute('title', row[col.tooltip] ?? '');
+        el.setAttribute('title', String(text));
     }
 
     #createTd(row, col, defaultContent = '') {

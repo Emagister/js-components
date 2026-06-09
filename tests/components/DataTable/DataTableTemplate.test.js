@@ -323,6 +323,15 @@ describe('DataTableTemplate', () => {
                 expect(i.getAttribute('data-component')).toBe('tooltip');
                 expect(i.getAttribute('title')).toBe('Usuario activo');
             });
+
+            it('no aplica tooltip cuando el campo referenciado por col.tooltip no existe en la fila', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice' }] };
+                const content = template.createContent(state, config);
+                const td = content.querySelector('tbody td');
+                expect(td.getAttribute('data-component')).toBeNull();
+                expect(td.getAttribute('title')).toBeNull();
+            });
         });
     });
 
