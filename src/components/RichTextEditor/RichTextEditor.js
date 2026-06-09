@@ -112,23 +112,23 @@ export default class RichTextEditor extends Component {
         if (!this.settings.toolbar) return TOOLBAR_ITEMS;
 
         const allowed = new Set(this.settings.toolbar);
-        const result = [];
+        const visibleItems = [];
 
         for (const item of TOOLBAR_ITEMS) {
             if (item.type === 'separator') {
                 // Añade el separador solo si el último item añadido fue un botón
-                if (result.length > 0 && result[result.length - 1].type !== 'separator') {
-                    result.push(item);
+                if (visibleItems.length > 0 && visibleItems[visibleItems.length - 1].type !== 'separator') {
+                    visibleItems.push(item);
                 }
             } else if (allowed.has(item.labelKey)) {
-                result.push(item);
+                visibleItems.push(item);
             }
         }
 
         // Elimina separador final si no hay botón después
-        if (result.at(-1)?.type === 'separator') result.pop();
+        if (visibleItems.at(-1)?.type === 'separator') visibleItems.pop();
 
-        return result;
+        return visibleItems;
     }
 
     #createToolbar() {

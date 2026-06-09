@@ -330,11 +330,11 @@ export default class DataTable extends Component {
                 throw new Error('Network response was not ok');
             }
 
-            const result = await response.json();
+            const apiResponse = await response.json();
 
             // Expected format: { data: [...], meta: { page: 1, total: 100, perPage: 10 } }
             const currentPage = this.state.meta.page;
-            const lastPage = result.meta.perPage !== 0 ? Math.ceil(result.meta.total / result.meta.perPage) : 0;
+            const lastPage = apiResponse.meta.perPage !== 0 ? Math.ceil(apiResponse.meta.total / apiResponse.meta.perPage) : 0;
 
             if (lastPage >= 1 && currentPage > lastPage) {
                 this.#setState({ meta: { ...this.state.meta, page: lastPage }, isLoading: false });
@@ -343,10 +343,10 @@ export default class DataTable extends Component {
             }
 
             this.#setState({
-                data: result.data,
+                data: apiResponse.data,
                 meta: {
                     ...this.state.meta,
-                    ...result.meta,
+                    ...apiResponse.meta,
                     lastPage
                 },
                 isLoading: false

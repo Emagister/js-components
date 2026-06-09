@@ -137,12 +137,12 @@ export default class AsyncForm extends Component {
                 throw new Error('Server response is not valid JSON');
             }
 
-            const data = await response.json();
+            const responseData = await response.json();
 
             if (response.ok || response.status === 201) {
-                this.#handleSuccess(data);
+                this.#handleSuccess(responseData);
             } else {
-                this.#handleBackendError(data);
+                this.#handleBackendError(responseData);
             }
 
         } catch (error) {

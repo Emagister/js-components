@@ -2,6 +2,8 @@ import Component from "../Component";
 import { MessageToastType } from './MessageToastType';
 import { Toast } from 'bootstrap';
 
+const DEFAULT_TOAST_DURATION_MS = 3000;
+
 export default class MessageToast extends Component {
     constructor(element) {
         super(element);
@@ -11,7 +13,7 @@ export default class MessageToast extends Component {
         const settings = JSON.parse(this.root.dataset.settings || '{}');
         this.settings = {
             mode: settings.mode || this.root.dataset.mode || 'global',
-            duration: settings.duration || parseInt(this.root.dataset.duration || '3000')
+            duration: settings.duration || parseInt(this.root.dataset.duration || String(DEFAULT_TOAST_DURATION_MS))
         };
 
         this.handleShow = this.#handleGlobalShow.bind(this);
@@ -42,7 +44,7 @@ export default class MessageToast extends Component {
     }
 
     #handleGlobalShow(e) {
-        const { message, type = MessageToastType.SUCCESS, duration = 3000 } = e.detail;
+        const { message, type = MessageToastType.SUCCESS, duration = DEFAULT_TOAST_DURATION_MS } = e.detail;
         this.show(message, type, duration);
     }
 
@@ -64,7 +66,7 @@ export default class MessageToast extends Component {
         this.timeoutId = null;
     }
 
-    show(message, type = MessageToastType.SUCCESS, duration = 3000) {
+    show(message, type = MessageToastType.SUCCESS, duration = DEFAULT_TOAST_DURATION_MS) {
         if (this.messageEl) {
             this.messageEl.textContent = message;
         }
