@@ -608,7 +608,8 @@ el.addEventListener('emg-jsc:chunkedUpload:initialized', () => {})
 el.addEventListener('emg-jsc:chunkedUpload:file-added', e => console.log(e.detail.file))
 el.addEventListener('emg-jsc:chunkedUpload:progress', e => {
   const { file, progress } = e.detail
-  console.log(`${progress.percentage}%`)
+  const pct = progress.bytesTotal ? Math.round(progress.bytesUploaded / progress.bytesTotal * 100) : 0
+  console.log(`${pct}%`)
 })
 el.addEventListener('emg-jsc:chunkedUpload:upload-success', e => {
   console.log('URL:', e.detail.response.uploadURL)
