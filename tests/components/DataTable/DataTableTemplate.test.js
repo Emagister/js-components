@@ -332,6 +332,34 @@ describe('DataTableTemplate', () => {
                 expect(td.getAttribute('data-component')).toBeNull();
                 expect(td.getAttribute('title')).toBeNull();
             });
+
+            it('añade tabindex="0" al elemento no enfocable con tooltip (texto plano)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td').getAttribute('tabindex')).toBe('0');
+            });
+
+            it('añade tabindex="0" al <span> con tooltip (badge)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'status', label: 'Estado', badge: 'level', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, status: 'Activo', level: 'success', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td span.badge').getAttribute('tabindex')).toBe('0');
+            });
+
+            it('añade tabindex="0" al <i> con tooltip (booleano)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'active', label: 'Activo', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, active: true, hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td i').getAttribute('tabindex')).toBe('0');
+            });
+
+            it('no añade tabindex al <a> con tooltip (ya es enfocable por defecto)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', link: 'url', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', url: '/alice', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td a').getAttribute('tabindex')).toBeNull();
+            });
         });
     });
 

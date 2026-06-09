@@ -171,6 +171,9 @@ export default class DataTableTemplate {
         if (text == null) return;
         el.setAttribute('data-component', 'tooltip');
         el.setAttribute('title', String(text));
+        if (el.tagName !== 'A') {
+            el.setAttribute('tabindex', '0');
+        }
     }
 
     #createTd(row, col, defaultContent = '') {
