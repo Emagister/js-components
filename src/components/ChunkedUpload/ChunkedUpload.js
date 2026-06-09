@@ -6,6 +6,7 @@ import './_chunked-upload.scss';
 const DEFAULT_CHUNK_SIZE = 50 * 1024 * 1024;
 const DEFAULT_MAX_FILE_SIZE = 500 * 1024 * 1024;
 const DEFAULT_RETRY_DELAYS = [0, 1000, 3000, 5000];
+const DEFAULT_AUTO_RESET_DELAY_MS = 3000;
 
 const DEFAULT_SETTINGS = {
     chunkSize: DEFAULT_CHUNK_SIZE,
@@ -13,7 +14,7 @@ const DEFAULT_SETTINGS = {
     retryDelays: DEFAULT_RETRY_DELAYS,
     parallelUploads: 1,
     autoProceed: false,
-    autoResetDelay: 3000,
+    autoResetDelay: DEFAULT_AUTO_RESET_DELAY_MS,
     allowedFileTypes: null,
     labels: {},
 };
@@ -116,36 +117,36 @@ export default class ChunkedUpload extends Component {
     }
 
     #buildUI() {
-        const s = this.settings;
+        const settings = this.settings;
 
         this.#fileInputEl = document.createElement('input');
         this.#fileInputEl.type = 'file';
         this.#fileInputEl.className = 'cu-file-input visually-hidden';
-        if (s.allowedFileTypes?.length) {
-            this.#fileInputEl.accept = s.allowedFileTypes.join(',');
+        if (settings.allowedFileTypes?.length) {
+            this.#fileInputEl.accept = settings.allowedFileTypes.join(',');
         }
 
         const iconEl = document.createElement('i');
-        iconEl.className = `bi ${s.labels.icon || 'bi-cloud-upload'} fs-1 cu-dropzone-icon d-block mb-2`;
+        iconEl.className = `bi ${settings.labels.icon || 'bi-cloud-upload'} fs-1 cu-dropzone-icon d-block mb-2`;
 
         const dropzoneLabelEl = document.createElement('p');
         dropzoneLabelEl.className = 'cu-dropzone-label fw-semibold mb-1';
-        dropzoneLabelEl.textContent = s.labels.dropzone || 'Arrastra el fichero aquí';
+        dropzoneLabelEl.textContent = settings.labels.dropzone || 'Arrastra el fichero aquí';
 
         const contentEl = document.createElement('div');
         contentEl.className = 'cu-dropzone-content text-center py-4';
         contentEl.append(iconEl, dropzoneLabelEl);
 
-        if (s.labels.dropzoneSubtitle) {
+        if (settings.labels.dropzoneSubtitle) {
             const subtitleEl = document.createElement('p');
             subtitleEl.className = 'cu-dropzone-subtitle text-muted small mb-0';
-            subtitleEl.textContent = s.labels.dropzoneSubtitle;
+            subtitleEl.textContent = settings.labels.dropzoneSubtitle;
             contentEl.appendChild(subtitleEl);
         }
 
         const spinnerLabelEl = document.createElement('span');
         spinnerLabelEl.className = 'visually-hidden';
-        spinnerLabelEl.textContent = s.labels.uploading || 'Subiendo…';
+        spinnerLabelEl.textContent = settings.labels.uploading || 'Subiendo…';
 
         const spinnerEl = document.createElement('div');
         spinnerEl.className = 'spinner-border';
@@ -171,16 +172,16 @@ export default class ChunkedUpload extends Component {
         this.#uploadBtnEl = document.createElement('button');
         this.#uploadBtnEl.type = 'button';
         this.#uploadBtnEl.className = 'btn btn-primary btn-sm cu-upload-btn';
-        this.#uploadBtnEl.append(uploadBtnIcon, s.labels.uploadFileButton || 'Subir');
+        this.#uploadBtnEl.append(uploadBtnIcon, settings.labels.uploadFileButton || 'Subir');
 
-        if (s.autoProceed) {
+        if (settings.autoProceed) {
             this.#uploadBtnEl.classList.add('d-none');
         }
 
         this.#cancelBtnEl = document.createElement('button');
         this.#cancelBtnEl.type = 'button';
         this.#cancelBtnEl.className = 'btn btn-outline-secondary btn-sm cu-cancel-btn';
-        this.#cancelBtnEl.textContent = s.labels.cancelButton || 'Cancelar';
+        this.#cancelBtnEl.textContent = settings.labels.cancelButton || 'Cancelar';
 
         this.#actionsEl = document.createElement('div');
         this.#actionsEl.className = 'cu-actions d-flex gap-2 d-none';
@@ -198,20 +199,20 @@ export default class ChunkedUpload extends Component {
     }
 
     #initUppy() {
-        const s = this.settings;
+        const settings = this.settings;
 
         this.#uppy = new Uppy({
             restrictions: {
-                maxFileSize: s.maxFileSize,
-                allowedFileTypes: s.allowedFileTypes,
+                maxFileSize: settings.maxFileSize,
+                allowedFileTypes: settings.allowedFileTypes,
                 maxNumberOfFiles: 1,
             },
-            autoProceed: s.autoProceed,
+            autoProceed: settings.autoProceed,
         }).use(Tus, {
-            endpoint: s.endpoint,
-            chunkSize: s.chunkSize,
-            retryDelays: s.retryDelays,
-            limit: s.parallelUploads,
+            endpoint: settings.endpoint,
+            chunkSize: settings.chunkSize,
+            retryDelays: settings.retryDelays,
+            limit: settings.parallelUploads,
         });
 
         this.#uppy
@@ -296,15 +297,15 @@ export default class ChunkedUpload extends Component {
     }
 
     #onUploadProgress(file, progress) {
-        const item = this.#fileItemMap.get(file.id);
-        if (item) {
-            item.progressEl.classList.remove('d-none');
+        const fileEntry = this.#fileItemMap.get(file.id);
+        if (fileEntry) {
+            fileEntry.progressEl.classList.remove('d-none');
             const pct = progress.bytesTotal
                 ? Math.round((progress.bytesUploaded / progress.bytesTotal) * 100)
                 : 0;
-            item.progressBarEl.style.width = `${pct}%`;
-            item.statusEl.className = 'cu-file-status badge bg-primary';
-            item.statusEl.textContent = this.settings.labels.statusUploading || 'Subiendo…';
+            fileEntry.progressBarEl.style.width = `${pct}%`;
+            fileEntry.statusEl.className = 'cu-file-status badge bg-primary';
+            fileEntry.statusEl.textContent = this.settings.labels.statusUploading || 'Subiendo…';
         }
 
         this.#latestProgressDetail = { file, progress };
@@ -320,11 +321,11 @@ export default class ChunkedUpload extends Component {
     }
 
     #onUploadSuccess(file, response) {
-        const item = this.#fileItemMap.get(file.id);
-        if (item) {
-            item.progressBarEl.style.width = '100%';
-            item.statusEl.className = 'cu-file-status badge bg-success';
-            item.statusEl.textContent = this.settings.labels.statusCompleted || 'Completado';
+        const fileEntry = this.#fileItemMap.get(file.id);
+        if (fileEntry) {
+            fileEntry.progressBarEl.style.width = '100%';
+            fileEntry.statusEl.className = 'cu-file-status badge bg-success';
+            fileEntry.statusEl.textContent = this.settings.labels.statusCompleted || 'Completado';
         }
 
         const uploadURL = response?.uploadURL;
@@ -349,10 +350,10 @@ export default class ChunkedUpload extends Component {
     }
 
     #onUploadError(file, error) {
-        const item = this.#fileItemMap.get(file.id);
-        if (item) {
-            item.statusEl.className = 'cu-file-status badge bg-danger';
-            item.statusEl.textContent = this.settings.labels.statusError || 'Error';
+        const fileEntry = this.#fileItemMap.get(file.id);
+        if (fileEntry) {
+            fileEntry.statusEl.className = 'cu-file-status badge bg-danger';
+            fileEntry.statusEl.textContent = this.settings.labels.statusError || 'Error';
         }
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:upload-error', {

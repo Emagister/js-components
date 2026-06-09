@@ -170,10 +170,10 @@ export default class DataTableTemplate {
         const cellValue = (row && row[col.key] !== undefined && row[col.key] !== null) ? row[col.key] : defaultContent;
 
         if (col.link) {
-            const a = document.createElement('a');
-            a.setAttribute('href', row[col.link]);
-            a.textContent = cellValue;
-            td.appendChild(a);
+            const cellLink = document.createElement('a');
+            cellLink.setAttribute('href', row[col.link]);
+            cellLink.textContent = cellValue;
+            td.appendChild(cellLink);
             return td;
         }
 
@@ -188,13 +188,13 @@ export default class DataTableTemplate {
         }
 
         if (row && typeof row[col.key] === 'boolean') {
-            const i = document.createElement('i');
+            const booleanIcon = document.createElement('i');
             if (row[col.key]) {
-                i.className = 'bi bi-check-lg text-success';
+                booleanIcon.className = 'bi bi-check-lg text-success';
             } else {
-                i.className = 'bi bi-x-lg text-danger';
+                booleanIcon.className = 'bi bi-x-lg text-danger';
             }
-            td.appendChild(i);
+            td.appendChild(booleanIcon);
             return td;
         }
 
@@ -279,10 +279,10 @@ export default class DataTableTemplate {
             button.setAttribute('title', label);
             button.setAttribute('aria-label', label);
 
-            const i = document.createElement('i');
-            i.className = icon;
+            const actionIcon = document.createElement('i');
+            actionIcon.className = icon;
 
-            button.appendChild(i);
+            button.appendChild(actionIcon);
             td.appendChild(button);
         }
 
@@ -364,8 +364,8 @@ export default class DataTableTemplate {
 
         ul.appendChild(this.#createPaginationItem(page - 1, labels.previous, false, page === 1));
 
-        for (const p of pages) {
-            ul.appendChild(this.#createPaginationItem(p, p, parseInt(page) === p, p === '...'));
+        for (const pageNumber of pages) {
+            ul.appendChild(this.#createPaginationItem(pageNumber, pageNumber, parseInt(page) === pageNumber, pageNumber === '...'));
         }
 
         ul.appendChild(this.#createPaginationItem(page + 1, labels.next, false, page === lastPage));
@@ -385,16 +385,16 @@ export default class DataTableTemplate {
             li.classList.add('disabled');
         }
 
-        const a = document.createElement('a');
-        a.className = 'page-link';
-        a.textContent = text;
+        const pageLink = document.createElement('a');
+        pageLink.className = 'page-link';
+        pageLink.textContent = text;
 
         if (!disabled && text !== '...') {
-            a.setAttribute('data-page', pageId);
-            a.setAttribute('href', '#');
+            pageLink.setAttribute('data-page', pageId);
+            pageLink.setAttribute('href', '#');
         }
 
-        li.appendChild(a);
+        li.appendChild(pageLink);
         return li;
     }
 
