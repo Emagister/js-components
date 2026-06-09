@@ -286,6 +286,81 @@ describe('DataTableTemplate', () => {
             const content = template.createContent(state, config);
             expect(content.querySelector('tbody tr').getAttribute('aria-disabled')).toBeNull();
         });
+
+        describe('tooltip en columnas', () => {
+            it('añade data-component="tooltip" y title al <td> cuando col.tooltip está definido en celda de texto plano', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', hint: 'Información adicional' }] };
+                const content = template.createContent(state, config);
+                const td = content.querySelector('tbody td');
+                expect(td.getAttribute('data-component')).toBe('tooltip');
+                expect(td.getAttribute('title')).toBe('Información adicional');
+            });
+
+            it('añade data-component="tooltip" y title al <a> cuando col.tooltip está definido en celda de tipo link', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', link: 'url', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', url: '/alice', hint: 'Ver perfil' }] };
+                const content = template.createContent(state, config);
+                const a = content.querySelector('tbody td a');
+                expect(a.getAttribute('data-component')).toBe('tooltip');
+                expect(a.getAttribute('title')).toBe('Ver perfil');
+            });
+
+            it('añade data-component="tooltip" y title al <span> cuando col.tooltip está definido en celda de tipo badge', () => {
+                const config = { ...baseConfig, columns: [{ key: 'status', label: 'Estado', badge: 'level', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, status: 'Activo', level: 'success', hint: 'Estado actual' }] };
+                const content = template.createContent(state, config);
+                const span = content.querySelector('tbody td span.badge');
+                expect(span.getAttribute('data-component')).toBe('tooltip');
+                expect(span.getAttribute('title')).toBe('Estado actual');
+            });
+
+            it('añade data-component="tooltip" y title al <i> cuando col.tooltip está definido en celda de tipo booleano', () => {
+                const config = { ...baseConfig, columns: [{ key: 'active', label: 'Activo', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, active: true, hint: 'Usuario activo' }] };
+                const content = template.createContent(state, config);
+                const i = content.querySelector('tbody td i');
+                expect(i.getAttribute('data-component')).toBe('tooltip');
+                expect(i.getAttribute('title')).toBe('Usuario activo');
+            });
+
+            it('no aplica tooltip cuando el campo referenciado por col.tooltip no existe en la fila', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice' }] };
+                const content = template.createContent(state, config);
+                const td = content.querySelector('tbody td');
+                expect(td.getAttribute('data-component')).toBeNull();
+                expect(td.getAttribute('title')).toBeNull();
+            });
+
+            it('añade tabindex="0" al elemento no enfocable con tooltip (texto plano)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td').getAttribute('tabindex')).toBe('0');
+            });
+
+            it('añade tabindex="0" al <span> con tooltip (badge)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'status', label: 'Estado', badge: 'level', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, status: 'Activo', level: 'success', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td span.badge').getAttribute('tabindex')).toBe('0');
+            });
+
+            it('añade tabindex="0" al <i> con tooltip (booleano)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'active', label: 'Activo', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, active: true, hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td i').getAttribute('tabindex')).toBe('0');
+            });
+
+            it('no añade tabindex al <a> con tooltip (ya es enfocable por defecto)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', link: 'url', tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', url: '/alice', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('tbody td a').getAttribute('tabindex')).toBeNull();
+            });
+        });
     });
 
     describe('acciones', () => {

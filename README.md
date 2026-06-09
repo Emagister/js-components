@@ -176,6 +176,7 @@ Propiedades de `data-columns` (array de objetos):
 - `headerClass` (String): Clases CSS aplicadas al `<th>` de esta columna.
 - `link` (String): Clave del campo que contiene la URL para enlazar el valor.
 - `badge` (String): Clave del campo que determina el nivel del badge Bootstrap.
+- `tooltip` (String): Clave del campo que contiene el texto del tooltip. Funciona con todos los tipos de celda (texto plano, link, badge e iconos booleanos). El componente `tooltip` debe estar registrado en la página.
 - `width` (String): Ancho de la columna (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Si al menos una columna define `width`, se genera un `<colgroup>` para controlar los anchos.
 
 Propiedades de `data-actions` (array de objetos), renderizadas como iconos con tooltip:
@@ -431,11 +432,26 @@ Uso básico con opciones estáticas:
 </select>
 ```
 
+Placeholder diferenciado según haya o no ítems seleccionados:
+```html
+<select name="centers[]" multiple
+        data-component="rich-multi-select"
+        data-settings='{
+          "placeholder": "Selecciona centros…",
+          "placeholderWithItems": "Añadir más centros…"
+        }'>
+  <option value="1">Centro Madrid</option>
+  <option value="2">Centro Barcelona</option>
+</select>
+```
+
 Opciones en `data-settings`:
 
 | Propiedad | Tipo | Default | Descripción |
 |---|---|---|---|
-| `placeholder` | String | `"Seleccionar…"` | Texto del input cuando no hay selección. |
+| `placeholder` | String | `"Seleccionar…"` | Texto del input cuando no hay ningún ítem seleccionado. |
+| `placeholderWithItems` | String | — | Texto alternativo del input cuando hay al menos un ítem seleccionado. Se aplica también si el `<select>` ya tiene valores preseleccionados al inicializar. Si no se define, el placeholder no cambia. |
+| `clearInputOnSelect` | Boolean | `false` | Si es `true`, vacía el texto de búsqueda cada vez que se selecciona un ítem y refresca la lista de opciones. Útil en combinación con `remoteUrl` para lanzar una búsqueda nueva tras cada selección. |
 | `maxItems` | Number \| null | `null` | Máximo de ítems seleccionables. `null` es ilimitado. |
 | `searchField` | String | `"text"` | Campo(s) sobre los que buscar. |
 | `create` | Boolean | `false` | Permite crear opciones nuevas no existentes. |

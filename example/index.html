@@ -45,7 +45,7 @@
                         <div data-component="data-table" id="example-datatable"
                             data-url="http://localhost:5173/example/datatableData.json"
                             data-bulk-delete-url="http://localhost:5173/example/bulkDelete"
-                            data-columns='[{"key":"id", "label":"ID", "width": "5%"}, {"key":"name", "label":"Nombre", "sortable":true}, {"key":"email", "label":"Email", "width": "30%"}, {"key":"phone", "label":"Teléfono"}, {"key":"status", "label":"Estado", "badge": "statusLevel"}]'
+                            data-columns='[{"key":"id", "label":"ID", "width": "5%"}, {"key":"name", "label":"Nombre", "sortable":true}, {"key":"email", "label":"Email", "width": "30%"}, {"key":"phone", "label":"Teléfono"}, {"key":"status", "label":"Estado", "badge": "statusLevel", "tooltip": "statusTooltip"}]'
                             data-actions='[{"name": "delete", "states": [{"key": "deleteUrl", "label": "Eliminar", "icon": "bi-trash"}]}, {"name": "activate", "label": "Activar", "icon": "bi bi-check-circle", "activeOnDisabledRow": true}]'
                             data-settings='{ "perPage": 3, "striped": false, "pageSizeOptions": [3, 5, 10], "disabledRow": "is_disabled", "filterForm": { "id": "datatable-filter-form", "resetButtonId": "datatable-filter-reset" } }'>
                             <!-- Library will inject content here -->
@@ -192,12 +192,34 @@
                                 <pre id="rms-output" class="mt-2 p-2 bg-light rounded border small d-none"></pre>
                             </div>
                             <div class="col-md-6">
-                                <label for="rms-remote" class="form-label">Carga remota AJAX (≥ 2 caracteres)</label>
+                                <label for="rms-remote" class="form-label">Carga remota AJAX + <code>clearInputOnSelect</code></label>
                                 <select id="rms-remote" name="remote[]" multiple data-component="rich-multi-select"
-                                    data-settings='{"placeholder": "Escribe para buscar…", "remoteUrl": "/api/centers/search"}'>
+                                    data-settings='{
+                                        "placeholder": "Escribe para buscar…",
+                                        "remoteUrl": "/api/centers/search",
+                                        "clearInputOnSelect": true
+                                    }'>
                                 </select>
                                 <small class="text-muted d-block mt-1">
-                                    Prueba: <code>mad</code>, <code>bar</code>, <code>val</code>, <code>sev</code>
+                                    Prueba: <code>mad</code>, <code>bar</code>, <code>val</code>, <code>sev</code>.
+                                    Al seleccionar un centro el input se limpia para una nueva búsqueda.
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="rms-dual-placeholder" class="form-label">Placeholder diferenciado (<code>placeholderWithItems</code>)</label>
+                                <select id="rms-dual-placeholder" name="dual[]" multiple data-component="rich-multi-select"
+                                    data-settings='{
+                                        "placeholder": "Selecciona centros…",
+                                        "placeholderWithItems": "Añadir más centros…"
+                                    }'>
+                                    <option value="1" selected>Centro Madrid Norte</option>
+                                    <option value="2">Centro Madrid Sur</option>
+                                    <option value="3">Centro Barcelona</option>
+                                    <option value="4">Centro Valencia</option>
+                                    <option value="5">Centro Sevilla</option>
+                                </select>
+                                <small class="text-muted d-block mt-1">
+                                    El placeholder se inicializa como <em>"Añadir más centros…"</em> porque ya hay un valor preseleccionado. Al vaciar la selección vuelve a <em>"Selecciona centros…"</em>.
                                 </small>
                             </div>
                         </div>

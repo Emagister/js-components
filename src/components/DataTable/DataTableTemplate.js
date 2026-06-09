@@ -165,6 +165,17 @@ export default class DataTableTemplate {
         return tr;
     }
 
+    #applyTooltip(el, row, col) {
+        if (!col.tooltip) return;
+        const text = row[col.tooltip];
+        if (text == null) return;
+        el.setAttribute('data-component', 'tooltip');
+        el.setAttribute('title', String(text));
+        if (el.tagName !== 'A') {
+            el.setAttribute('tabindex', '0');
+        }
+    }
+
     #createTd(row, col, defaultContent = '') {
         const td = document.createElement('td');
         const cellValue = (row && row[col.key] !== undefined && row[col.key] !== null) ? row[col.key] : defaultContent;
@@ -173,16 +184,17 @@ export default class DataTableTemplate {
             const cellLink = document.createElement('a');
             cellLink.setAttribute('href', row[col.link]);
             cellLink.textContent = cellValue;
+            this.#applyTooltip(cellLink, row, col);
             td.appendChild(cellLink);
             return td;
         }
 
         if (col.badge) {
             const span = document.createElement('span');
-            // Assuming col.badge format is something like "badge bg-%level%"
             const level = row[col.badge] || 'secondary';
             span.className = `badge bg-${level}-subtle text-${level}`;
             span.textContent = cellValue;
+            this.#applyTooltip(span, row, col);
             td.appendChild(span);
             return td;
         }
@@ -194,10 +206,12 @@ export default class DataTableTemplate {
             } else {
                 booleanIcon.className = 'bi bi-x-lg text-danger';
             }
+            this.#applyTooltip(booleanIcon, row, col);
             td.appendChild(booleanIcon);
             return td;
         }
 
+        this.#applyTooltip(td, row, col);
         td.textContent = cellValue;
         return td;
     }

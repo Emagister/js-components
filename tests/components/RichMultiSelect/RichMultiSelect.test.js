@@ -20,11 +20,15 @@ describe('RichMultiSelect', () => {
 
         TomSelect.mockImplementation(function (el, config) {
             this._config = config;
+            this.settings = { placeholder: config.placeholder ?? 'Seleccionar…' };
             this.getValue = vi.fn(() => []);
             this.setValue = vi.fn();
             this.addOption = vi.fn();
             this.clear = vi.fn();
             this.destroy = vi.fn();
+            this.setTextboxValue = vi.fn();
+            this.refreshOptions = vi.fn();
+            this.control_input = document.createElement('input');
         });
 
         rms = new RichMultiSelect(element);
@@ -390,6 +394,164 @@ describe('RichMultiSelect', () => {
             await Promise.resolve();
 
             expect(callback).not.toHaveBeenCalledWith([{ value: '1', text: 'Centro Madrid' }]);
+        });
+    });
+
+    // ─── placeholderWithItems ─────────────────────────────────────────────────
+
+    describe('placeholderWithItems', () => {
+        it('sin placeholderWithItems, el placeholder no cambia al seleccionar ítems', () => {
+            element.dataset.settings = JSON.stringify({ placeholder: 'Buscar…' });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            ts.control_input.placeholder = 'Buscar…';
+            getTsConfig().onChange(['1']);
+            expect(ts.control_input.placeholder).toBe('Buscar…');
+        });
+
+        it('con placeholderWithItems cadena vacía, activa igualmente el comportamiento', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: ''
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            expect(ts.control_input.placeholder).toBe('');
+            expect(ts.settings.placeholder).toBe('');
+        });
+
+        it('con placeholderWithItems, cambia el placeholder al añadir el primer ítem', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            expect(ts.control_input.placeholder).toBe('Añadir más centros…');
+        });
+
+        it('con placeholderWithItems, restaura el placeholder original al quitar todos los ítems', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            getTsConfig().onChange([]);
+            expect(ts.control_input.placeholder).toBe('Buscar centros…');
+        });
+
+        it('con placeholderWithItems, actualiza settings.placeholder al seleccionar ítems para que TomSelect no lo sobreescriba', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            expect(ts.settings.placeholder).toBe('Añadir más centros…');
+        });
+
+        it('con placeholderWithItems, restaura settings.placeholder al quitar todos los ítems', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            getTsConfig().onChange([]);
+            expect(ts.settings.placeholder).toBe('Buscar centros…');
+        });
+
+        it('con placeholderWithItems, mantiene el placeholder de ítems al añadir más de uno', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar…',
+                placeholderWithItems: 'Añadir más…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            getTsConfig().onChange(['1', '2']);
+            expect(ts.control_input.placeholder).toBe('Añadir más…');
+        });
+
+        it('con placeholderWithItems y valores iniciales, aplica placeholderWithItems al inicializar', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            TomSelect.mockImplementationOnce(function (el, config) {
+                this._config = config;
+                this.settings = { placeholder: config.placeholder ?? 'Seleccionar…' };
+                this.getValue = vi.fn(() => ['1', '2']);
+                this.setValue = vi.fn();
+                this.addOption = vi.fn();
+                this.clear = vi.fn();
+                this.destroy = vi.fn();
+                this.setTextboxValue = vi.fn();
+                this.refreshOptions = vi.fn();
+                this.control_input = document.createElement('input');
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            expect(ts.control_input.placeholder).toBe('Añadir más centros…');
+            expect(ts.settings.placeholder).toBe('Añadir más centros…');
+        });
+    });
+
+    // ─── clearInputOnSelect ───────────────────────────────────────────────────
+
+    describe('clearInputOnSelect', () => {
+        it('sin clearInputOnSelect, no limpia el input al seleccionar un ítem', () => {
+            rms.init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.setTextboxValue).not.toHaveBeenCalled();
+            expect(ts.refreshOptions).not.toHaveBeenCalled();
+        });
+
+        it('con clearInputOnSelect: false, no limpia el input al seleccionar un ítem', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: false });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.setTextboxValue).not.toHaveBeenCalled();
+        });
+
+        it('con clearInputOnSelect: true, limpia el input al seleccionar un ítem', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: true });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.setTextboxValue).toHaveBeenCalledWith('');
+        });
+
+        it('con clearInputOnSelect: true, refresca las opciones sin disparar búsqueda', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: true });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.refreshOptions).toHaveBeenCalledWith(false);
+        });
+
+        it('con clearInputOnSelect: true, sigue emitiendo el evento item-add', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: true });
+            new RichMultiSelect(element).init();
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:richMultiSelect:item-add', handler);
+            const $item = document.createElement('div');
+            $item.textContent = 'Centro Barcelona';
+            getTsConfig().onItemAdd('3', $item);
+            expect(handler).toHaveBeenCalledOnce();
+            expect(handler.mock.calls[0][0].detail).toEqual({ value: '3', text: 'Centro Barcelona' });
         });
     });
 

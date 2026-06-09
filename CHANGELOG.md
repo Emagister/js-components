@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.10.0](https://github.com/Emagister/js-components/compare/v1.9.0...v1.10.0) (2026-05-19)
+
+
+### Features
+
+* **data-table:** add activeOnDisabledRow option to keep an action interactive on disabled rows ([130faa7](https://github.com/Emagister/js-components/commit/130faa7e773e26778555d753ff62ff0fe61700eb))
+* **data-table:** add disabledRow option to visually mute rows ([a1043c1](https://github.com/Emagister/js-components/commit/a1043c1706b317efc41632bc7037901228cefa2d))
+* **data-table:** support negation prefix ! in disabledRow option ([dfc3dc7](https://github.com/Emagister/js-components/commit/dfc3dc70ba851648029309a6357f4d3758ea6fd7))
+* **data-table:** three-state sort cycle (asc → desc → reset) ([739620e](https://github.com/Emagister/js-components/commit/739620ed9ffd92654adf97dbd28837b0d9f7bd54))
+
+
+### Bug Fixes
+
+* **data-table:** add aria-disabled and disable interactive elements on disabled rows ([d5670e2](https://github.com/Emagister/js-components/commit/d5670e2bdfccd12b478b1332bd5c82b2f2f41aa3))
+* **data-table:** add aria-sort attribute for screen reader accessibility ([48c6738](https://github.com/Emagister/js-components/commit/48c6738fa092049a7215d47d9a45b76e8d087ee0))
+* **data-table:** auto-apply data-table-container class on init ([082b5e2](https://github.com/Emagister/js-components/commit/082b5e28281c09448d9257464ed8b8e7173e3f68))
+
+
+### Documentation
+
+* **claude:** add guideline for responding to PR review comments with fix SHA ([f61c334](https://github.com/Emagister/js-components/commit/f61c33437955f54e12d360a62abd4cabfef17089))
+
+
+
+
 ## [1.9.0](https://github.com/Emagister/js-components/compare/v1.8.1...v1.9.0) (2026-05-15)
 
 
