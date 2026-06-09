@@ -403,8 +403,9 @@ describe('RichMultiSelect', () => {
             element.dataset.settings = JSON.stringify({ placeholder: 'Buscar…' });
             new RichMultiSelect(element).init();
             const ts = getTsInstance();
+            ts.control_input.placeholder = 'Buscar…';
             getTsConfig().onChange(['1']);
-            expect(ts.control_input.placeholder).not.toBe('1 seleccionado');
+            expect(ts.control_input.placeholder).toBe('Buscar…');
         });
 
         it('con placeholderWithItems, cambia el placeholder al añadir el primer ítem', () => {
