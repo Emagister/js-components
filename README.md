@@ -176,6 +176,7 @@ Propiedades de `data-columns` (array de objetos):
 - `headerClass` (String): Clases CSS aplicadas al `<th>` de esta columna.
 - `link` (String): Clave del campo que contiene la URL para enlazar el valor.
 - `badge` (String): Clave del campo que determina el nivel del badge Bootstrap.
+- `tooltip` (String): Clave del campo que contiene el texto del tooltip. Funciona con todos los tipos de celda (texto plano, link, badge e iconos booleanos). El componente `tooltip` debe estar registrado en la página.
 - `width` (String): Ancho de la columna (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Si al menos una columna define `width`, se genera un `<colgroup>` para controlar los anchos.
 
 Propiedades de `data-actions` (array de objetos), renderizadas como iconos con tooltip:

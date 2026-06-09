@@ -7,6 +7,7 @@
             "email": "Sincere@april.biz",
             "status": "active",
             "statusLevel": "success",
+            "statusTooltip": "El usuario tiene acceso completo al sistema",
             "address": {
                 "street": "Kulas Light",
                 "suite": "Apt. 556",
@@ -33,6 +34,7 @@
             "email": "Shanna@melissa.tv",
             "status": "inactive",
             "statusLevel": "warning",
+            "statusTooltip": "El usuario no puede iniciar sesión",
             "address": {
                 "street": "Victor Plains",
                 "suite": "Suite 879",
@@ -59,6 +61,7 @@
             "email": "Nathan@yesenia.net",
             "status": "active",
             "statusLevel": "success",
+            "statusTooltip": "El usuario tiene acceso completo al sistema",
             "address": {
                 "street": "Douglas Extension",
                 "suite": "Suite 847",
@@ -85,6 +88,7 @@
             "email": "Julianne.OConner@kory.org",
             "status": "blocked",
             "statusLevel": "danger",
+            "statusTooltip": "El usuario ha sido bloqueado por el administrador",
             "is_disabled": true,
             "address": {
                 "street": "Hoeger Mall",
@@ -112,6 +116,7 @@
             "email": "Lucio_Hettinger@annie.ca",
             "status": "active",
             "statusLevel": "success",
+            "statusTooltip": "El usuario tiene acceso completo al sistema",
             "address": {
                 "street": "Skiles Walks",
                 "suite": "Suite 351",
@@ -138,6 +143,7 @@
             "email": "Karley_Dach@jasper.info",
             "status": "active",
             "statusLevel": "success",
+            "statusTooltip": "El usuario tiene acceso completo al sistema",
             "address": {
                 "street": "Norberto Crossing",
                 "suite": "Apt. 950",
@@ -164,6 +170,7 @@
             "email": "Telly.Hoeger@billy.biz",
             "status": "blocked",
             "statusLevel": "danger",
+            "statusTooltip": "El usuario ha sido bloqueado por el administrador",
             "is_disabled": true,
             "address": {
                 "street": "Rex Trail",
@@ -191,6 +198,7 @@
             "email": "Sherwood@rosamond.me",
             "status": "active",
             "statusLevel": "success",
+            "statusTooltip": "El usuario tiene acceso completo al sistema",
             "address": {
                 "street": "Ellsworth Summit",
                 "suite": "Suite 729",
@@ -217,6 +225,7 @@
             "email": "Chaim_McDermott@dana.io",
             "status": "active",
             "statusLevel": "success",
+            "statusTooltip": "El usuario tiene acceso completo al sistema",
             "address": {
                 "street": "Dayna Park",
                 "suite": "Suite 449",
@@ -243,6 +252,7 @@
             "email": "Rey.Padberg@karina.biz",
             "status": "blocked",
             "statusLevel": "danger",
+            "statusTooltip": "El usuario ha sido bloqueado por el administrador",
             "is_disabled": true,
             "address": {
                 "street": "Kattie Turnpike",
