@@ -31,6 +31,8 @@ export default class ChunkedUpload extends Component {
     #fileItemMap = new Map();
     #autoResetTimer = null;
     #isUploading = false;
+    #progressRaf = null;
+    #latestProgressDetail = null;
 
     #onDropzoneClick = (e) => {
         if (this.#isUploading) return;
@@ -305,10 +307,16 @@ export default class ChunkedUpload extends Component {
             item.statusEl.textContent = this.settings.labels.statusUploading || 'Subiendo…';
         }
 
-        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:progress', {
-            bubbles: true,
-            detail: { file, progress },
-        }));
+        this.#latestProgressDetail = { file, progress };
+        if (!this.#progressRaf) {
+            this.#progressRaf = requestAnimationFrame(() => {
+                this.#progressRaf = null;
+                this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:progress', {
+                    bubbles: true,
+                    detail: this.#latestProgressDetail,
+                }));
+            });
+        }
     }
 
     #onUploadSuccess(file, response) {
@@ -421,6 +429,10 @@ export default class ChunkedUpload extends Component {
 
     #destroy() {
         this.#clearAutoResetTimer();
+        if (this.#progressRaf) {
+            cancelAnimationFrame(this.#progressRaf);
+            this.#progressRaf = null;
+        }
         this.#dropzoneEl?.removeEventListener('click', this.#onDropzoneClick);
         this.#dropzoneEl?.removeEventListener('keydown', this.#onDropzoneKeyDown);
         this.#fileInputEl?.removeEventListener('change', this.#onFileInputChange);

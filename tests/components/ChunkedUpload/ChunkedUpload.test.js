@@ -468,6 +468,23 @@ describe('ChunkedUpload', () => {
         });
 
         describe('upload-progress', () => {
+            let rafCallback;
+
+            beforeEach(() => {
+                vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+                    rafCallback = cb;
+                    return 1;
+                });
+                vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+            });
+
+            afterEach(() => {
+                vi.restoreAllMocks();
+                rafCallback = undefined;
+            });
+
+            const flushRaf = () => { if (rafCallback) { const cb = rafCallback; rafCallback = undefined; cb(0); } };
+
             it('muestra la barra de progreso del fichero', () => {
                 uppyInstance._emit('file-added', fakeFile());
                 uppyInstance._emit('upload-progress', fakeFile(), { bytesUploaded: 20 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 });
@@ -508,15 +525,29 @@ describe('ChunkedUpload', () => {
                 expect(li.querySelector('.cu-progress-bar').style.width).toBe('0%');
             });
 
-            it('despacha emg-jsc:chunkedUpload:progress con el detail correcto', () => {
+            it('despacha emg-jsc:chunkedUpload:progress con el detail correcto tras el frame de animación', () => {
                 const handler = vi.fn();
                 element.addEventListener('emg-jsc:chunkedUpload:progress', handler);
                 const file = fakeFile();
                 const progress = { bytesUploaded: 25 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 };
                 uppyInstance._emit('file-added', file);
                 uppyInstance._emit('upload-progress', file, progress);
+                expect(handler).not.toHaveBeenCalled();
+                flushRaf();
                 expect(handler).toHaveBeenCalledOnce();
                 expect(handler.mock.calls[0][0].detail).toEqual({ file, progress });
+            });
+
+            it('despacha el evento solo una vez por frame aunque haya múltiples ticks de progreso', () => {
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:chunkedUpload:progress', handler);
+                const file = fakeFile();
+                uppyInstance._emit('file-added', file);
+                uppyInstance._emit('upload-progress', file, { bytesUploaded: 10 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 });
+                uppyInstance._emit('upload-progress', file, { bytesUploaded: 20 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 });
+                uppyInstance._emit('upload-progress', file, { bytesUploaded: 30 * 1024 * 1024, bytesTotal: 50 * 1024 * 1024 });
+                flushRaf();
+                expect(handler).toHaveBeenCalledOnce();
             });
         });
 
