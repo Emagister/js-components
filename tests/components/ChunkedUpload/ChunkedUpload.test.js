@@ -213,6 +213,14 @@ describe('ChunkedUpload', () => {
             expect(handler).toHaveBeenCalledOnce();
         });
 
+        it('los eventos del componente burbujean hacia elementos ancestros', () => {
+            const handler = vi.fn();
+            document.body.addEventListener('emg-jsc:chunkedUpload:initialized', handler);
+            component.init();
+            expect(handler).toHaveBeenCalledOnce();
+            document.body.removeEventListener('emg-jsc:chunkedUpload:initialized', handler);
+        });
+
         it('oculta cu-upload-btn cuando autoProceed es true', () => {
             const el = createElement({ endpoint: '/files/', autoProceed: true });
             const c = new ChunkedUpload(el);

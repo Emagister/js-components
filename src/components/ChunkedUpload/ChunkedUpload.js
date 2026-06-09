@@ -72,7 +72,7 @@ export default class ChunkedUpload extends Component {
         this.#clearAutoResetTimer();
         this.#setUploading(false);
         this.#uppy.cancelAll();
-        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all', { bubbles: true }));
     };
 
     constructor(element) {
@@ -114,14 +114,14 @@ export default class ChunkedUpload extends Component {
 
         this.root.chunkedUpload = {
             upload: () => { this.#uppy.upload(); return this.root.chunkedUpload; },
-            cancelAll: () => { this.#clearAutoResetTimer(); this.#setUploading(false); this.#uppy.cancelAll(); this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all')); return this.root.chunkedUpload; },
+            cancelAll: () => { this.#clearAutoResetTimer(); this.#setUploading(false); this.#uppy.cancelAll(); this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all', { bubbles: true })); return this.root.chunkedUpload; },
             reset: () => { this.#reset(); return this.root.chunkedUpload; },
             openFilePicker: () => { this.#fileInputEl?.click(); return this.root.chunkedUpload; },
             addFiles: (files) => { this.#addFiles(files); return this.root.chunkedUpload; },
             destroy: () => this.#destroy(),
         };
 
-        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:initialized'));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:initialized', { bubbles: true }));
     }
 
     #buildUI() {
@@ -301,7 +301,7 @@ export default class ChunkedUpload extends Component {
             this.#actionsEl.classList.remove('d-none');
         }
 
-        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:file-added', { detail: { file } }));
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:file-added', { bubbles: true, detail: { file } }));
     }
 
     #onUploadProgress(file, progress) {
@@ -317,6 +317,7 @@ export default class ChunkedUpload extends Component {
         }
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:progress', {
+            bubbles: true,
             detail: { file, progress },
         }));
     }
@@ -338,6 +339,7 @@ export default class ChunkedUpload extends Component {
         }
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:upload-success', {
+            bubbles: true,
             detail: { file, response, uploadId },
         }));
 
@@ -357,6 +359,7 @@ export default class ChunkedUpload extends Component {
         }
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:upload-error', {
+            bubbles: true,
             detail: { file, error },
         }));
     }
@@ -364,6 +367,7 @@ export default class ChunkedUpload extends Component {
     #onComplete(result) {
         this.#setUploading(false);
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:complete', {
+            bubbles: true,
             detail: result,
         }));
     }
