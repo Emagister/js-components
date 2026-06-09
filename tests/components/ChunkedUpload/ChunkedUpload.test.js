@@ -427,6 +427,14 @@ describe('ChunkedUpload', () => {
                 expect(badge.textContent).toBe('Pendiente');
             });
 
+            it('click en el botón de eliminar mientras se sube no llama a uppy.removeFile', () => {
+                uppyInstance._emit('file-added', fakeFile());
+                uppyInstance._emit('upload');
+                const removeBtn = element.querySelector('.cu-file-remove');
+                removeBtn.click();
+                expect(uppyInstance.removeFile).not.toHaveBeenCalled();
+            });
+
             it('hace visible cu-file-list y cu-actions', () => {
                 uppyInstance._emit('file-added', fakeFile());
                 expect(element.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);

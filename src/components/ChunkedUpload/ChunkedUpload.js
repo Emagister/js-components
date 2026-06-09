@@ -284,6 +284,7 @@ export default class ChunkedUpload extends Component {
         li.append(icon, nameEl, sizeEl, progressEl, statusEl, removeBtn);
 
         removeBtn.addEventListener('click', () => {
+            if (this.#isUploading) return;
             this.#uppy.removeFile(file.id);
             li.remove();
             this.#fileItemMap.delete(file.id);
