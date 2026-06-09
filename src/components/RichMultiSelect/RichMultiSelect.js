@@ -49,7 +49,7 @@ export default class RichMultiSelect extends Component {
                 }
             },
             onChange: (values) => {
-                if (s.placeholderWithItems && this.#tomSelect) {
+                if (s.placeholderWithItems != null && this.#tomSelect) {
                     const ph = values.length > 0
                         ? s.placeholderWithItems
                         : (s.placeholder ?? 'Seleccionar…');

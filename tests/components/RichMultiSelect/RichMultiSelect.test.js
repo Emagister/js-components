@@ -409,6 +409,18 @@ describe('RichMultiSelect', () => {
             expect(ts.control_input.placeholder).toBe('Buscar…');
         });
 
+        it('con placeholderWithItems cadena vacía, activa igualmente el comportamiento', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: ''
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            expect(ts.control_input.placeholder).toBe('');
+            expect(ts.settings.placeholder).toBe('');
+        });
+
         it('con placeholderWithItems, cambia el placeholder al añadir el primer ítem', () => {
             element.dataset.settings = JSON.stringify({
                 placeholder: 'Buscar centros…',
