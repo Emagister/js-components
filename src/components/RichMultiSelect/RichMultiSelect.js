@@ -23,10 +23,10 @@ export default class RichMultiSelect extends Component {
 
         this.#tomSelect = new TomSelect(this.root, this.#buildConfig());
 
-        const s = this.#settings;
-        if (s.placeholderWithItems != null && this.#tomSelect.getValue().length > 0) {
-            this.#tomSelect.settings.placeholder = s.placeholderWithItems;
-            this.#tomSelect.control_input.placeholder = s.placeholderWithItems;
+        const settings = this.#settings;
+        if (settings.placeholderWithItems != null && this.#tomSelect.getValue().length > 0) {
+            this.#tomSelect.settings.placeholder = settings.placeholderWithItems;
+            this.#tomSelect.control_input.placeholder = settings.placeholderWithItems;
         }
 
         this.root.richMultiSelect = {
@@ -57,10 +57,10 @@ export default class RichMultiSelect extends Component {
                 }
             },
             onChange: (values) => {
-                if (s.placeholderWithItems != null && this.#tomSelect) {
+                if (settings.placeholderWithItems != null && this.#tomSelect) {
                     const ph = values.length > 0
-                        ? s.placeholderWithItems
-                        : (s.placeholder ?? 'Seleccionar…');
+                        ? settings.placeholderWithItems
+                        : (settings.placeholder ?? 'Seleccionar…');
                     this.#tomSelect.settings.placeholder = ph;
                     this.#tomSelect.control_input.placeholder = ph;
                 }
@@ -69,7 +69,7 @@ export default class RichMultiSelect extends Component {
                 );
             },
             onItemAdd: (value, $item) => {
-                if (s.clearInputOnSelect && this.#tomSelect) {
+                if (settings.clearInputOnSelect && this.#tomSelect) {
                     this.#tomSelect.setTextboxValue('');
                     this.#tomSelect.refreshOptions(false);
                 }

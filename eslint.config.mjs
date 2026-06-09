@@ -20,6 +20,8 @@ export default [
         navigator: 'readonly',
         clearTimeout: 'readonly',
         setTimeout: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
         URL: 'readonly',
         location: 'readonly',
       },
