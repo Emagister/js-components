@@ -744,6 +744,20 @@ describe('ChunkedUpload', () => {
             element.querySelector('.cu-cancel-btn').click();
             expect(handler).toHaveBeenCalledOnce();
         });
+
+        it('reset() despacha emg-jsc:chunkedUpload:cancel-all', () => {
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:chunkedUpload:cancel-all', handler);
+            element.chunkedUpload.reset();
+            expect(handler).toHaveBeenCalledOnce();
+        });
+
+        it('cancelAll() de la API pública despacha emg-jsc:chunkedUpload:cancel-all', () => {
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:chunkedUpload:cancel-all', handler);
+            element.chunkedUpload.cancelAll();
+            expect(handler).toHaveBeenCalledOnce();
+        });
     });
 
     // ─── Auto-reset (autoProceed) ─────────────────────────────────────────────

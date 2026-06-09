@@ -406,6 +406,7 @@ export default class ChunkedUpload extends Component {
         this.#fileListEl.classList.add('d-none');
         this.#actionsEl.classList.add('d-none');
         this.#clearError();
+        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all', { bubbles: true }));
     }
 
     #showError(message) {
