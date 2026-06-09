@@ -25,6 +25,7 @@ describe('RichMultiSelect', () => {
             this.addOption = vi.fn();
             this.clear = vi.fn();
             this.destroy = vi.fn();
+            this.control_input = document.createElement('input');
         });
 
         rms = new RichMultiSelect(element);
@@ -390,6 +391,53 @@ describe('RichMultiSelect', () => {
             await Promise.resolve();
 
             expect(callback).not.toHaveBeenCalledWith([{ value: '1', text: 'Centro Madrid' }]);
+        });
+    });
+
+    // ─── placeholderWithItems ─────────────────────────────────────────────────
+
+    describe('placeholderWithItems', () => {
+        it('sin placeholderWithItems, el placeholder no cambia al seleccionar ítems', () => {
+            element.dataset.settings = JSON.stringify({ placeholder: 'Buscar…' });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            expect(ts.control_input.placeholder).not.toBe('1 seleccionado');
+        });
+
+        it('con placeholderWithItems, cambia el placeholder al añadir el primer ítem', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            expect(ts.control_input.placeholder).toBe('Añadir más centros…');
+        });
+
+        it('con placeholderWithItems, restaura el placeholder original al quitar todos los ítems', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            getTsConfig().onChange([]);
+            expect(ts.control_input.placeholder).toBe('Buscar centros…');
+        });
+
+        it('con placeholderWithItems, mantiene el placeholder de ítems al añadir más de uno', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar…',
+                placeholderWithItems: 'Añadir más…'
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            getTsConfig().onChange(['1']);
+            getTsConfig().onChange(['1', '2']);
+            expect(ts.control_input.placeholder).toBe('Añadir más…');
         });
     });
 

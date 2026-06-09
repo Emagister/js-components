@@ -200,6 +200,23 @@
                                     Prueba: <code>mad</code>, <code>bar</code>, <code>val</code>, <code>sev</code>
                                 </small>
                             </div>
+                            <div class="col-md-6">
+                                <label for="rms-dual-placeholder" class="form-label">Placeholder diferenciado (<code>placeholderWithItems</code>)</label>
+                                <select id="rms-dual-placeholder" name="dual[]" multiple data-component="rich-multi-select"
+                                    data-settings='{
+                                        "placeholder": "Selecciona centros…",
+                                        "placeholderWithItems": "Añadir más centros…"
+                                    }'>
+                                    <option value="1">Centro Madrid Norte</option>
+                                    <option value="2">Centro Madrid Sur</option>
+                                    <option value="3">Centro Barcelona</option>
+                                    <option value="4">Centro Valencia</option>
+                                    <option value="5">Centro Sevilla</option>
+                                </select>
+                                <small class="text-muted d-block mt-1">
+                                    Al seleccionar al menos un centro el placeholder cambia a <em>"Añadir más centros…"</em>.
+                                </small>
+                            </div>
                         </div>
                         <div class="mt-4">
                             <label class="form-label fw-semibold">Registro de eventos</label>

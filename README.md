@@ -431,11 +431,25 @@ Uso básico con opciones estáticas:
 </select>
 ```
 
+Placeholder diferenciado según haya o no ítems seleccionados:
+```html
+<select name="centers[]" multiple
+        data-component="rich-multi-select"
+        data-settings='{
+          "placeholder": "Selecciona centros…",
+          "placeholderWithItems": "Añadir más centros…"
+        }'>
+  <option value="1">Centro Madrid</option>
+  <option value="2">Centro Barcelona</option>
+</select>
+```
+
 Opciones en `data-settings`:
 
 | Propiedad | Tipo | Default | Descripción |
 |---|---|---|---|
-| `placeholder` | String | `"Seleccionar…"` | Texto del input cuando no hay selección. |
+| `placeholder` | String | `"Seleccionar…"` | Texto del input cuando no hay ningún ítem seleccionado. |
+| `placeholderWithItems` | String | — | Texto alternativo del input cuando hay al menos un ítem seleccionado. Si no se define, el placeholder no cambia. |
 | `maxItems` | Number \| null | `null` | Máximo de ítems seleccionables. `null` es ilimitado. |
 | `searchField` | String | `"text"` | Campo(s) sobre los que buscar. |
 | `create` | Boolean | `false` | Permite crear opciones nuevas no existentes. |
