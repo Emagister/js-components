@@ -7,6 +7,17 @@ const DEFAULT_CHUNK_SIZE = 50 * 1024 * 1024;
 const DEFAULT_MAX_FILE_SIZE = 500 * 1024 * 1024;
 const DEFAULT_RETRY_DELAYS = [0, 1000, 3000, 5000];
 
+const DEFAULT_SETTINGS = {
+    chunkSize: DEFAULT_CHUNK_SIZE,
+    maxFileSize: DEFAULT_MAX_FILE_SIZE,
+    retryDelays: DEFAULT_RETRY_DELAYS,
+    parallelUploads: 1,
+    autoProceed: false,
+    autoResetDelay: 3000,
+    allowedFileTypes: null,
+    labels: {},
+};
+
 export default class ChunkedUpload extends Component {
     #uppy = null;
     #fileInputEl = null;
@@ -75,28 +86,9 @@ export default class ChunkedUpload extends Component {
     constructor(element) {
         super(element);
         try {
-            this.settings = {
-                chunkSize: DEFAULT_CHUNK_SIZE,
-                maxFileSize: DEFAULT_MAX_FILE_SIZE,
-                retryDelays: DEFAULT_RETRY_DELAYS,
-                parallelUploads: 1,
-                autoProceed: false,
-                autoResetDelay: 3000,
-                allowedFileTypes: null,
-                labels: {},
-                ...JSON.parse(element.dataset.settings || '{}'),
-            };
+            this.settings = { ...DEFAULT_SETTINGS, ...JSON.parse(element.dataset.settings || '{}') };
         } catch {
-            this.settings = {
-                chunkSize: DEFAULT_CHUNK_SIZE,
-                maxFileSize: DEFAULT_MAX_FILE_SIZE,
-                retryDelays: DEFAULT_RETRY_DELAYS,
-                parallelUploads: 1,
-                autoProceed: false,
-                autoResetDelay: 3000,
-                allowedFileTypes: null,
-                labels: {},
-            };
+            this.settings = { ...DEFAULT_SETTINGS };
         }
     }
 
