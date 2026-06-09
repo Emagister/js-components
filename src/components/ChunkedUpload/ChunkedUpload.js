@@ -61,6 +61,7 @@ export default class ChunkedUpload extends Component {
 
     #onDropzoneKeyDown = (e) => {
         if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
         if (this.#isUploading) return;
         this.#fileInputEl?.click();
     };
@@ -68,6 +69,7 @@ export default class ChunkedUpload extends Component {
     #onUploadBtnClick = () => this.#uppy.upload();
 
     #onCancelBtnClick = () => {
+        this.#clearAutoResetTimer();
         this.#setUploading(false);
         this.#uppy.cancelAll();
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all'));
@@ -112,7 +114,7 @@ export default class ChunkedUpload extends Component {
 
         this.root.chunkedUpload = {
             upload: () => { this.#uppy.upload(); return this.root.chunkedUpload; },
-            cancelAll: () => { this.#setUploading(false); this.#uppy.cancelAll(); this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all')); return this.root.chunkedUpload; },
+            cancelAll: () => { this.#clearAutoResetTimer(); this.#setUploading(false); this.#uppy.cancelAll(); this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all')); return this.root.chunkedUpload; },
             reset: () => { this.#reset(); return this.root.chunkedUpload; },
             openFilePicker: () => { this.#fileInputEl?.click(); return this.root.chunkedUpload; },
             addFiles: (files) => { this.#addFiles(files); return this.root.chunkedUpload; },
@@ -377,6 +379,13 @@ export default class ChunkedUpload extends Component {
         });
     }
 
+    #clearAutoResetTimer() {
+        if (this.#autoResetTimer) {
+            clearTimeout(this.#autoResetTimer);
+            this.#autoResetTimer = null;
+        }
+    }
+
     #setUploading(active) {
         this.#isUploading = active;
         this.#dropzoneEl?.classList.toggle('is-uploading', active);
@@ -384,10 +393,7 @@ export default class ChunkedUpload extends Component {
     }
 
     #reset() {
-        if (this.#autoResetTimer) {
-            clearTimeout(this.#autoResetTimer);
-            this.#autoResetTimer = null;
-        }
+        this.#clearAutoResetTimer();
         this.#setUploading(false);
         this.#uppy.cancelAll();
         this.#fileItemMap.clear();
@@ -419,10 +425,7 @@ export default class ChunkedUpload extends Component {
     }
 
     #destroy() {
-        if (this.#autoResetTimer) {
-            clearTimeout(this.#autoResetTimer);
-            this.#autoResetTimer = null;
-        }
+        this.#clearAutoResetTimer();
         this.#dropzoneEl?.removeEventListener('click', this.#onDropzoneClick);
         this.#dropzoneEl?.removeEventListener('keydown', this.#onDropzoneKeyDown);
         this.#fileInputEl?.removeEventListener('change', this.#onFileInputChange);
