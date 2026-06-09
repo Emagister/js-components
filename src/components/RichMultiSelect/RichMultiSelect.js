@@ -49,11 +49,22 @@ export default class RichMultiSelect extends Component {
                 }
             },
             onChange: (values) => {
+                if (s.placeholderWithItems != null && this.#tomSelect) {
+                    const ph = values.length > 0
+                        ? s.placeholderWithItems
+                        : (s.placeholder ?? 'Seleccionar…');
+                    this.#tomSelect.settings.placeholder = ph;
+                    this.#tomSelect.control_input.placeholder = ph;
+                }
                 this.root.dispatchEvent(
                     new CustomEvent('emg-jsc:richMultiSelect:change', { detail: { values } })
                 );
             },
             onItemAdd: (value, $item) => {
+                if (s.clearInputOnSelect && this.#tomSelect) {
+                    this.#tomSelect.setTextboxValue('');
+                    this.#tomSelect.refreshOptions(false);
+                }
                 this.root.dispatchEvent(
                     new CustomEvent('emg-jsc:richMultiSelect:item-add', {
                         detail: { value, text: $item?.textContent ?? '' }
