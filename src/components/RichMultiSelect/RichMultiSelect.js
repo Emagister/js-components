@@ -21,6 +21,12 @@ export default class RichMultiSelect extends Component {
 
         this.#tomSelect = new TomSelect(this.root, this.#buildConfig());
 
+        const s = this.#settings;
+        if (s.placeholderWithItems != null && this.#tomSelect.getValue().length > 0) {
+            this.#tomSelect.settings.placeholder = s.placeholderWithItems;
+            this.#tomSelect.control_input.placeholder = s.placeholderWithItems;
+        }
+
         this.root.richMultiSelect = {
             getValue: () => this.#tomSelect.getValue(),
             setValue: (values) => this.#tomSelect.setValue(values),

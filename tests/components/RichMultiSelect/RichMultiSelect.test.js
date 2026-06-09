@@ -478,6 +478,29 @@ describe('RichMultiSelect', () => {
             getTsConfig().onChange(['1', '2']);
             expect(ts.control_input.placeholder).toBe('Añadir más…');
         });
+
+        it('con placeholderWithItems y valores iniciales, aplica placeholderWithItems al inicializar', () => {
+            element.dataset.settings = JSON.stringify({
+                placeholder: 'Buscar centros…',
+                placeholderWithItems: 'Añadir más centros…'
+            });
+            TomSelect.mockImplementationOnce(function (el, config) {
+                this._config = config;
+                this.settings = { placeholder: config.placeholder ?? 'Seleccionar…' };
+                this.getValue = vi.fn(() => ['1', '2']);
+                this.setValue = vi.fn();
+                this.addOption = vi.fn();
+                this.clear = vi.fn();
+                this.destroy = vi.fn();
+                this.setTextboxValue = vi.fn();
+                this.refreshOptions = vi.fn();
+                this.control_input = document.createElement('input');
+            });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            expect(ts.control_input.placeholder).toBe('Añadir más centros…');
+            expect(ts.settings.placeholder).toBe('Añadir más centros…');
+        });
     });
 
     // ─── clearInputOnSelect ───────────────────────────────────────────────────
