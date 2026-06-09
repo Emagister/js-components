@@ -25,6 +25,8 @@ describe('RichMultiSelect', () => {
             this.addOption = vi.fn();
             this.clear = vi.fn();
             this.destroy = vi.fn();
+            this.setTextboxValue = vi.fn();
+            this.refreshOptions = vi.fn();
             this.control_input = document.createElement('input');
         });
 
@@ -438,6 +440,58 @@ describe('RichMultiSelect', () => {
             getTsConfig().onChange(['1']);
             getTsConfig().onChange(['1', '2']);
             expect(ts.control_input.placeholder).toBe('Añadir más…');
+        });
+    });
+
+    // ─── clearInputOnSelect ───────────────────────────────────────────────────
+
+    describe('clearInputOnSelect', () => {
+        it('sin clearInputOnSelect, no limpia el input al seleccionar un ítem', () => {
+            rms.init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.setTextboxValue).not.toHaveBeenCalled();
+            expect(ts.refreshOptions).not.toHaveBeenCalled();
+        });
+
+        it('con clearInputOnSelect: false, no limpia el input al seleccionar un ítem', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: false });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.setTextboxValue).not.toHaveBeenCalled();
+        });
+
+        it('con clearInputOnSelect: true, limpia el input al seleccionar un ítem', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: true });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.setTextboxValue).toHaveBeenCalledWith('');
+        });
+
+        it('con clearInputOnSelect: true, refresca las opciones sin disparar búsqueda', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: true });
+            new RichMultiSelect(element).init();
+            const ts = getTsInstance();
+            const $item = document.createElement('div');
+            getTsConfig().onItemAdd('1', $item);
+            expect(ts.refreshOptions).toHaveBeenCalledWith(false);
+        });
+
+        it('con clearInputOnSelect: true, sigue emitiendo el evento item-add', () => {
+            element.dataset.settings = JSON.stringify({ clearInputOnSelect: true });
+            new RichMultiSelect(element).init();
+            const handler = vi.fn();
+            element.addEventListener('emg-jsc:richMultiSelect:item-add', handler);
+            const $item = document.createElement('div');
+            $item.textContent = 'Centro Barcelona';
+            getTsConfig().onItemAdd('3', $item);
+            expect(handler).toHaveBeenCalledOnce();
+            expect(handler.mock.calls[0][0].detail).toEqual({ value: '3', text: 'Centro Barcelona' });
         });
     });
 

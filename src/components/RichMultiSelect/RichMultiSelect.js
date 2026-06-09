@@ -59,6 +59,10 @@ export default class RichMultiSelect extends Component {
                 );
             },
             onItemAdd: (value, $item) => {
+                if (s.clearInputOnSelect && this.#tomSelect) {
+                    this.#tomSelect.setTextboxValue('');
+                    this.#tomSelect.refreshOptions(false);
+                }
                 this.root.dispatchEvent(
                     new CustomEvent('emg-jsc:richMultiSelect:item-add', {
                         detail: { value, text: $item?.textContent ?? '' }

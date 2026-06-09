@@ -450,6 +450,7 @@ Opciones en `data-settings`:
 |---|---|---|---|
 | `placeholder` | String | `"Seleccionar…"` | Texto del input cuando no hay ningún ítem seleccionado. |
 | `placeholderWithItems` | String | — | Texto alternativo del input cuando hay al menos un ítem seleccionado. Si no se define, el placeholder no cambia. |
+| `clearInputOnSelect` | Boolean | `false` | Si es `true`, vacía el texto de búsqueda cada vez que se selecciona un ítem y refresca la lista de opciones. Útil en combinación con `remoteUrl` para lanzar una búsqueda nueva tras cada selección. |
 | `maxItems` | Number \| null | `null` | Máximo de ítems seleccionables. `null` es ilimitado. |
 | `searchField` | String | `"text"` | Campo(s) sobre los que buscar. |
 | `create` | Boolean | `false` | Permite crear opciones nuevas no existentes. |

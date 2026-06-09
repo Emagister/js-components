@@ -192,12 +192,17 @@
                                 <pre id="rms-output" class="mt-2 p-2 bg-light rounded border small d-none"></pre>
                             </div>
                             <div class="col-md-6">
-                                <label for="rms-remote" class="form-label">Carga remota AJAX (≥ 2 caracteres)</label>
+                                <label for="rms-remote" class="form-label">Carga remota AJAX + <code>clearInputOnSelect</code></label>
                                 <select id="rms-remote" name="remote[]" multiple data-component="rich-multi-select"
-                                    data-settings='{"placeholder": "Escribe para buscar…", "remoteUrl": "/api/centers/search"}'>
+                                    data-settings='{
+                                        "placeholder": "Escribe para buscar…",
+                                        "remoteUrl": "/api/centers/search",
+                                        "clearInputOnSelect": true
+                                    }'>
                                 </select>
                                 <small class="text-muted d-block mt-1">
-                                    Prueba: <code>mad</code>, <code>bar</code>, <code>val</code>, <code>sev</code>
+                                    Prueba: <code>mad</code>, <code>bar</code>, <code>val</code>, <code>sev</code>.
+                                    Al seleccionar un centro el input se limpia para una nueva búsqueda.
                                 </small>
                             </div>
                             <div class="col-md-6">
