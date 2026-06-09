@@ -69,10 +69,7 @@ export default class ChunkedUpload extends Component {
     #onUploadBtnClick = () => this.#uppy.upload();
 
     #onCancelBtnClick = () => {
-        this.#clearAutoResetTimer();
-        this.#setUploading(false);
-        this.#uppy.cancelAll();
-        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all', { bubbles: true }));
+        this.#reset();
     };
 
     constructor(element) {
@@ -114,7 +111,7 @@ export default class ChunkedUpload extends Component {
 
         this.root.chunkedUpload = {
             upload: () => { this.#uppy.upload(); return this.root.chunkedUpload; },
-            cancelAll: () => { this.#clearAutoResetTimer(); this.#setUploading(false); this.#uppy.cancelAll(); this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all', { bubbles: true })); return this.root.chunkedUpload; },
+            cancelAll: () => { this.#reset(); return this.root.chunkedUpload; },
             reset: () => { this.#reset(); return this.root.chunkedUpload; },
             openFilePicker: () => { this.#fileInputEl?.click(); return this.root.chunkedUpload; },
             addFiles: (files) => { this.#addFiles(files); return this.root.chunkedUpload; },

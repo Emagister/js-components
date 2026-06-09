@@ -758,6 +758,22 @@ describe('ChunkedUpload', () => {
             element.chunkedUpload.cancelAll();
             expect(handler).toHaveBeenCalledOnce();
         });
+
+        it('click en cu-cancel-btn limpia la lista de ficheros del DOM', () => {
+            const fakeF = { id: 'f1', name: 'video.mp4', size: 1024, type: 'video/mp4' };
+            uppyInstance._emit('file-added', fakeF);
+            element.querySelector('.cu-cancel-btn').click();
+            expect(element.querySelector('.cu-file-list').children).toHaveLength(0);
+            expect(element.querySelector('.cu-file-list').classList.contains('d-none')).toBe(true);
+        });
+
+        it('cancelAll() de la API pública limpia la lista de ficheros del DOM', () => {
+            const fakeF = { id: 'f1', name: 'video.mp4', size: 1024, type: 'video/mp4' };
+            uppyInstance._emit('file-added', fakeF);
+            element.chunkedUpload.cancelAll();
+            expect(element.querySelector('.cu-file-list').children).toHaveLength(0);
+            expect(element.querySelector('.cu-file-list').classList.contains('d-none')).toBe(true);
+        });
     });
 
     // ─── Auto-reset (autoProceed) ─────────────────────────────────────────────
