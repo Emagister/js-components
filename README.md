@@ -22,6 +22,9 @@ npm install @tiptap/core @tiptap/starter-kit
 
 # Para RichMultiSelect
 npm install tom-select
+
+# Para ChunkedUpload
+npm install @uppy/core @uppy/tus
 ```
 
 ## Uso Principal: ComponentManager
