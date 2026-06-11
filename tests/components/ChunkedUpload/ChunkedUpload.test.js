@@ -1051,5 +1051,29 @@ describe('ChunkedUpload', () => {
             const overlay = element.querySelector('.cu-dropzone-overlay');
             expect(overlay.querySelector('.spinner-border')).not.toBeNull();
         });
+
+        it('el evento upload-error quita is-uploading del dropzone', () => {
+            uppyInstance._emit('upload');
+            uppyInstance._emit('upload-error', { id: 'f1', name: 'fail.mp4', size: 1024, type: 'video/mp4' }, new Error('Network error'));
+            expect(element.querySelector('.cu-dropzone').classList.contains('is-uploading')).toBe(false);
+        });
+
+        it('el evento upload-error oculta el overlay', () => {
+            uppyInstance._emit('upload');
+            uppyInstance._emit('upload-error', { id: 'f1', name: 'fail.mp4', size: 1024, type: 'video/mp4' }, new Error('Network error'));
+            expect(element.querySelector('.cu-dropzone-overlay').classList.contains('d-none')).toBe(true);
+        });
+
+        it('el dropzone vuelve a ser interactivo tras upload-error (en autoProceed)', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true });
+            const c = new ChunkedUpload(el);
+            c.init();
+            uppyInstance._emit('upload');
+            uppyInstance._emit('upload-error', { id: 'f1', name: 'fail.mp4', size: 1024, type: 'video/mp4' }, new Error('Network error'));
+            const input = el.querySelector('.cu-file-input');
+            const clickSpy = vi.spyOn(input, 'click');
+            el.querySelector('.cu-dropzone').click();
+            expect(clickSpy).toHaveBeenCalledOnce();
+        });
     });
 });

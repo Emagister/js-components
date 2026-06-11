@@ -353,6 +353,8 @@ export default class ChunkedUpload extends Component {
             fileEntry.statusEl.textContent = this.settings.labels.statusError || 'Error';
         }
 
+        this.#setUploading(false);
+
         this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:upload-error', {
             bubbles: true,
             detail: { file, error },
