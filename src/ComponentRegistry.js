@@ -10,6 +10,7 @@ const ComponentRegistry = {
     'confirm': () => import('./components/Confirm/Confirm'),
     'rich-text-editor': () => import('./components/RichTextEditor/RichTextEditor'),
     'rich-multi-select': () => import('./components/RichMultiSelect/RichMultiSelect'),
+    'chunked-upload': () => import('./components/ChunkedUpload/ChunkedUpload'),
 };
 
 export default ComponentRegistry;

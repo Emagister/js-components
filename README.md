@@ -521,6 +521,128 @@ Wrapper del Tooltip de Bootstrap. Usa el atributo estándar `title` para el text
 ### `dropdown`
 Wrapper del Dropdown de Bootstrap. Expone la API en `element.dropdown`: `show()`, `hide()`, `toggle()`.
 
+### `chunked-upload`
+
+Componente para subir ficheros grandes (hasta 500 MB) dividiéndolos en chunks mediante el **protocolo Tus** ([tus.io](https://tus.io)). Requiere un servidor Tus en el endpoint configurado.
+
+**Peer dependencies:** `@uppy/core ^5.0.0`, `@uppy/tus ^5.0.0`
+
+```bash
+npm install @uppy/core @uppy/tus
+```
+
+**Servidor Tus para desarrollo local:**
+```bash
+docker run -p 1080:8080 tusproject/tusd
+```
+
+**HTML:**
+```html
+<div
+  data-component="chunked-upload"
+  data-settings='{
+    "endpoint": "https://your-server.com/files/",
+    "chunkSize": 52428800,
+    "maxFileSize": 524288000,
+    "allowedFileTypes": ["video/*", ".zip"],
+    "retryDelays": [0, 1000, 3000, 5000],
+    "parallelUploads": 1,
+    "autoProceed": false
+  }'
+></div>
+```
+
+**Opciones de configuración (`data-settings`):**
+
+| Opción | Tipo | Default | Descripción |
+|---|---|---|---|
+| `endpoint` | `string` | **requerido** | URL del servidor Tus |
+| `chunkSize` | `number` | `52428800` (50 MB) | Bytes por chunk |
+| `maxFileSize` | `number` | `524288000` (500 MB) | Tamaño máximo del fichero |
+| `maxNumberOfFiles` | `number \| null` | `1` | Número máximo de ficheros simultáneos. `null` = sin límite. Cuando es distinto de `1`, el input acepta selección múltiple |
+| `allowedFileTypes` | `string[]` | `null` (todos) | MIME types o extensiones permitidas |
+| `retryDelays` | `number[]` | `[0,1000,3000,5000]` | Milisegundos entre reintentos |
+| `parallelUploads` | `number` | `1` | Número de uploads que Tus ejecuta en paralelo cuando hay varios ficheros |
+| `autoProceed` | `boolean` | `false` | Inicia la subida al seleccionar el fichero |
+| `autoResetDelay` | `number` | `3000` | Ms tras los que el componente se resetea automáticamente después de que todos los ficheros se suban sin errores (solo aplica cuando `autoProceed: true`) |
+| `labels` | `object` | *(ver abajo)* | Textos e icono de UI sobreescribibles (ver tabla de labels) |
+
+**Labels disponibles (`labels`):**
+
+| Label | Default | Descripción |
+|---|---|---|
+| `icon` | `'bi-cloud-upload'` | Clase del icono Bootstrap Icons en el dropzone |
+| `dropzone` | `'Arrastra el fichero aquí'` | Título principal del dropzone (en negrita) |
+| `dropzoneSubtitle` | *(no se muestra)* | Texto secundario bajo el título (opcional) |
+| `uploadFileButton` | `'Subir'` | Texto del botón de inicio de subida |
+| `cancelButton` | `'Cancelar'` | Texto del botón de cancelación |
+| `statusQueued` | `'En cola'` | Badge cuando el fichero está en espera |
+| `statusUploading` | `'Subiendo…'` | Badge durante la subida |
+| `statusCompleted` | `'Completado'` | Badge cuando la subida finaliza con éxito |
+| `statusError` | `'Error'` | Badge cuando la subida falla |
+| `uploading` | `'Subiendo…'` | Texto accesible del spinner del overlay (visually-hidden) |
+
+```html
+<div
+  data-component="chunked-upload"
+  data-settings='{
+    "endpoint": "https://your-server.com/files/",
+    "allowedFileTypes": [".zip"],
+    "labels": {
+      "icon": "bi-file-earmark-zip",
+      "dropzone": "Arrastra tu archivo ZIP aquí",
+      "dropzoneSubtitle": "o haz clic para seleccionar",
+      "uploadFileButton": "Subir ZIP",
+      "cancelButton": "Detener"
+    }
+  }'
+></div>
+```
+
+**Comportamiento durante la subida:**
+
+Mientras hay ficheros en proceso de subida, el dropzone muestra un overlay con un spinner Bootstrap y bloquea las interacciones: no es posible hacer clic para abrir el selector de ficheros ni arrastrar y soltar nuevos ficheros. Al completarse la subida (o al cancelarla), el dropzone recupera su estado normal.
+
+**API pública (`element.chunkedUpload`):**
+
+Todos los métodos excepto `destroy()` retornan `element.chunkedUpload` para encadenamiento.
+
+```js
+const el = document.querySelector('[data-component="chunked-upload"]')
+
+el.chunkedUpload.upload()            // inicia la subida
+el.chunkedUpload.cancelAll()         // cancela la subida en curso
+el.chunkedUpload.reset()             // vuelve al estado inicial
+el.chunkedUpload.openFilePicker()    // abre el selector de ficheros del SO
+el.chunkedUpload.addFiles([file])    // añade File[] programáticamente
+el.chunkedUpload.destroy()           // limpieza completa
+```
+
+**Eventos DOM:**
+
+```js
+el.addEventListener('emg-jsc:chunkedUpload:initialized', () => {})
+el.addEventListener('emg-jsc:chunkedUpload:file-added', e => console.log(e.detail.file))
+el.addEventListener('emg-jsc:chunkedUpload:progress', e => {
+  const { file, progress } = e.detail
+  const pct = progress.bytesTotal ? Math.round(progress.bytesUploaded / progress.bytesTotal * 100) : 0
+  console.log(`${pct}%`)
+})
+el.addEventListener('emg-jsc:chunkedUpload:upload-success', e => {
+  console.log('URL:', e.detail.response.uploadURL)
+  // uploadId: último segmento de la URL (ej. el UUID que asigna tusd), o null si no se pudo extraer
+  console.log('ID:', e.detail.uploadId)
+})
+el.addEventListener('emg-jsc:chunkedUpload:upload-error', e => {
+  console.error(e.detail.error)
+})
+el.addEventListener('emg-jsc:chunkedUpload:complete', e => {
+  console.log('Completados:', e.detail.successful.length)
+  console.log('Fallidos:', e.detail.failed.length)
+})
+el.addEventListener('emg-jsc:chunkedUpload:cancel-all', () => {})
+```
+
 ## Personalización de Estilos
 
 La librería permite una personalización profunda a dos niveles:

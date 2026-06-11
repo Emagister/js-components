@@ -1,6 +1,8 @@
 import Component from "../Component";
 import TomSelect from "tom-select";
 
+const SEARCH_DEBOUNCE_DELAY_MS = 300;
+
 export default class RichMultiSelect extends Component {
     #tomSelect = null;
     #settings = {};
@@ -21,10 +23,10 @@ export default class RichMultiSelect extends Component {
 
         this.#tomSelect = new TomSelect(this.root, this.#buildConfig());
 
-        const s = this.#settings;
-        if (s.placeholderWithItems != null && this.#tomSelect.getValue().length > 0) {
-            this.#tomSelect.settings.placeholder = s.placeholderWithItems;
-            this.#tomSelect.control_input.placeholder = s.placeholderWithItems;
+        const settings = this.#settings;
+        if (settings.placeholderWithItems != null && this.#tomSelect.getValue().length > 0) {
+            this.#tomSelect.settings.placeholder = settings.placeholderWithItems;
+            this.#tomSelect.control_input.placeholder = settings.placeholderWithItems;
         }
 
         this.root.richMultiSelect = {
@@ -39,26 +41,26 @@ export default class RichMultiSelect extends Component {
     }
 
     #buildConfig() {
-        const s = this.#settings;
+        const settings = this.#settings;
         const config = {
-            placeholder: s.placeholder ?? 'Seleccionar…',
-            maxItems: s.maxItems ?? null,
-            searchField: s.searchField ?? 'text',
-            create: s.create ?? false,
+            placeholder: settings.placeholder ?? 'Seleccionar…',
+            maxItems: settings.maxItems ?? null,
+            searchField: settings.searchField ?? 'text',
+            create: settings.create ?? false,
             plugins: ['remove_button'],
             render: {
                 no_results: () => {
-                    const el = document.createElement('div');
-                    el.className = 'rms-no-results';
-                    el.textContent = s.noResultsText ?? 'Sin resultados';
-                    return el.outerHTML;
+                    const noResultsEl = document.createElement('div');
+                    noResultsEl.className = 'rms-no-results';
+                    noResultsEl.textContent = settings.noResultsText ?? 'Sin resultados';
+                    return noResultsEl.outerHTML;
                 }
             },
             onChange: (values) => {
-                if (s.placeholderWithItems != null && this.#tomSelect) {
+                if (settings.placeholderWithItems != null && this.#tomSelect) {
                     const ph = values.length > 0
-                        ? s.placeholderWithItems
-                        : (s.placeholder ?? 'Seleccionar…');
+                        ? settings.placeholderWithItems
+                        : (settings.placeholder ?? 'Seleccionar…');
                     this.#tomSelect.settings.placeholder = ph;
                     this.#tomSelect.control_input.placeholder = ph;
                 }
@@ -67,7 +69,7 @@ export default class RichMultiSelect extends Component {
                 );
             },
             onItemAdd: (value, $item) => {
-                if (s.clearInputOnSelect && this.#tomSelect) {
+                if (settings.clearInputOnSelect && this.#tomSelect) {
                     this.#tomSelect.setTextboxValue('');
                     this.#tomSelect.refreshOptions(false);
                 }
@@ -90,11 +92,11 @@ export default class RichMultiSelect extends Component {
             }
         };
 
-        if (s.remoteUrl) {
+        if (settings.remoteUrl) {
             config.load = this.#buildLoadFn(
-                s.remoteUrl,
-                s.remoteValueField ?? 'id',
-                s.remoteLabelField ?? 'name'
+                settings.remoteUrl,
+                settings.remoteValueField ?? 'id',
+                settings.remoteLabelField ?? 'name'
             );
         }
 
@@ -117,8 +119,8 @@ export default class RichMultiSelect extends Component {
                         callback([]);
                         return;
                     }
-                    const data = await response.json();
-                    callback(data.map(item => ({
+                    const remoteOptions = await response.json();
+                    callback(remoteOptions.map(item => ({
                         value: String(item[valueField]),
                         text: item[labelField]
                     })));
@@ -127,7 +129,7 @@ export default class RichMultiSelect extends Component {
                     this.root.dispatchEvent(new CustomEvent('emg-jsc:richMultiSelect:load-error'));
                     callback([]);
                 }
-            }, 300);
+            }, SEARCH_DEBOUNCE_DELAY_MS);
         };
     }
 

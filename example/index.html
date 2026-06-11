@@ -291,7 +291,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Modal Basic Setup -->
     <div data-component="modal" class="modal fade" id="example-modal" tabindex="-1">
@@ -343,9 +342,8 @@
         </div>
     </div>
 
-    <!-- RichTextEditor Example -->
-    <div class="container mb-5">
-        <div class="row">
+        <!-- RichTextEditor Component -->
+        <div class="row mb-4">
             <div class="col-md-12">
                 <div class="card shadow-sm">
                     <div class="card-header bg-white">
@@ -367,6 +365,40 @@
                             </div>
                             <pre id="rte-html-output" class="mt-3 p-3 bg-light rounded border small d-none"></pre>
                         </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ChunkedUpload Component -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">ChunkedUpload Component</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">
+                            Subida de ficheros grandes (hasta 500 MB) mediante chunks de 5 MB via protocolo Tus.
+                            Requiere un servidor Tus en el endpoint configurado.
+                            Para pruebas locales: <code>docker run -p 1080:8080 tusproject/tusd</code>
+                        </p>
+                        <p class="text-muted small mb-3">
+                            Durante la subida, el dropzone muestra un overlay con spinner y bloquea la interacción hasta que el proceso finaliza o se cancela.
+                        </p>
+                        <div
+                            data-component="chunked-upload"
+                            data-settings='{
+                                "endpoint": "http://localhost:1080/files/",
+                                "chunkSize": 5242880,
+                                "maxFileSize": 524288000,
+                                "labels": {
+                                    "icon": "bi-file-earmark-zip",
+                                    "dropzone": "Arrastra tu archivo aquí",
+                                    "dropzoneSubtitle": "o haz clic para seleccionar"
+                                }
+                            }'
+                        ></div>
                     </div>
                 </div>
             </div>
