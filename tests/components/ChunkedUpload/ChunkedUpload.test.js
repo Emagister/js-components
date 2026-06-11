@@ -500,6 +500,12 @@ describe('ChunkedUpload', () => {
                 expect(handler).toHaveBeenCalledOnce();
                 expect(handler.mock.calls[0][0].detail.file).toBe(file);
             });
+
+            it('no muestra NaN cuando file.size es undefined', () => {
+                uppyInstance._emit('file-added', fakeFile({ size: undefined }));
+                const sizeEl = element.querySelector('[data-file-id="uppy-test-id"] .cu-file-size');
+                expect(sizeEl.textContent).not.toContain('NaN');
+            });
         });
 
         describe('upload-progress', () => {
