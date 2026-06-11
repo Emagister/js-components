@@ -48,6 +48,14 @@
     "@uppy/core": "^5.0.0",
     "@uppy/tus": "^5.0.0"
   },
+  "peerDependenciesMeta": {
+    "@tiptap/core": { "optional": true },
+    "@tiptap/starter-kit": { "optional": true },
+    "flatpickr": { "optional": true },
+    "tom-select": { "optional": true },
+    "@uppy/core": { "optional": true },
+    "@uppy/tus": { "optional": true }
+  },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
     "@tiptap/core": "^3.22.4",
