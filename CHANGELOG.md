@@ -1,5 +1,66 @@
 # Changelog
 
+## [1.11.0](https://github.com/Emagister/js-components/compare/v1.10.0...v1.11.0) (2026-06-11)
+
+
+### Features
+
+* **chunked-upload:** add ChunkedUpload component with Tus protocol support ([a21b7ac](https://github.com/Emagister/js-components/commit/a21b7acff6f2932afdb5a2282c33e95ea4b00e56))
+* **chunked-upload:** add configurable button labels (selectFileButton, uploadFileButton, cancelButton) ([9c7c578](https://github.com/Emagister/js-components/commit/9c7c5782ffb66be96f7db27bf222e5208be95153))
+* **chunked-upload:** add keyboard accessibility to dropzone ([d67a331](https://github.com/Emagister/js-components/commit/d67a331f6173acfe65100b91e6183bb5f0dc0303))
+* **chunked-upload:** add labels.icon and labels.dropzoneSubtitle support ([2b2c611](https://github.com/Emagister/js-components/commit/2b2c6118c57644abe4b0d4a7605547c3bc247920))
+* **chunked-upload:** add uploading overlay, auto-reset, and status labels ([945fb60](https://github.com/Emagister/js-components/commit/945fb608dd6d74d44536f8852b52732ac3cfac79))
+* **chunked-upload:** expose uploadId in upload-success event detail ([0a4bdda](https://github.com/Emagister/js-components/commit/0a4bdda6c13b80588097757cb9f256ac4b0f2569))
+* **chunked-upload:** make maxNumberOfFiles configurable and move auto-reset to complete ([f952621](https://github.com/Emagister/js-components/commit/f952621b276a3a069809608e49c7f1d9f6635afa))
+* **data-table:** add tooltip support to column cell values ([fd9d406](https://github.com/Emagister/js-components/commit/fd9d406b391c996e0abbc255412ad9bd3d6e79d3))
+* **rich-multi-select:** add clearInputOnSelect option ([37501df](https://github.com/Emagister/js-components/commit/37501df8fb776ee6fd8a62f206abdc80892fb911))
+* **rich-multi-select:** add placeholderWithItems option ([17f955b](https://github.com/Emagister/js-components/commit/17f955bf2df0c233d437f8174c8150faa123084d))
+
+
+### Bug Fixes
+
+* **chunked-upload:** add bubbles:true to all CustomEvent dispatches ([ec581c8](https://github.com/Emagister/js-components/commit/ec581c8b549b6ab393a5128c264285d5c2d649b8))
+* **chunked-upload:** clear file list DOM on cancel ([65dcbbd](https://github.com/Emagister/js-components/commit/65dcbbd824e7b6ef7372066434187dffb9ee706b))
+* **chunked-upload:** dispatch cancel-all event from #reset() ([9c9ce79](https://github.com/Emagister/js-components/commit/9c9ce79df2b8fec5841101d5562c2945546bff22))
+* **chunked-upload:** emit cancel-all only on explicit user cancellation ([6fb13cc](https://github.com/Emagister/js-components/commit/6fb13cc3ab177da0d17b996e31dc396f1da778b0))
+* **chunked-upload:** guard formatBytes against undefined file size ([c0130e1](https://github.com/Emagister/js-components/commit/c0130e172a3b88f57b58ad5bcb25841b58b0a50d))
+* **chunked-upload:** guard new URL() in upload-success against relative and invalid URLs ([8432f88](https://github.com/Emagister/js-components/commit/8432f888f832aba19adc499958884cca8ba6558b))
+* **chunked-upload:** guard remove button against mid-upload removal ([f55319e](https://github.com/Emagister/js-components/commit/f55319e3a1da3c66e691ae3c82a3ca9f89d865b9))
+* **chunked-upload:** prevent page scroll on Space key and clear auto-reset timer on cancel ([05e00d4](https://github.com/Emagister/js-components/commit/05e00d4ce7e2a411b8bef48a113d952caa45c7a6))
+* **chunked-upload:** remove overlay on upload-error to prevent blocked dropzone ([2424056](https://github.com/Emagister/js-components/commit/2424056826da5bdc3eb6a0273d368ce9c5f83e6c))
+* **chunked-upload:** replace hardcoded rgba background with color-mix CSS variable ([518a4dc](https://github.com/Emagister/js-components/commit/518a4dc2438847fbea9707b55030dadfc9be4316))
+* **chunked-upload:** throttle upload-progress CustomEvent to animation frame ([2ac637b](https://github.com/Emagister/js-components/commit/2ac637b0e62c634b77d83ef3c80e69df4b747c78))
+* **data-table:** add tabindex="0" to non-focusable tooltip elements ([8b01ea8](https://github.com/Emagister/js-components/commit/8b01ea84d3761103bdcacb7d58055c38b2d49b23))
+* **data-table:** skip tooltip when row field is null or undefined ([ce4ac18](https://github.com/Emagister/js-components/commit/ce4ac1812f4c90b7801ca18ac1d9cc0ce2b374a9))
+* **lint:** add location and KeyboardEvent browser globals to eslint config ([1c72dde](https://github.com/Emagister/js-components/commit/1c72dde520e92834044a981aa35f5d2342fc86ee))
+* **lint:** add missing browser globals URL, File, DragEvent to eslint config ([32d9bdd](https://github.com/Emagister/js-components/commit/32d9bdd1b4a5a92dacb7e0df3e4cb3140519d0e9))
+* **lint:** complete s→settings rename in RichMultiSelect and add rAF globals ([25e11d6](https://github.com/Emagister/js-components/commit/25e11d69dcb31a516b6799acded1c6c6531b55cd))
+* **rich-multi-select:** apply placeholderWithItems on init when values are pre-selected ([de09b38](https://github.com/Emagister/js-components/commit/de09b386eb7b2f543af597f6a38f7c815c904f86))
+* **rich-multi-select:** persist placeholderWithItems across TomSelect internal resets ([74faa2e](https://github.com/Emagister/js-components/commit/74faa2ea014833a055b26b3d5a4dc83346d37440))
+* **rich-multi-select:** use != null guard for placeholderWithItems ([65b72b2](https://github.com/Emagister/js-components/commit/65b72b2ddf13faeff6b66858ee42b33e2641f634))
+
+
+### Documentation
+
+* **chunked-upload:** document uploadId field in upload-success event ([dc75412](https://github.com/Emagister/js-components/commit/dc754128d9c37b260e25978746b76eb98a93533f))
+* **chunked-upload:** fix progress snippet and example chunk size label ([e9c5d68](https://github.com/Emagister/js-components/commit/e9c5d68e5407b9c5101e4107a9044b65d69ada57))
+
+
+### Tests
+
+* **rich-multi-select:** strengthen placeholderWithItems default test ([a0237b2](https://github.com/Emagister/js-components/commit/a0237b29c039718c85a421c2e110eef6eb30efa0))
+
+
+### Code Refactoring
+
+* **chunked-upload:** extract DEFAULT_SETTINGS constant to avoid duplication ([e4e7749](https://github.com/Emagister/js-components/commit/e4e7749f6f8a8ade828b7fa7e61dbe90f94df1fc))
+* **chunked-upload:** replace innerHTML and querySelector with createElement ([9226604](https://github.com/Emagister/js-components/commit/9226604a224712f538b60591cbc2ae762ec8eee2))
+* rename single-letter variables to descriptive names ([339b330](https://github.com/Emagister/js-components/commit/339b3304be9882d3070ac83b3e9135391cd0a202))
+* replace generic variable names and magic numbers with descriptive identifiers ([9379e0d](https://github.com/Emagister/js-components/commit/9379e0dadb5c195607a36be7494336e77a9a08f7))
+
+
+
+
 ## [1.10.0](https://github.com/Emagister/js-components/compare/v1.9.0...v1.10.0) (2026-05-19)
 
 
