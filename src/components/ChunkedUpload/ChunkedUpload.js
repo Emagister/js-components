@@ -11,6 +11,7 @@ const DEFAULT_AUTO_RESET_DELAY_MS = 3000;
 const DEFAULT_SETTINGS = {
     chunkSize: DEFAULT_CHUNK_SIZE,
     maxFileSize: DEFAULT_MAX_FILE_SIZE,
+    maxNumberOfFiles: 1,
     retryDelays: DEFAULT_RETRY_DELAYS,
     parallelUploads: 1,
     autoProceed: false,
@@ -122,6 +123,9 @@ export default class ChunkedUpload extends Component {
         this.#fileInputEl = document.createElement('input');
         this.#fileInputEl.type = 'file';
         this.#fileInputEl.className = 'cu-file-input visually-hidden';
+        if (settings.maxNumberOfFiles !== 1) {
+            this.#fileInputEl.multiple = true;
+        }
         if (settings.allowedFileTypes?.length) {
             this.#fileInputEl.accept = settings.allowedFileTypes.join(',');
         }
@@ -205,7 +209,7 @@ export default class ChunkedUpload extends Component {
             restrictions: {
                 maxFileSize: settings.maxFileSize,
                 allowedFileTypes: settings.allowedFileTypes,
-                maxNumberOfFiles: 1,
+                maxNumberOfFiles: settings.maxNumberOfFiles,
             },
             autoProceed: settings.autoProceed,
         }).use(Tus, {
@@ -340,13 +344,6 @@ export default class ChunkedUpload extends Component {
             bubbles: true,
             detail: { file, response, uploadId },
         }));
-
-        if (this.settings.autoProceed) {
-            this.#autoResetTimer = setTimeout(() => {
-                this.#autoResetTimer = null;
-                this.#reset();
-            }, this.settings.autoResetDelay);
-        }
     }
 
     #onUploadError(file, error) {
@@ -368,6 +365,13 @@ export default class ChunkedUpload extends Component {
             bubbles: true,
             detail: result,
         }));
+
+        if (this.settings.autoProceed && result.failed.length === 0 && result.successful.length > 0) {
+            this.#autoResetTimer = setTimeout(() => {
+                this.#autoResetTimer = null;
+                this.#reset();
+            }, this.settings.autoResetDelay);
+        }
     }
 
     #onRestrictionFailed(file, error) {

@@ -559,11 +559,12 @@ docker run -p 1080:8080 tusproject/tusd
 | `endpoint` | `string` | **requerido** | URL del servidor Tus |
 | `chunkSize` | `number` | `52428800` (50 MB) | Bytes por chunk |
 | `maxFileSize` | `number` | `524288000` (500 MB) | Tamaño máximo del fichero |
+| `maxNumberOfFiles` | `number \| null` | `1` | Número máximo de ficheros simultáneos. `null` = sin límite. Cuando es distinto de `1`, el input acepta selección múltiple |
 | `allowedFileTypes` | `string[]` | `null` (todos) | MIME types o extensiones permitidas |
 | `retryDelays` | `number[]` | `[0,1000,3000,5000]` | Milisegundos entre reintentos |
-| `parallelUploads` | `number` | `1` | Uploads simultáneos |
+| `parallelUploads` | `number` | `1` | Número de uploads que Tus ejecuta en paralelo cuando hay varios ficheros |
 | `autoProceed` | `boolean` | `false` | Inicia la subida al seleccionar el fichero |
-| `autoResetDelay` | `number` | `3000` | Ms tras los que el componente se resetea automáticamente después de un upload exitoso (solo aplica cuando `autoProceed: true`) |
+| `autoResetDelay` | `number` | `3000` | Ms tras los que el componente se resetea automáticamente después de que todos los ficheros se suban sin errores (solo aplica cuando `autoProceed: true`) |
 | `labels` | `object` | *(ver abajo)* | Textos e icono de UI sobreescribibles (ver tabla de labels) |
 
 **Labels disponibles (`labels`):**

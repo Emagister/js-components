@@ -81,6 +81,10 @@ describe('ChunkedUpload', () => {
             expect(component.settings.autoProceed).toBe(false);
         });
 
+        it('aplica maxNumberOfFiles por defecto de 1', () => {
+            expect(component.settings.maxNumberOfFiles).toBe(1);
+        });
+
         it('lee configuración personalizada desde data-settings', () => {
             const el = createElement({
                 endpoint: '/upload/',
@@ -161,6 +165,37 @@ describe('ChunkedUpload', () => {
                     }),
                 })
             );
+        });
+
+        it('pasa maxNumberOfFiles a las restrictions de Uppy', () => {
+            const el = createElement({ endpoint: '/files/', maxNumberOfFiles: 3 });
+            const c = new ChunkedUpload(el);
+            c.init();
+            expect(Uppy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    restrictions: expect.objectContaining({ maxNumberOfFiles: 3 }),
+                })
+            );
+        });
+
+        it('el input no tiene multiple cuando maxNumberOfFiles es 1', () => {
+            component.init();
+            const input = element.querySelector('input.cu-file-input');
+            expect(input.multiple).toBe(false);
+        });
+
+        it('el input tiene multiple cuando maxNumberOfFiles es mayor que 1', () => {
+            const el = createElement({ endpoint: '/files/', maxNumberOfFiles: 3 });
+            const c = new ChunkedUpload(el);
+            c.init();
+            expect(el.querySelector('input.cu-file-input').multiple).toBe(true);
+        });
+
+        it('el input tiene multiple cuando maxNumberOfFiles es null (sin límite)', () => {
+            const el = createElement({ endpoint: '/files/', maxNumberOfFiles: null });
+            const c = new ChunkedUpload(el);
+            c.init();
+            expect(el.querySelector('input.cu-file-input').multiple).toBe(true);
         });
 
         it('llama a .use(Tus) con endpoint y chunkSize correctos', () => {
@@ -838,12 +873,13 @@ describe('ChunkedUpload', () => {
             expect(c.settings.autoResetDelay).toBe(5000);
         });
 
-        it('oculta cu-file-list tras autoResetDelay ms después de upload-success', () => {
+        it('oculta cu-file-list tras autoResetDelay ms después de complete sin errores', () => {
             const el = createElement({ endpoint: '/files/', autoProceed: true, autoResetDelay: 3000 });
             const c = new ChunkedUpload(el);
             c.init();
             uppyInstance._emit('file-added', fakeFile());
             uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            uppyInstance._emit('complete', { successful: [fakeFile()], failed: [] });
             expect(el.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
             vi.advanceTimersByTime(3000);
             expect(el.querySelector('.cu-file-list').classList.contains('d-none')).toBe(true);
@@ -855,6 +891,7 @@ describe('ChunkedUpload', () => {
             c.init();
             uppyInstance._emit('file-added', fakeFile());
             uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            uppyInstance._emit('complete', { successful: [fakeFile()], failed: [] });
             vi.advanceTimersByTime(2999);
             expect(el.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
         });
@@ -865,6 +902,7 @@ describe('ChunkedUpload', () => {
             c.init();
             uppyInstance._emit('file-added', fakeFile());
             uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            uppyInstance._emit('complete', { successful: [fakeFile()], failed: [] });
             vi.advanceTimersByTime(3000);
             expect(el.querySelector('.cu-file-list').children).toHaveLength(0);
         });
@@ -873,8 +911,19 @@ describe('ChunkedUpload', () => {
             component.init();
             uppyInstance._emit('file-added', fakeFile());
             uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            uppyInstance._emit('complete', { successful: [fakeFile()], failed: [] });
             vi.advanceTimersByTime(10000);
             expect(element.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
+        });
+
+        it('no dispara auto-reset cuando complete tiene ficheros fallidos', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true });
+            const c = new ChunkedUpload(el);
+            c.init();
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('complete', { successful: [], failed: [fakeFile()] });
+            vi.advanceTimersByTime(10000);
+            expect(el.querySelector('.cu-file-list').classList.contains('d-none')).toBe(false);
         });
 
         it('destroy() cancela el timer de auto-reset pendiente', () => {
@@ -883,6 +932,7 @@ describe('ChunkedUpload', () => {
             c.init();
             uppyInstance._emit('file-added', fakeFile());
             uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            uppyInstance._emit('complete', { successful: [fakeFile()], failed: [] });
             el.chunkedUpload.destroy();
             expect(() => vi.advanceTimersByTime(3000)).not.toThrow();
         });
@@ -893,6 +943,7 @@ describe('ChunkedUpload', () => {
             c.init();
             uppyInstance._emit('file-added', fakeFile());
             uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            uppyInstance._emit('complete', { successful: [fakeFile()], failed: [] });
             el.chunkedUpload.reset();
             uppyInstance.cancelAll.mockClear();
             vi.advanceTimersByTime(3000);
