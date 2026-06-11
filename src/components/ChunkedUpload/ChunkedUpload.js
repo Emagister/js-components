@@ -84,7 +84,7 @@ export default class ChunkedUpload extends Component {
     #onUploadBtnClick = () => this.#uppy.upload();
 
     #onCancelBtnClick = () => {
-        this.#reset();
+        this.#reset(true);
     };
 
     constructor(element) {
@@ -107,7 +107,7 @@ export default class ChunkedUpload extends Component {
 
         this.root.chunkedUpload = {
             upload: () => { this.#uppy.upload(); return this.root.chunkedUpload; },
-            cancelAll: () => { this.#reset(); return this.root.chunkedUpload; },
+            cancelAll: () => { this.#reset(true); return this.root.chunkedUpload; },
             reset: () => { this.#reset(); return this.root.chunkedUpload; },
             openFilePicker: () => { this.#fileInputEl?.click(); return this.root.chunkedUpload; },
             addFiles: (files) => { this.#addFiles(files); return this.root.chunkedUpload; },
@@ -399,7 +399,7 @@ export default class ChunkedUpload extends Component {
         this.#overlayEl?.classList.toggle('d-none', !active);
     }
 
-    #reset() {
+    #reset(emitCancelEvent = false) {
         this.#clearAutoResetTimer();
         this.#setUploading(false);
         this.#uppy.cancelAll();
@@ -408,7 +408,9 @@ export default class ChunkedUpload extends Component {
         this.#fileListEl.classList.add('d-none');
         this.#actionsEl.classList.add('d-none');
         this.#clearError();
-        this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all', { bubbles: true }));
+        if (emitCancelEvent) {
+            this.root.dispatchEvent(new CustomEvent('emg-jsc:chunkedUpload:cancel-all', { bubbles: true }));
+        }
     }
 
     #showError(message) {

@@ -811,11 +811,11 @@ describe('ChunkedUpload', () => {
             expect(handler).toHaveBeenCalledOnce();
         });
 
-        it('reset() despacha emg-jsc:chunkedUpload:cancel-all', () => {
+        it('reset() no despacha emg-jsc:chunkedUpload:cancel-all', () => {
             const handler = vi.fn();
             element.addEventListener('emg-jsc:chunkedUpload:cancel-all', handler);
             element.chunkedUpload.reset();
-            expect(handler).toHaveBeenCalledOnce();
+            expect(handler).not.toHaveBeenCalled();
         });
 
         it('cancelAll() de la API pública despacha emg-jsc:chunkedUpload:cancel-all', () => {
@@ -948,6 +948,19 @@ describe('ChunkedUpload', () => {
             uppyInstance.cancelAll.mockClear();
             vi.advanceTimersByTime(3000);
             expect(uppyInstance.cancelAll).not.toHaveBeenCalled();
+        });
+
+        it('el auto-reset no emite cancel-all', () => {
+            const el = createElement({ endpoint: '/files/', autoProceed: true, autoResetDelay: 100 });
+            const c = new ChunkedUpload(el);
+            c.init();
+            const handler = vi.fn();
+            el.addEventListener('emg-jsc:chunkedUpload:cancel-all', handler);
+            uppyInstance._emit('file-added', fakeFile());
+            uppyInstance._emit('upload-success', fakeFile(), { uploadURL: 'https://example.com/files/abc' });
+            uppyInstance._emit('complete', { successful: [fakeFile()], failed: [] });
+            vi.advanceTimersByTime(100);
+            expect(handler).not.toHaveBeenCalled();
         });
     });
 
