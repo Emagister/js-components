@@ -630,6 +630,8 @@ el.addEventListener('emg-jsc:chunkedUpload:progress', e => {
 })
 el.addEventListener('emg-jsc:chunkedUpload:upload-success', e => {
   console.log('URL:', e.detail.response.uploadURL)
+  // uploadId: último segmento de la URL (ej. el UUID que asigna tusd), o null si no se pudo extraer
+  console.log('ID:', e.detail.uploadId)
 })
 el.addEventListener('emg-jsc:chunkedUpload:upload-error', e => {
   console.error(e.detail.error)
