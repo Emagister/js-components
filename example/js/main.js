@@ -106,6 +106,19 @@ document.addEventListener('emg-jsc:datatable:bulk-delete:error', () => {
         detail: { message: 'Error al eliminar los registros seleccionados', type: MessageToastType.ERROR, duration: 3000 }
     }));
 });
+document.addEventListener('emg-jsc:datatable:bulk-action', (e) => {
+    const { actionKey, ids } = e.detail;
+    if (actionKey === 'delete') return;
+
+    const labels = { activate: 'activado(s)', deactivate: 'desactivado(s)' };
+    window.dispatchEvent(new CustomEvent('toast:show', {
+        detail: { message: `${ids.length} registro(s) ${labels[actionKey] || actionKey}`, type: MessageToastType.SUCCESS, duration: 3000 }
+    }));
+
+    const table = document.getElementById('example-datatable');
+    table.dataTable.clearSelection();
+    table.dispatchEvent(new CustomEvent('emg-jsc:datatable:refresh'));
+});
 document.addEventListener('emg-jsc:datatable:fetch:unauthorized', () => {
     // In a real app: window.location.href = '/login';
     console.warn('DataTable: sesión caducada (401). Redirigir al login.');
