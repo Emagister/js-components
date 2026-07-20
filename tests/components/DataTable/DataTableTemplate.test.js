@@ -14,6 +14,7 @@ describe('DataTableTemplate', () => {
                 { key: 'age', label: 'Edad' },
             ],
             actions: [],
+            bulkActions: [],
             striped: false,
             hover: true,
             headerClass: null,
@@ -728,14 +729,16 @@ describe('DataTableTemplate', () => {
         });
     });
 
-    describe('eliminación masiva (bulkDeleteUrl)', () => {
+    describe('acciones de lote (bulkActions)', () => {
         let bulkConfig;
         let bulkState;
 
         beforeEach(() => {
             bulkConfig = {
                 ...baseConfig,
-                bulkDeleteUrl: '/api/bulk-delete',
+                bulkActions: [
+                    { key: 'delete', label: 'Eliminar seleccionados', url: '/api/bulk-delete', method: 'DELETE', variant: 'danger' },
+                ],
                 labels: {
                     ...baseConfig.labels,
                     bulkDelete: 'Eliminar seleccionados',
@@ -747,12 +750,12 @@ describe('DataTableTemplate', () => {
             };
         });
 
-        it('añade th con checkbox de selección global cuando bulkDeleteUrl está definido', () => {
+        it('añade th con checkbox de selección global cuando hay bulkActions', () => {
             const content = template.createContent(bulkState, bulkConfig);
             expect(content.querySelector('thead th [data-select-all]')).not.toBeNull();
         });
 
-        it('no añade th de checkbox cuando bulkDeleteUrl no está definido', () => {
+        it('no añade th de checkbox cuando no hay bulkActions', () => {
             const content = template.createContent(baseState, baseConfig);
             expect(content.querySelector('[data-select-all]')).toBeNull();
         });
@@ -763,7 +766,7 @@ describe('DataTableTemplate', () => {
             expect(firstTh.querySelector('[data-select-all]')).not.toBeNull();
         });
 
-        it('añade td con checkbox en cada fila cuando bulkDeleteUrl está definido', () => {
+        it('añade td con checkbox en cada fila cuando hay bulkActions', () => {
             const content = template.createContent(bulkState, bulkConfig);
             expect(content.querySelectorAll('tbody td [data-select-id]')).toHaveLength(1);
         });
@@ -811,12 +814,12 @@ describe('DataTableTemplate', () => {
             expect(content.querySelector('tbody td').getAttribute('colspan')).toBe('3');
         });
 
-        it('renderiza la barra de acciones masivas cuando bulkDeleteUrl está definido', () => {
+        it('renderiza la barra de acciones masivas cuando hay bulkActions', () => {
             const content = template.createContent(bulkState, bulkConfig);
             expect(content.querySelector('.datatable-bulk-actions')).not.toBeNull();
         });
 
-        it('no renderiza la barra de acciones masivas cuando bulkDeleteUrl no está definido', () => {
+        it('no renderiza la barra de acciones masivas cuando no hay bulkActions', () => {
             const content = template.createContent(baseState, baseConfig);
             expect(content.querySelector('.datatable-bulk-actions')).toBeNull();
         });
@@ -835,12 +838,12 @@ describe('DataTableTemplate', () => {
         it('el botón de eliminación masiva muestra el label y el count de seleccionados', () => {
             const state = { ...bulkState, selectedIds: new Set(['1']) };
             const content = template.createContent(state, bulkConfig);
-            const btn = content.querySelector('[data-bulk-delete]');
+            const btn = content.querySelector('[data-bulk-action="delete"]');
             expect(btn.textContent).toContain('Eliminar seleccionados');
             expect(btn.textContent).toContain('1');
         });
 
-        it('el colgroup incluye col para la columna de checkbox cuando bulkDeleteUrl está definido', () => {
+        it('el colgroup incluye col para la columna de checkbox cuando hay bulkActions', () => {
             const config = {
                 ...bulkConfig,
                 columns: [

@@ -750,7 +750,7 @@ describe('DataTable', () => {
 
                 element.querySelector('[data-select-id="1"]').click();
                 element.querySelector('[data-select-id="2"]').click();
-                const btn = element.querySelector('[data-bulk-delete]');
+                const btn = element.querySelector('[data-bulk-action="delete"]');
                 expect(btn.textContent).toContain('2');
             });
         });
@@ -767,7 +767,7 @@ describe('DataTable', () => {
                     .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
                     .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
 
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
 
                 await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
                 const [url, options] = fetch.mock.calls[0];
@@ -787,7 +787,7 @@ describe('DataTable', () => {
                     .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
                     .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
 
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
                 await vi.waitFor(() => expect(dt.state.selectedIds.size).toBe(0));
             });
 
@@ -805,7 +805,7 @@ describe('DataTable', () => {
                 const handler = vi.fn();
                 element.addEventListener('emg-jsc:datatable:bulk-delete:success', handler);
 
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
                 await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
                 expect(handler.mock.calls[0][0].detail.count).toBe(1);
             });
@@ -823,7 +823,7 @@ describe('DataTable', () => {
                 const handler = vi.fn();
                 element.addEventListener('emg-jsc:datatable:bulk-delete:error', handler);
 
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
                 await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
             });
 
@@ -843,7 +843,7 @@ describe('DataTable', () => {
                     return Promise.resolve({ ok: true, json: () => Promise.resolve(body) });
                 });
 
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
                 await vi.waitFor(() => expect(callCount).toBe(2));
             });
 
@@ -864,7 +864,7 @@ describe('DataTable', () => {
                     )});
                 });
 
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
                 await vi.waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/bulk-delete', expect.anything()));
                 expect(loaderVisibleDuringRequest).toBe(true);
             });
@@ -879,7 +879,7 @@ describe('DataTable', () => {
                 global.fetch = vi.fn().mockResolvedValue({ ok: false });
                 vi.spyOn(console, 'error').mockImplementation(() => {});
 
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
                 await vi.waitFor(() => expect(
                     element.querySelector('.loader-overlay').classList.contains('is-visible')
                 ).toBe(false));
@@ -888,11 +888,356 @@ describe('DataTable', () => {
             it('no llama al endpoint si no hay ids seleccionados', async () => {
                 const dt = new DataTable(element);
                 dt.init();
-                await vi.waitFor(() => expect(element.querySelector('[data-bulk-delete]')).not.toBeNull());
+                await vi.waitFor(() => expect(element.querySelector('[data-bulk-action="delete"]')).not.toBeNull());
 
                 global.fetch = vi.fn();
-                element.querySelector('[data-bulk-delete]').click();
+                element.querySelector('[data-bulk-action="delete"]').click();
                 expect(fetch).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('acciones de lote configurables (bulkActions)', () => {
+        const mockRows = () => mockFetch(
+            [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }],
+            { page: 1, total: 2, perPage: 10 }
+        );
+
+        describe('configuración', () => {
+            it('lee bulkActions desde data-settings', () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar seleccionadas' }],
+                });
+                const dt = new DataTable(element);
+                expect(dt.config.bulkActions).toHaveLength(1);
+                expect(dt.config.bulkActions[0].key).toBe('activate');
+                expect(dt.config.bulkActions[0].label).toBe('Activar seleccionadas');
+            });
+
+            it('bulkActions es un array vacío por defecto', () => {
+                const dt = new DataTable(element);
+                expect(dt.config.bulkActions).toEqual([]);
+            });
+
+            it('normaliza method a POST por defecto', () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'pause', label: 'Pausar', url: '/api/pause' }],
+                });
+                const dt = new DataTable(element);
+                expect(dt.config.bulkActions[0].method).toBe('POST');
+            });
+
+            it('respeta el method indicado en la acción', () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'pause', label: 'Pausar', url: '/api/pause', method: 'PUT' }],
+                });
+                const dt = new DataTable(element);
+                expect(dt.config.bulkActions[0].method).toBe('PUT');
+            });
+
+            it('normaliza variant a "secondary" por defecto', () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar' }],
+                });
+                const dt = new DataTable(element);
+                expect(dt.config.bulkActions[0].variant).toBe('secondary');
+            });
+
+            it('retrocompat: bulkDeleteUrl se traduce a una bulkAction delete (DELETE, danger)', () => {
+                element.dataset.bulkDeleteUrl = '/api/bulk-delete';
+                const dt = new DataTable(element);
+                const deleteAction = dt.config.bulkActions.find(a => a.key === 'delete');
+                expect(deleteAction).toBeDefined();
+                expect(deleteAction.url).toBe('/api/bulk-delete');
+                expect(deleteAction.method).toBe('DELETE');
+                expect(deleteAction.variant).toBe('danger');
+            });
+        });
+
+        describe('renderizado de botones', () => {
+            it('renderiza un botón por cada bulkAction con su key en data-bulk-action', async () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [
+                        { key: 'activate', label: 'Activar' },
+                        { key: 'deactivate', label: 'Desactivar' },
+                    ],
+                });
+                mockRows();
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('.datatable-bulk-actions')).not.toBeNull());
+                expect(element.querySelector('[data-bulk-action="activate"]')).not.toBeNull();
+                expect(element.querySelector('[data-bulk-action="deactivate"]')).not.toBeNull();
+            });
+
+            it('aplica la clase btn-{variant} a cada botón', async () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar', variant: 'success' }],
+                });
+                mockRows();
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-bulk-action="activate"]')).not.toBeNull());
+                expect(element.querySelector('[data-bulk-action="activate"]').classList.contains('btn-success')).toBe(true);
+            });
+
+            it('incluye el contador de seleccionados en el label del botón', async () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar seleccionadas' }],
+                });
+                mockRows();
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                const btn = element.querySelector('[data-bulk-action="activate"]');
+                expect(btn.textContent).toBe('Activar seleccionadas (1)');
+            });
+
+            it('muestra checkboxes cuando hay al menos una bulkAction (sin bulkDeleteUrl)', async () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar' }],
+                });
+                mockRows();
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('tbody tr')).not.toBeNull());
+                expect(element.querySelectorAll('[data-select-id]')).toHaveLength(2);
+                expect(element.querySelector('[data-select-all]')).not.toBeNull();
+            });
+
+            it('no muestra checkboxes cuando no hay ni bulkActions ni bulkDeleteUrl', async () => {
+                mockFetch([{ id: 1, name: 'Alice' }], { page: 1, total: 1, perPage: 10 });
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('tbody tr')).not.toBeNull());
+                expect(element.querySelector('[data-select-id]')).toBeNull();
+            });
+        });
+
+        describe('acción sin url (solo evento)', () => {
+            beforeEach(() => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar seleccionadas' }],
+                });
+                mockRows();
+            });
+
+            it('emite emg-jsc:datatable:bulk-action con { actionKey, ids } al pulsar', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                element.querySelector('[data-select-id="2"]').click();
+
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-action', handler);
+
+                element.querySelector('[data-bulk-action="activate"]').click();
+
+                expect(handler).toHaveBeenCalledOnce();
+                expect(handler.mock.calls[0][0].detail).toEqual({ actionKey: 'activate', ids: ['1', '2'] });
+            });
+
+            it('NO hace fetch al pulsar una acción sin url', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn();
+                element.querySelector('[data-bulk-action="activate"]').click();
+                expect(fetch).not.toHaveBeenCalled();
+            });
+
+            it('NO limpia la selección tras una acción sin url (lo hace el consumidor)', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                element.querySelector('[data-bulk-action="activate"]').click();
+                expect(dt.state.selectedIds.size).toBe(1);
+            });
+
+            it('no emite ni actúa si no hay ids seleccionados', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-bulk-action="activate"]')).not.toBeNull());
+
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-action', handler);
+
+                element.querySelector('[data-bulk-action="activate"]').click();
+                expect(handler).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('acción con url (la ejecuta el componente)', () => {
+            beforeEach(() => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'pause', label: 'Pausar', url: '/api/pause', variant: 'warning' }],
+                });
+                mockRows();
+            });
+
+            it('hace fetch al url/method con { ids } al pulsar', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                element.querySelector('[data-bulk-action="pause"]').click();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
+                const [url, options] = fetch.mock.calls[0];
+                expect(url).toBe('/api/pause');
+                expect(options.method).toBe('POST');
+                expect(JSON.parse(options.body)).toEqual({ ids: ['1'] });
+            });
+
+            it('limpia la selección tras ejecutar correctamente', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                element.querySelector('[data-bulk-action="pause"]').click();
+                await vi.waitFor(() => expect(dt.state.selectedIds.size).toBe(0));
+            });
+
+            it('refresca los datos tras ejecutar correctamente', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                let callCount = 0;
+                global.fetch = vi.fn().mockImplementation((url) => {
+                    callCount++;
+                    const body = url === '/api/pause'
+                        ? {}
+                        : { data: [], meta: { page: 1, total: 0, perPage: 10 } };
+                    return Promise.resolve({ ok: true, json: () => Promise.resolve(body) });
+                });
+
+                element.querySelector('[data-bulk-action="pause"]').click();
+                await vi.waitFor(() => expect(callCount).toBe(2));
+            });
+
+            it('emite emg-jsc:datatable:bulk-action:success con { actionKey, count }', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-action:success', handler);
+
+                element.querySelector('[data-bulk-action="pause"]').click();
+                await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
+                expect(handler.mock.calls[0][0].detail).toEqual({ actionKey: 'pause', count: 1 });
+            });
+
+            it('emite emg-jsc:datatable:bulk-action:error y conserva la selección si falla', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn().mockResolvedValue({ ok: false });
+                vi.spyOn(console, 'error').mockImplementation(() => {});
+
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-action:error', handler);
+
+                element.querySelector('[data-bulk-action="pause"]').click();
+                await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
+                expect(handler.mock.calls[0][0].detail.actionKey).toBe('pause');
+                expect(dt.state.selectedIds.size).toBe(1);
+            });
+        });
+
+        describe('clearSelection()', () => {
+            beforeEach(() => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar' }],
+                });
+                mockRows();
+            });
+
+            it('expone clearSelection() en root.dataTable', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(fetch).toHaveBeenCalled());
+                expect(typeof element.dataTable.clearSelection).toBe('function');
+            });
+
+            it('vacía la selección y desmarca los checkboxes', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                element.querySelector('[data-select-id="2"]').click();
+                expect(dt.state.selectedIds.size).toBe(2);
+
+                element.dataTable.clearSelection();
+                expect(dt.state.selectedIds.size).toBe(0);
+                expect(element.querySelector('[data-select-id="1"]').checked).toBe(false);
+                expect(element.querySelector('.datatable-bulk-actions').classList.contains('d-none')).toBe(true);
+            });
+        });
+
+        describe('retrocompat del alias bulkDeleteUrl', () => {
+            beforeEach(() => {
+                element.dataset.bulkDeleteUrl = '/api/bulk-delete';
+                mockRows();
+            });
+
+            it('renderiza un botón de borrado con data-bulk-action="delete"', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('.datatable-bulk-actions')).not.toBeNull());
+                expect(element.querySelector('[data-bulk-action="delete"]')).not.toBeNull();
+            });
+
+            it('sigue emitiendo emg-jsc:datatable:bulk-delete:success tras borrar', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                const handler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-delete:success', handler);
+
+                element.querySelector('[data-bulk-action="delete"]').click();
+                await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
+                expect(handler.mock.calls[0][0].detail.count).toBe(1);
             });
         });
     });
