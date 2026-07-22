@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.12.0](https://github.com/Emagister/js-components/compare/v1.11.1...v1.12.0) (2026-07-22)
+
+
+### Features
+
+* **datatable:** clear selection on filter and deprecate bulkDeleteUrl ([b5dc1c0](https://github.com/Emagister/js-components/commit/b5dc1c0f61766f15142e350aa357d9cf6757f2e4))
+* **datatable:** support configurable bulk actions ([6615420](https://github.com/Emagister/js-components/commit/6615420fecb8cdffac7a72f41152ef950da02aad))
+
+
+### Bug Fixes
+
+* **datatable:** dedupe delete alias and sync selection UI on filter ([8ac7474](https://github.com/Emagister/js-components/commit/8ac7474658129f2cc94d0336bf015b6c689d14d7))
+* **datatable:** emit legacy events only for deprecated bulkDeleteUrl alias ([bf8498e](https://github.com/Emagister/js-components/commit/bf8498ea9402539ed01d6ef78395708b2f3bd869))
+* **datatable:** guard against non-array bulkActions ([1a50d56](https://github.com/Emagister/js-components/commit/1a50d564de4df335c848ab2240b2beb92d5ed2cb))
+* **datatable:** update bulk counters via rendered buttons ([e7f3dce](https://github.com/Emagister/js-components/commit/e7f3dced9310df3a564444320b2f859749e293c5))
+
+
+### Code Refactoring
+
+* **datatable:** use early return in bulkDeleteUrl alias dedupe ([d3dc6dd](https://github.com/Emagister/js-components/commit/d3dc6dda0ac7dbe902cf7d5cc995115258d2afc1))
+
+
+### Documentation
+
+* **datatable:** document configurable bulk actions ([d2c3933](https://github.com/Emagister/js-components/commit/d2c39331e6cec6ef8f839709e4a2349a1d4566b0))
+* **datatable:** document selection lifecycle and bulkDeleteUrl deprecation ([db00fc9](https://github.com/Emagister/js-components/commit/db00fc9f8445029003dacbb236fdf47e9c8c797f))
+* **example:** simulate bulk activate/deactivate ([884ee8f](https://github.com/Emagister/js-components/commit/884ee8f5b3f5a174aa7546d69541c29638ca269f))
+
+
+
+
 ### [1.11.1](https://github.com/Emagister/js-components/compare/v1.11.0...v1.11.1) (2026-06-11)
 
 
