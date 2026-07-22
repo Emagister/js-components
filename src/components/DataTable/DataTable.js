@@ -282,9 +282,9 @@ export default class DataTable extends Component {
         const bulkBar = this.root.querySelector('.datatable-bulk-actions');
         if (bulkBar) {
             bulkBar.classList.toggle('d-none', count === 0);
-            this.config.bulkActions.forEach(action => {
-                const btn = bulkBar.querySelector(`[data-bulk-action="${action.key}"]`);
-                if (btn) {
+            bulkBar.querySelectorAll('[data-bulk-action]').forEach(btn => {
+                const action = this.config.bulkActions.find(a => a.key === btn.dataset.bulkAction);
+                if (action) {
                     btn.textContent = `${action.label} (${count})`;
                 }
             });

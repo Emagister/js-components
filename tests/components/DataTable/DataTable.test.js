@@ -1008,6 +1008,20 @@ describe('DataTable', () => {
                 expect(element.querySelector('[data-bulk-action="deactivate"]')).not.toBeNull();
             });
 
+            it('actualiza el contador aunque la key contenga comillas', async () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'a"b', label: 'Rara' }],
+                });
+                mockRows();
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+                const btn = element.querySelector('[data-bulk-action]');
+                expect(btn.textContent).toBe('Rara (1)');
+            });
+
             it('aplica la clase btn-{variant} a cada botón', async () => {
                 element.dataset.settings = JSON.stringify({
                     bulkActions: [{ key: 'activate', label: 'Activar', variant: 'success' }],
