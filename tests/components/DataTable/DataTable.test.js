@@ -982,6 +982,14 @@ describe('DataTable', () => {
                 expect(deletes).toHaveLength(1);
                 expect(deletes[0].url).toBe('/api/custom-delete');
             });
+
+            it('ignora bulkActions y avisa por consola si no es un array', () => {
+                element.dataset.settings = JSON.stringify({ bulkActions: 'no-soy-un-array' });
+                const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+                const dt = new DataTable(element);
+                expect(dt.config.bulkActions).toEqual([]);
+                expect(errorSpy).toHaveBeenCalled();
+            });
         });
 
         describe('renderizado de botones', () => {

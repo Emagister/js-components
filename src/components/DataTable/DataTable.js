@@ -67,6 +67,11 @@ export default class DataTable extends Component {
     }
 
     #normalizeBulkActions(rawActions, config) {
+        if (rawActions !== undefined && !Array.isArray(rawActions)) {
+            console.error('DataTable: "bulkActions" debe ser un array; se ignora el valor recibido.');
+            rawActions = [];
+        }
+
         const actions = (rawActions || []).map(action => ({
             key: action.key,
             label: action.label,
