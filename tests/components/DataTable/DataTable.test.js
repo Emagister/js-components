@@ -970,6 +970,18 @@ describe('DataTable', () => {
                 new DataTable(element);
                 expect(warnSpy).not.toHaveBeenCalled();
             });
+
+            it('no duplica la acción delete si ya existe una en bulkActions y además hay bulkDeleteUrl', () => {
+                element.dataset.bulkDeleteUrl = '/api/legacy-delete';
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'delete', label: 'Borrar', url: '/api/custom-delete', method: 'DELETE' }],
+                });
+                vi.spyOn(console, 'warn').mockImplementation(() => {});
+                const dt = new DataTable(element);
+                const deletes = dt.config.bulkActions.filter(a => a.key === 'delete');
+                expect(deletes).toHaveLength(1);
+                expect(deletes[0].url).toBe('/api/custom-delete');
+            });
         });
 
         describe('renderizado de botones', () => {
@@ -1283,6 +1295,21 @@ describe('DataTable', () => {
             dt.state.isLoading = false;
             dt.setFilters({ q: 'x' });
             expect(dt.state.selectedIds.size).toBe(0);
+        });
+
+        it('sincroniza la UI de selección al filtrar (oculta la barra y desmarca) sin esperar al fetch', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+            element.querySelector('[data-select-id="1"]').click();
+            expect(element.querySelector('.datatable-bulk-actions').classList.contains('d-none')).toBe(false);
+
+            dt.state.isLoading = false;
+            dt.setFilters({ q: 'x' });
+
+            expect(element.querySelector('.datatable-bulk-actions').classList.contains('d-none')).toBe(true);
+            expect(element.querySelector('[data-select-id="1"]').checked).toBe(false);
         });
 
         it('conserva la selección al ordenar', async () => {
