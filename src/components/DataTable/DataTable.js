@@ -76,6 +76,7 @@ export default class DataTable extends Component {
         }));
 
         if (config.bulkDeleteUrl) {
+            console.warn('DataTable: "bulkDeleteUrl" está deprecado y se eliminará en una versión futura. Usa "bulkActions" con una acción { key: "delete", url, method: "DELETE", variant: "danger" } en su lugar.');
             actions.push({
                 key: 'delete',
                 label: config.labels.bulkDelete,
@@ -451,7 +452,8 @@ export default class DataTable extends Component {
     setFilters(filters) {
         this.#setState({
             filters: filters,
-            meta: { ...this.state.meta, page: 1 }
+            meta: { ...this.state.meta, page: 1 },
+            selectedIds: new Set()
         });
         this.#fetchData();
     }

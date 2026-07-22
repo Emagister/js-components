@@ -613,6 +613,7 @@ describe('DataTable', () => {
     describe('eliminación masiva', () => {
         beforeEach(() => {
             element.dataset.bulkDeleteUrl = '/api/bulk-delete';
+            vi.spyOn(console, 'warn').mockImplementation(() => {});
             mockFetch(
                 [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }],
                 { page: 1, total: 2, perPage: 10 }
@@ -945,12 +946,29 @@ describe('DataTable', () => {
 
             it('retrocompat: bulkDeleteUrl se traduce a una bulkAction delete (DELETE, danger)', () => {
                 element.dataset.bulkDeleteUrl = '/api/bulk-delete';
+                vi.spyOn(console, 'warn').mockImplementation(() => {});
                 const dt = new DataTable(element);
                 const deleteAction = dt.config.bulkActions.find(a => a.key === 'delete');
                 expect(deleteAction).toBeDefined();
                 expect(deleteAction.url).toBe('/api/bulk-delete');
                 expect(deleteAction.method).toBe('DELETE');
                 expect(deleteAction.variant).toBe('danger');
+            });
+
+            it('avisa por consola de que bulkDeleteUrl está deprecado', () => {
+                element.dataset.bulkDeleteUrl = '/api/bulk-delete';
+                const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+                new DataTable(element);
+                expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('bulkDeleteUrl'));
+            });
+
+            it('no avisa de deprecación cuando se usa bulkActions sin bulkDeleteUrl', () => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'activate', label: 'Activar' }],
+                });
+                const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+                new DataTable(element);
+                expect(warnSpy).not.toHaveBeenCalled();
             });
         });
 
@@ -1211,6 +1229,7 @@ describe('DataTable', () => {
         describe('retrocompat del alias bulkDeleteUrl', () => {
             beforeEach(() => {
                 element.dataset.bulkDeleteUrl = '/api/bulk-delete';
+                vi.spyOn(console, 'warn').mockImplementation(() => {});
                 mockRows();
             });
 
@@ -1239,6 +1258,53 @@ describe('DataTable', () => {
                 await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
                 expect(handler.mock.calls[0][0].detail.count).toBe(1);
             });
+        });
+    });
+
+    describe('limpieza de selección al filtrar', () => {
+        beforeEach(() => {
+            element.dataset.settings = JSON.stringify({
+                bulkActions: [{ key: 'activate', label: 'Activar' }],
+            });
+            mockFetch(
+                [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }],
+                { page: 1, total: 30, perPage: 10 }
+            );
+        });
+
+        it('limpia la selección al aplicar filtros con setFilters()', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+            element.querySelector('[data-select-id="1"]').click();
+            expect(dt.state.selectedIds.size).toBe(1);
+
+            dt.state.isLoading = false;
+            dt.setFilters({ q: 'x' });
+            expect(dt.state.selectedIds.size).toBe(0);
+        });
+
+        it('conserva la selección al ordenar', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+            element.querySelector('[data-select-id="1"]').click();
+            dt.state.isLoading = false;
+            dt.handleSort('name');
+            expect(dt.state.selectedIds.size).toBe(1);
+        });
+
+        it('conserva la selección al cambiar de página', async () => {
+            const dt = new DataTable(element);
+            dt.init();
+            await vi.waitFor(() => expect(dt.state.isLoading).toBe(false));
+
+            element.querySelector('[data-select-id="1"]').click();
+            dt.state.isLoading = false;
+            dt.handlePageChange(2);
+            expect(dt.state.selectedIds.size).toBe(1);
         });
     });
 
