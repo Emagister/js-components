@@ -5,6 +5,9 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 // In-memory store of deleted IDs for the demo
 const deletedIds = new Set();
 
+// In-memory store of status changes (activate/deactivate) for the demo
+const statusOverrides = new Map();
+
 window.fetch = async (url, options) => {
     const urlObj = new URL(url, window.location.origin);
 
@@ -17,8 +20,13 @@ window.fetch = async (url, options) => {
         const response = await originalFetch(urlObj.pathname, options);
         const fullData = await response.json();
 
-        // Filter out records deleted during this session
-        const remaining = fullData.data.filter(item => !deletedIds.has(String(item.id)));
+        // Filter out records deleted during this session and apply status changes
+        const remaining = fullData.data
+            .filter(item => !deletedIds.has(String(item.id)))
+            .map(item => {
+                const override = statusOverrides.get(String(item.id));
+                return override ? { ...item, ...override } : item;
+            });
 
         const start = (page - 1) * limit;
         const end = start + limit;
@@ -71,6 +79,23 @@ window.fetch = async (url, options) => {
         });
     }
 
+    // Simulation for DataTable Bulk Activate / Deactivate
+    if (urlObj.pathname.includes('bulkActivate') || urlObj.pathname.includes('bulkDeactivate')) {
+        await delay(600);
+        const body = JSON.parse(options?.body || '{}');
+        const ids = body.ids || [];
+        const activating = urlObj.pathname.includes('bulkActivate');
+        const override = activating
+            ? { status: 'active', statusLevel: 'success', statusTooltip: 'El usuario tiene acceso completo al sistema' }
+            : { status: 'inactive', statusLevel: 'warning', statusTooltip: 'El usuario no puede iniciar sesión' };
+        ids.forEach(id => statusOverrides.set(String(id), override));
+
+        return new Response(JSON.stringify({ updated: ids.length }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
     // Simulations for AsyncForm Errors
     if (url.includes('simulate-error')) {
         await delay(800); // Artificial delay to see the form loader
@@ -106,18 +131,39 @@ document.addEventListener('emg-jsc:datatable:bulk-delete:error', () => {
         detail: { message: 'Error al eliminar los registros seleccionados', type: MessageToastType.ERROR, duration: 3000 }
     }));
 });
-document.addEventListener('emg-jsc:datatable:bulk-action', (e) => {
+document.addEventListener('emg-jsc:datatable:bulk-action', async (e) => {
     const { actionKey, ids } = e.detail;
-    if (actionKey === 'delete') return;
 
-    const labels = { activate: 'activado(s)', deactivate: 'desactivado(s)' };
-    window.dispatchEvent(new CustomEvent('toast:show', {
-        detail: { message: `${ids.length} registro(s) ${labels[actionKey] || actionKey}`, type: MessageToastType.SUCCESS, duration: 3000 }
-    }));
+    const endpoints = {
+        activate: 'http://localhost:5173/example/bulkActivate',
+        deactivate: 'http://localhost:5173/example/bulkDeactivate',
+    };
+    const endpoint = endpoints[actionKey];
+    if (!endpoint) return;
 
     const table = document.getElementById('example-datatable');
-    table.dataTable.clearSelection();
-    table.dispatchEvent(new CustomEvent('emg-jsc:datatable:refresh'));
+    table.dispatchEvent(new CustomEvent('emg-jsc:datatable:loader:show'));
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids }),
+        });
+        if (!response.ok) throw new Error('Bulk action failed');
+
+        const labels = { activate: 'activado(s)', deactivate: 'desactivado(s)' };
+        window.dispatchEvent(new CustomEvent('toast:show', {
+            detail: { message: `${ids.length} registro(s) ${labels[actionKey]}`, type: MessageToastType.SUCCESS, duration: 3000 }
+        }));
+        table.dataTable.clearSelection();
+        table.dispatchEvent(new CustomEvent('emg-jsc:datatable:refresh'));
+    } catch (error) {
+        table.dispatchEvent(new CustomEvent('emg-jsc:datatable:loader:hide'));
+        window.dispatchEvent(new CustomEvent('toast:show', {
+            detail: { message: 'Error al actualizar los registros seleccionados', type: MessageToastType.ERROR, duration: 3000 }
+        }));
+    }
 });
 document.addEventListener('emg-jsc:datatable:fetch:unauthorized', () => {
     // In a real app: window.location.href = '/login';
