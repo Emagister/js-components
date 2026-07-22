@@ -247,8 +247,8 @@ Eventos emitidos por el componente:
 - `emg-jsc:datatable:bulk-action` — al pulsar una acción de lote **sin `url`**. `detail: { actionKey, ids }`. El componente no hace ninguna petición ni limpia la selección: es responsabilidad del consumidor.
 - `emg-jsc:datatable:bulk-action:success` — tras ejecutar correctamente una acción de lote **con `url`**. `detail: { actionKey, count }`. La selección ya se ha limpiado y la tabla se ha refrescado.
 - `emg-jsc:datatable:bulk-action:error` — si una acción de lote con `url` responde con error. `detail: { actionKey, error }`. La selección se conserva.
-- `emg-jsc:datatable:bulk-delete:success` — **@deprecated** (usa `bulk-action:success`). Se sigue emitiendo por la acción `delete`. `detail: { count }`.
-- `emg-jsc:datatable:bulk-delete:error` — **@deprecated** (usa `bulk-action:error`). Se sigue emitiendo por la acción `delete`. `detail: { error }`.
+- `emg-jsc:datatable:bulk-delete:success` — **@deprecated** (usa `bulk-action:success`). Se emite **únicamente** cuando la acción proviene del alias deprecado `bulkDeleteUrl`. `detail: { count }`.
+- `emg-jsc:datatable:bulk-delete:error` — **@deprecated** (usa `bulk-action:error`). Se emite **únicamente** cuando la acción proviene del alias deprecado `bulkDeleteUrl`. `detail: { error }`.
 - `emg-jsc:datatable:fetch:unauthorized` — cuando el servidor responde con HTTP 401. `detail: { status: 401 }`. El componente muestra el mensaje de error habitual además de emitir este evento.
 - `emg-jsc:datatable:fetch:redirect` — cuando el servidor redirige la petición (p.ej. a una página de login tras expirar la sesión). `detail: { url }` donde `url` es la URL de destino de la redirección. El componente muestra el mensaje de error habitual además de emitir este evento.
 

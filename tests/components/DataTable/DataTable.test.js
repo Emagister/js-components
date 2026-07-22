@@ -1292,6 +1292,78 @@ describe('DataTable', () => {
                 await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
                 expect(handler.mock.calls[0][0].detail.count).toBe(1);
             });
+
+            it('NO emite el evento nuevo bulk-action:success (solo el deprecado)', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                const legacyHandler = vi.fn();
+                const newHandler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-delete:success', legacyHandler);
+                element.addEventListener('emg-jsc:datatable:bulk-action:success', newHandler);
+
+                element.querySelector('[data-bulk-action="delete"]').click();
+                await vi.waitFor(() => expect(legacyHandler).toHaveBeenCalledOnce());
+                expect(newHandler).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('separación de eventos según origen (deprecado vs nuevo)', () => {
+            beforeEach(() => {
+                element.dataset.settings = JSON.stringify({
+                    bulkActions: [{ key: 'delete', label: 'Borrar', url: '/api/delete', method: 'DELETE' }],
+                });
+                mockRows();
+            });
+
+            it('una acción delete definida vía bulkActions emite bulk-action:success y NO el evento deprecado', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn()
+                    .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
+                    .mockResolvedValue({ ok: true, json: () => Promise.resolve({ data: [], meta: { page: 1, total: 0, perPage: 10 } }) });
+
+                const newHandler = vi.fn();
+                const legacyHandler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-action:success', newHandler);
+                element.addEventListener('emg-jsc:datatable:bulk-delete:success', legacyHandler);
+
+                element.querySelector('[data-bulk-action="delete"]').click();
+                await vi.waitFor(() => expect(newHandler).toHaveBeenCalledOnce());
+                expect(newHandler.mock.calls[0][0].detail).toEqual({ actionKey: 'delete', count: 1 });
+                expect(legacyHandler).not.toHaveBeenCalled();
+            });
+
+            it('en fallo emite bulk-action:error y NO el evento deprecado', async () => {
+                const dt = new DataTable(element);
+                dt.init();
+                await vi.waitFor(() => expect(element.querySelector('[data-select-id]')).not.toBeNull());
+
+                element.querySelector('[data-select-id="1"]').click();
+
+                global.fetch = vi.fn().mockResolvedValue({ ok: false });
+                vi.spyOn(console, 'error').mockImplementation(() => {});
+
+                const newHandler = vi.fn();
+                const legacyHandler = vi.fn();
+                element.addEventListener('emg-jsc:datatable:bulk-action:error', newHandler);
+                element.addEventListener('emg-jsc:datatable:bulk-delete:error', legacyHandler);
+
+                element.querySelector('[data-bulk-action="delete"]').click();
+                await vi.waitFor(() => expect(newHandler).toHaveBeenCalledOnce());
+                expect(legacyHandler).not.toHaveBeenCalled();
+            });
         });
     });
 
