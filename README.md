@@ -89,7 +89,13 @@ Opciones en `data-settings`:
 - `hover` (Boolean, default: true): Activa/desactiva el efecto hover en filas.
 - `headerClass` (String): Clases CSS aplicadas al `<tr>` del encabezado.
 - `scrollOffset` (Number, default: 0): Desplazamiento en píxeles al hacer scroll al paginar. Útil para compensar navbars fijos.
-- `bulkDeleteUrl` (String, default: `null`): URL del endpoint para la eliminación masiva de registros. **Si no se indica, la funcionalidad queda completamente desactivada** (no aparecen checkboxes ni el botón de eliminar). Cuando está activo, se añade una columna de checkboxes al inicio de la tabla y un botón "Eliminar seleccionados" al pie. Al pulsar el botón, se envía `POST` a esta URL con `{ ids: ["1", "2", ...] }` como cuerpo JSON. Tras la respuesta exitosa, la tabla se refresca automáticamente.
+- `bulkActions` (Array, default: `[]`): Lista de acciones de lote sobre las filas seleccionadas. **Si está vacía y tampoco se indica `bulkDeleteUrl`, la selección queda desactivada** (no aparecen checkboxes ni la barra de acciones). Cuando hay al menos una acción, se añade una columna de checkboxes al inicio de la tabla y una barra al pie con un botón por acción. Cada objeto admite:
+  - `key` (String, obligatorio): Identificador de la acción, viaja en los eventos.
+  - `label` (String, obligatorio): Texto del botón. El número de elementos seleccionados se añade automáticamente entre paréntesis (ej: `Activar seleccionadas (3)`).
+  - `url` (String, default: `null`): Determina **quién ejecuta la acción**. Si se indica, el componente hace la petición él mismo (`method` con `{ ids: [...] }` en el cuerpo), limpia la selección, refresca la tabla y emite `bulk-action:success`/`bulk-action:error`. Si **no** se indica, el componente no llama a ningún endpoint: solo emite el evento `bulk-action` con `{ actionKey, ids }` para que el consumidor decida qué hacer (útil cuando la respuesta necesita un tratamiento a medida, p. ej. un toast de conflicto).
+  - `method` (String, default: `'POST'`): Método HTTP usado cuando la acción tiene `url`.
+  - `variant` (String, default: `'secondary'`): Color contextual de Bootstrap para el botón (`btn-{variant}`). Acepta cualquier color contextual: `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`, o los personalizados que definas vía SCSS (`$theme-colors`).
+- `bulkDeleteUrl` (String, default: `null`): **@deprecated — usa `bulkActions`.** Alias de compatibilidad que se traduce internamente en una acción de lote `{ key: "delete", url, method: "DELETE", variant: "danger" }` con el label `labels.bulkDelete`. Sigue enviando `DELETE` con `{ ids: [...] }` y emitiendo los eventos `bulk-delete:success`/`bulk-delete:error`. Su uso emite un aviso de deprecación por consola; será eliminado en una versión futura.
 - `pageSizeOptions` (Array, default: `[10, 25, 50, 100]`): Opciones disponibles en el selector de filas por página. Se renderiza como un `<select>` junto al contador de resultados. El valor activo en cada momento refleja el `perPage` en uso. Al cambiar la selección, la tabla vuelve a la primera página y lanza una nueva petición. Para ocultar el selector, pasa un array vacío: `[]` (en ese caso no se añade `perPage` automáticamente). Si el array no está vacío y el valor de `perPage` no está incluido, se añade automáticamente en la posición ordenada correcta.
 - `actionsWidth` (String, default: `'80px'`): Ancho fijo de la columna de acciones (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Se genera automáticamente un `<colgroup>` con el ancho indicado para dicha columna, aunque ninguna columna de datos tenga `width`.
 - `fetchOnInit` (Boolean, default: `true`): Controla si el componente realiza la petición inicial al cargar. Ponlo a `false` para que la tabla permanezca vacía hasta que el usuario interactúe con el formulario de búsqueda.
@@ -119,19 +125,53 @@ Ejemplo con formulario de filtros y botón de reset:
 </div>
 ```
 
-Ejemplo con eliminación masiva activada:
+Ejemplo con acciones de lote (una ejecutada por el componente, dos delegadas al consumidor):
 ```html
 <div data-component="data-table"
      data-url="/api/users"
      data-columns='[{"key":"name","label":"Nombre"},{"key":"email","label":"Email"}]'
+     data-settings='{
+       "bulkActions": [
+         { "key": "activate",   "label": "Activar seleccionadas",    "variant": "success" },
+         { "key": "deactivate", "label": "Desactivar seleccionadas",  "variant": "warning" },
+         { "key": "delete",     "label": "Eliminar",   "url": "/api/users/bulk-delete", "method": "DELETE", "variant": "danger" }
+       ]
+     }'>
+</div>
+```
+
+Las acciones `activate` y `deactivate` no tienen `url`: al pulsarlas, el componente solo emite `emg-jsc:datatable:bulk-action` con `{ actionKey, ids }` y es el consumidor quien hace la petición y refresca. La acción `delete` sí tiene `url`, así que el componente envía la petición él mismo. El servidor recibirá una `DELETE /api/users/bulk-delete` con el cuerpo:
+```json
+{ "ids": ["3", "7", "12"] }
+```
+
+Ejemplo de gestión de una acción sin `url` desde el consumidor:
+```javascript
+const table = document.querySelector('[data-component="data-table"]');
+
+table.addEventListener('emg-jsc:datatable:bulk-action', async (e) => {
+    const { actionKey, ids } = e.detail;
+    const response = await fetch(`/api/users/${actionKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids }),
+    });
+    // ... trata la respuesta a medida (p. ej. un toast de conflicto) ...
+    table.dataTable.clearSelection();
+    table.dispatchEvent(new CustomEvent('emg-jsc:datatable:refresh'));
+});
+```
+
+Retrocompatibilidad: `bulkDeleteUrl` sigue funcionando como alias deprecado y equivale a una única acción `delete`:
+```html
+<div data-component="data-table"
+     data-url="/api/users"
+     data-columns='[{"key":"name","label":"Nombre"}]'
      data-settings='{ "bulkDeleteUrl": "/api/users/bulk-delete" }'>
 </div>
 ```
 
-El servidor recibirá una petición `DELETE /api/users/bulk-delete` con el siguiente cuerpo:
-```json
-{ "ids": ["3", "7", "12"] }
-```
+Ciclo de vida de la selección: la selección se mantiene por id y **persiste al paginar, ordenar y cambiar el tamaño de página** (permite seleccionar registros a lo largo de varias páginas antes de actuar). En cambio, **se limpia automáticamente al aplicar filtros** (`setFilters()`, incluido el submit y el reset del formulario de filtros), porque el conjunto de resultados cambia. Para vaciarla manualmente en cualquier otro momento, usa `element.dataTable.clearSelection()`.
 
 Tabla con búsqueda diferida (`fetchOnInit: false`): la tabla no carga datos hasta que el usuario envía el formulario. Ideal cuando la búsqueda debe ser siempre explícita:
 ```html
@@ -204,8 +244,11 @@ La API devuelta por el servidor debe tener el formato: `{ data: [...], meta: { p
 
 Eventos emitidos por el componente:
 - `emg-jsc:datatable:action` — al pulsar un botón de acción. `detail: { action, id, row }`.
-- `emg-jsc:datatable:bulk-delete:success` — tras una eliminación masiva exitosa. `detail: { count }` (número de registros eliminados).
-- `emg-jsc:datatable:bulk-delete:error` — si el endpoint de eliminación masiva responde con error. `detail: { error }`.
+- `emg-jsc:datatable:bulk-action` — al pulsar una acción de lote **sin `url`**. `detail: { actionKey, ids }`. El componente no hace ninguna petición ni limpia la selección: es responsabilidad del consumidor.
+- `emg-jsc:datatable:bulk-action:success` — tras ejecutar correctamente una acción de lote **con `url`**. `detail: { actionKey, count }`. La selección ya se ha limpiado y la tabla se ha refrescado.
+- `emg-jsc:datatable:bulk-action:error` — si una acción de lote con `url` responde con error. `detail: { actionKey, error }`. La selección se conserva.
+- `emg-jsc:datatable:bulk-delete:success` — **@deprecated** (usa `bulk-action:success`). Se emite **únicamente** cuando la acción proviene del alias deprecado `bulkDeleteUrl`. `detail: { count }`.
+- `emg-jsc:datatable:bulk-delete:error` — **@deprecated** (usa `bulk-action:error`). Se emite **únicamente** cuando la acción proviene del alias deprecado `bulkDeleteUrl`. `detail: { error }`.
 - `emg-jsc:datatable:fetch:unauthorized` — cuando el servidor responde con HTTP 401. `detail: { status: 401 }`. El componente muestra el mensaje de error habitual además de emitir este evento.
 - `emg-jsc:datatable:fetch:redirect` — cuando el servidor redirige la petición (p.ej. a una página de login tras expirar la sesión). `detail: { url }` donde `url` es la URL de destino de la redirección. El componente muestra el mensaje de error habitual además de emitir este evento.
 

@@ -43,6 +43,8 @@ export default class DataTable extends Component {
             this.config.pageSizeOptions = [...this.config.pageSizeOptions, this.config.perPage].sort((a, b) => a - b);
         }
 
+        this.config.bulkActions = this.#normalizeBulkActions(settings.bulkActions, this.config);
+
         this.state = {
             data: [],
             meta: {
@@ -64,6 +66,38 @@ export default class DataTable extends Component {
         this.templating = new DataTableTemplate(this.root);
     }
 
+    #normalizeBulkActions(rawActions, config) {
+        if (rawActions !== undefined && !Array.isArray(rawActions)) {
+            console.error('DataTable: "bulkActions" debe ser un array; se ignora el valor recibido.');
+            rawActions = [];
+        }
+
+        const actions = (rawActions || []).map(action => ({
+            key: action.key,
+            label: action.label,
+            url: action.url || null,
+            method: action.method || 'POST',
+            variant: action.variant || 'secondary',
+        }));
+
+        if (config.bulkDeleteUrl) {
+            console.warn('DataTable: "bulkDeleteUrl" está deprecado y se eliminará en una versión futura. Usa "bulkActions" con una acción { key: "delete", url, method: "DELETE", variant: "danger" } en su lugar.');
+            if (actions.some(action => action.key === 'delete')) {
+                return actions;
+            }
+            actions.push({
+                key: 'delete',
+                label: config.labels.bulkDelete,
+                url: config.bulkDeleteUrl,
+                method: 'DELETE',
+                variant: 'danger',
+                deprecated: true,
+            });
+        }
+
+        return actions;
+    }
+
     init() {
         this.root.classList.add('data-table-container');
 
@@ -79,7 +113,8 @@ export default class DataTable extends Component {
         this.#bindFilterForm();
 
         this.root.dataTable = {
-            destroy: () => this.#destroy()
+            destroy: () => this.#destroy(),
+            clearSelection: () => this.clearSelection()
         };
 
         this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:initialized'));
@@ -149,9 +184,9 @@ export default class DataTable extends Component {
                 return;
             }
 
-            const bulkDeleteBtn = e.target.closest('[data-bulk-delete]');
-            if (bulkDeleteBtn) {
-                this.#handleBulkDelete();
+            const bulkActionBtn = e.target.closest('[data-bulk-action]');
+            if (bulkActionBtn) {
+                this.#handleBulkAction(bulkActionBtn.dataset.bulkAction);
                 return;
             }
 
@@ -224,7 +259,7 @@ export default class DataTable extends Component {
     }
 
     #updateBulkUI() {
-        if (!this.config.bulkDeleteUrl) return;
+        if (this.config.bulkActions.length === 0) return;
 
         const count = this.state.selectedIds.size;
 
@@ -248,22 +283,38 @@ export default class DataTable extends Component {
         const bulkBar = this.root.querySelector('.datatable-bulk-actions');
         if (bulkBar) {
             bulkBar.classList.toggle('d-none', count === 0);
-            const btn = bulkBar.querySelector('[data-bulk-delete]');
-            if (btn) {
-                btn.textContent = `${this.config.labels.bulkDelete} (${count})`;
-            }
+            bulkBar.querySelectorAll('[data-bulk-action]').forEach(btn => {
+                const action = this.config.bulkActions.find(a => a.key === btn.dataset.bulkAction);
+                if (action) {
+                    btn.textContent = `${action.label} (${count})`;
+                }
+            });
         }
     }
 
-    async #handleBulkDelete() {
-        if (!this.config.bulkDeleteUrl || this.state.selectedIds.size === 0) return;
+    clearSelection() {
+        this.#setState({ selectedIds: new Set() });
+        this.#updateBulkUI();
+    }
+
+    async #handleBulkAction(key) {
+        const action = this.config.bulkActions.find(a => a.key === key);
+        if (!action || this.state.selectedIds.size === 0) return;
 
         const ids = [...this.state.selectedIds];
 
+        if (!action.url) {
+            this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-action', {
+                bubbles: true,
+                detail: { actionKey: key, ids },
+            }));
+            return;
+        }
+
         this.loader.show();
         try {
-            const response = await fetch(this.config.bulkDeleteUrl, {
-                method: 'DELETE',
+            const response = await fetch(action.url, {
+                method: action.method,
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
@@ -272,23 +323,38 @@ export default class DataTable extends Component {
             });
 
             if (!response.ok) {
-                throw new Error('Bulk delete failed');
+                throw new Error('Bulk action failed');
             }
 
             this.#setState({ selectedIds: new Set() });
-            this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-delete:success', {
-                bubbles: true,
-                detail: { count: ids.length },
-            }));
+
+            if (action.deprecated) {
+                this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-delete:success', {
+                    bubbles: true,
+                    detail: { count: ids.length },
+                }));
+            } else {
+                this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-action:success', {
+                    bubbles: true,
+                    detail: { actionKey: key, count: ids.length },
+                }));
+            }
             this.#fetchData();
 
         } catch (error) {
             this.loader.hide();
-            console.error('DataTable bulk delete error:', error);
-            this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-delete:error', {
-                bubbles: true,
-                detail: { error },
-            }));
+            console.error('DataTable bulk action error:', error);
+            if (action.deprecated) {
+                this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-delete:error', {
+                    bubbles: true,
+                    detail: { error },
+                }));
+            } else {
+                this.root.dispatchEvent(new CustomEvent('emg-jsc:datatable:bulk-action:error', {
+                    bubbles: true,
+                    detail: { actionKey: key, error },
+                }));
+            }
         }
     }
 
@@ -397,8 +463,10 @@ export default class DataTable extends Component {
     setFilters(filters) {
         this.#setState({
             filters: filters,
-            meta: { ...this.state.meta, page: 1 }
+            meta: { ...this.state.meta, page: 1 },
+            selectedIds: new Set()
         });
+        this.#updateBulkUI();
         this.#fetchData();
     }
 

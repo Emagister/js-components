@@ -41,20 +41,22 @@ export default class DataTableTemplate {
         const container = document.createElement('div');
         container.appendChild(wrapper);
 
-        if (config.bulkDeleteUrl) {
+        if (config.bulkActions.length > 0) {
             const bulkBar = document.createElement('div');
-            bulkBar.className = 'datatable-bulk-actions mt-2';
+            bulkBar.className = 'datatable-bulk-actions mt-2 d-flex flex-wrap gap-2';
             if (selectedIds.size === 0) {
                 bulkBar.classList.add('d-none');
             }
 
-            const bulkBtn = document.createElement('button');
-            bulkBtn.type = 'button';
-            bulkBtn.className = 'btn btn-danger';
-            bulkBtn.setAttribute('data-bulk-delete', '');
-            bulkBtn.textContent = `${config.labels.bulkDelete} (${selectedIds.size})`;
+            for (const action of config.bulkActions) {
+                const bulkBtn = document.createElement('button');
+                bulkBtn.type = 'button';
+                bulkBtn.className = `btn btn-${action.variant}`;
+                bulkBtn.setAttribute('data-bulk-action', action.key);
+                bulkBtn.textContent = `${action.label} (${selectedIds.size})`;
+                bulkBar.appendChild(bulkBtn);
+            }
 
-            bulkBar.appendChild(bulkBtn);
             container.appendChild(bulkBar);
         }
 
@@ -70,7 +72,7 @@ export default class DataTableTemplate {
 
         const colgroup = document.createElement('colgroup');
 
-        if (config.bulkDeleteUrl) {
+        if (config.bulkActions.length > 0) {
             colgroup.appendChild(document.createElement('col'));
         }
 
@@ -98,7 +100,7 @@ export default class DataTableTemplate {
             headerRow.className = config.headerClass;
         }
 
-        if (config.bulkDeleteUrl) {
+        if (config.bulkActions.length > 0) {
             const th = document.createElement('th');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -242,7 +244,7 @@ export default class DataTableTemplate {
     }
 
     #appendContentCells(row, config, tr, selectedIds = new Set(), rowDisabled = false) {
-        if (config.bulkDeleteUrl) {
+        if (config.bulkActions.length > 0) {
             const td = document.createElement('td');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
@@ -437,7 +439,7 @@ export default class DataTableTemplate {
 
         const colCount = config.columns.length
             + (config.actions && config.actions.length ? 1 : 0)
-            + (config.bulkDeleteUrl ? 1 : 0);
+            + (config.bulkActions.length > 0 ? 1 : 0);
 
         td.setAttribute('colspan', colCount);
         td.className = 'text-center py-4 text-muted';
