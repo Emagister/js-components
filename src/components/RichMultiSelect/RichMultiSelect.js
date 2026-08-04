@@ -92,6 +92,10 @@ export default class RichMultiSelect extends Component {
             }
         };
 
+        if (settings.sortField) {
+            config.sortField = settings.sortField;
+        }
+
         if (settings.remoteUrl) {
             config.load = this.#buildLoadFn(
                 settings.remoteUrl,
