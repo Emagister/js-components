@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.13.0](https://github.com/Emagister/js-components/compare/v1.12.0...v1.13.0) (2026-08-04)
+
+
+### Features
+
+* **rich-multi-select:** allow configuring sortField from data-settings ([684fb35](https://github.com/Emagister/js-components/commit/684fb356bf9f2f47c88e040b6a404e9f8e0c68b1))
+
+
+
+
 ## [1.12.0](https://github.com/Emagister/js-components/compare/v1.11.1...v1.12.0) (2026-07-22)
 
 
