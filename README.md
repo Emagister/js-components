@@ -500,6 +500,7 @@ Opciones en `data-settings`:
 | `clearInputOnSelect` | Boolean | `false` | Si es `true`, vacía el texto de búsqueda cada vez que se selecciona un ítem y refresca la lista de opciones. Útil en combinación con `remoteUrl` para lanzar una búsqueda nueva tras cada selección. |
 | `maxItems` | Number \| null | `null` | Máximo de ítems seleccionables. `null` es ilimitado. |
 | `searchField` | String | `"text"` | Campo(s) sobre los que buscar. |
+| `sortField` | Array \| String | — | Criterios de ordenación del desplegable (formato de Tom Select). Si no se define, se respeta el orden por defecto de Tom Select (`$score`, es decir, por relevancia de la búsqueda). Usa `[{"field": "$order"}, {"field": "$score"}]` para mantener el orden en que se declararon las opciones y dejar la relevancia solo como desempate — así una lista alfabética sigue siendo alfabética al filtrar. |
 | `create` | Boolean | `false` | Permite crear opciones nuevas no existentes. |
 | `noResultsText` | String | `"Sin resultados"` | Mensaje cuando la búsqueda no devuelve coincidencias. |
 | `remoteUrl` | String | — | Si se indica, activa la carga remota vía AJAX (ver más abajo). |

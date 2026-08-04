@@ -103,6 +103,19 @@ describe('RichMultiSelect', () => {
             rms.init();
             expect(getTsConfig().plugins).toContain('remove_button');
         });
+
+        it('no define sortField cuando no se configura, dejando el orden por defecto de TomSelect', () => {
+            rms.init();
+            expect(getTsConfig()).not.toHaveProperty('sortField');
+        });
+
+        it('usa sortField de data-settings', () => {
+            element.dataset.settings = JSON.stringify({
+                sortField: [{ field: '$order' }, { field: '$score' }]
+            });
+            new RichMultiSelect(element).init();
+            expect(getTsConfig().sortField).toEqual([{ field: '$order' }, { field: '$score' }]);
+        });
     });
 
     // ─── API pública ──────────────────────────────────────────────────────────

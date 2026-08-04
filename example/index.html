@@ -221,6 +221,35 @@
                                     El placeholder se inicializa como <em>"Añadir más centros…"</em> porque ya hay un valor preseleccionado. Al vaciar la selección vuelve a <em>"Selecciona centros…"</em>.
                                 </small>
                             </div>
+                            <div class="col-md-6">
+                                <label for="rms-sort-default" class="form-label">Orden por defecto de Tom Select (relevancia)</label>
+                                <select id="rms-sort-default" name="sortDefault[]" multiple data-component="rich-multi-select"
+                                    data-settings='{"placeholder": "Selecciona provincias…"}'>
+                                    <option value="1">Albacete</option>
+                                    <option value="2">Barcelona</option>
+                                    <option value="3">Madrid</option>
+                                    <option value="4">Málaga</option>
+                                    <option value="5">Salamanca</option>
+                                    <option value="6">Zamora</option>
+                                </select>
+                                <label for="rms-sort-order" class="form-label mt-3">Orden de las opciones (<code>"sortField": [{"field": "$order"}, {"field": "$score"}]</code>)</label>
+                                <select id="rms-sort-order" name="sortOrder[]" multiple data-component="rich-multi-select"
+                                    data-settings='{
+                                        "placeholder": "Selecciona provincias…",
+                                        "sortField": [{"field": "$order"}, {"field": "$score"}]
+                                    }'>
+                                    <option value="1">Albacete</option>
+                                    <option value="2">Barcelona</option>
+                                    <option value="3">Madrid</option>
+                                    <option value="4">Málaga</option>
+                                    <option value="5">Salamanca</option>
+                                    <option value="6">Zamora</option>
+                                </select>
+                                <small class="text-muted d-block mt-1">
+                                    Escribe <code>ma</code> en ambos: el primero reordena por relevancia de la búsqueda y el
+                                    segundo mantiene el orden alfabético de la lista (Madrid, Málaga, Salamanca, Zamora).
+                                </small>
+                            </div>
                         </div>
                         <div class="mt-4">
                             <label class="form-label fw-semibold">Registro de eventos</label>
