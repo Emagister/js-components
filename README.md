@@ -501,6 +501,7 @@ Opciones en `data-settings`:
 | `maxItems` | Number \| null | `null` | Máximo de ítems seleccionables. `null` es ilimitado. |
 | `searchField` | String | `"text"` | Campo(s) sobre los que buscar. |
 | `sortField` | Array \| String | — | Criterios de ordenación del desplegable (formato de Tom Select). Si no se define, se respeta el orden por defecto de Tom Select (`$score`, es decir, por relevancia de la búsqueda). Usa `[{"field": "$order"}, {"field": "$score"}]` para mantener el orden en que se declararon las opciones y dejar la relevancia solo como desempate — así una lista alfabética sigue siendo alfabética al filtrar. |
+| `maxOptions` | Number | `50` (default de Tom Select) | Máximo de opciones que se muestran en el desplegable tras filtrar. Si cargas un catálogo grande de opciones localmente (sin `remoteUrl`), súbelo o auméntalo para evitar que se corten resultados de búsqueda que matchean pero quedan fuera del límite. |
 | `create` | Boolean | `false` | Permite crear opciones nuevas no existentes. |
 | `noResultsText` | String | `"Sin resultados"` | Mensaje cuando la búsqueda no devuelve coincidencias. |
 | `remoteUrl` | String | — | Si se indica, activa la carga remota vía AJAX (ver más abajo). |

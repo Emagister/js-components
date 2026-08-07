@@ -287,6 +287,19 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+    const populateWithManyTags = (select) => {
+        select.addEventListener('emg-jsc:richMultiSelect:initialized', () => {
+            for (let i = 1; i <= 120; i++) {
+                const value = String(i);
+                const text = `Tag ${String(i).padStart(3, '0')}`;
+                select.richMultiSelect.addOption({ value, text });
+            }
+        });
+    };
+
+    populateWithManyTags(document.getElementById('rms-max-options-default'));
+    populateWithManyTags(document.getElementById('rms-max-options-custom'));
+
     // AsyncForm custom handlers
     const asyncFormEl = document.getElementById('example-async-form');
     // We wait for the component to be initialized by the manager

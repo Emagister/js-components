@@ -96,6 +96,10 @@ export default class RichMultiSelect extends Component {
             config.sortField = settings.sortField;
         }
 
+        if (settings.maxOptions) {
+            config.maxOptions = settings.maxOptions;
+        }
+
         if (settings.remoteUrl) {
             config.load = this.#buildLoadFn(
                 settings.remoteUrl,

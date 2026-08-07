@@ -116,6 +116,17 @@ describe('RichMultiSelect', () => {
             new RichMultiSelect(element).init();
             expect(getTsConfig().sortField).toEqual([{ field: '$order' }, { field: '$score' }]);
         });
+
+        it('no define maxOptions cuando no se configura, dejando el default de TomSelect', () => {
+            rms.init();
+            expect(getTsConfig()).not.toHaveProperty('maxOptions');
+        });
+
+        it('usa maxOptions de data-settings', () => {
+            element.dataset.settings = JSON.stringify({ maxOptions: 500 });
+            new RichMultiSelect(element).init();
+            expect(getTsConfig().maxOptions).toBe(500);
+        });
     });
 
     // ─── API pública ──────────────────────────────────────────────────────────

@@ -250,6 +250,21 @@
                                     segundo mantiene el orden alfabético de la lista (Madrid, Málaga, Salamanca, Zamora).
                                 </small>
                             </div>
+                            <div class="col-md-6">
+                                <label for="rms-max-options-default" class="form-label">Sin <code>maxOptions</code> (default de Tom Select: 50)</label>
+                                <select id="rms-max-options-default" name="maxOptionsDefault[]" multiple data-component="rich-multi-select"
+                                    data-settings='{"placeholder": "Busca un tag…"}'>
+                                </select>
+                                <label for="rms-max-options-custom" class="form-label mt-3">Con <code>"maxOptions": 200</code></label>
+                                <select id="rms-max-options-custom" name="maxOptionsCustom[]" multiple data-component="rich-multi-select"
+                                    data-settings='{"placeholder": "Busca un tag…", "maxOptions": 200}'>
+                                </select>
+                                <small class="text-muted d-block mt-1">
+                                    Ambos se rellenan con 120 tags de ejemplo (<code>Tag 001</code>…<code>Tag 120</code>) vía <code>addOption()</code>.
+                                    Escribe <code>tag 1</code>: el primero corta el listado a 50 resultados y no llega a mostrar <code>Tag 100</code>–<code>Tag 120</code>;
+                                    el segundo, con <code>maxOptions</code> ampliado, los muestra todos.
+                                </small>
+                            </div>
                         </div>
                         <div class="mt-4">
                             <label class="form-label fw-semibold">Registro de eventos</label>
