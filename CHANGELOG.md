@@ -1,5 +1,15 @@
 # Changelog
 
+### [1.13.1](https://github.com/Emagister/js-components/compare/v1.13.0...v1.13.1) (2026-08-07)
+
+
+### Bug Fixes
+
+* **rich-multi-select:** forward maxOptions setting to tom-select ([94efe8e](https://github.com/Emagister/js-components/commit/94efe8e7b33b3142b44389d35198ac6895416b58)), closes [#22](https://github.com/Emagister/js-components/issues/22)
+
+
+
+
 ## [1.13.0](https://github.com/Emagister/js-components/compare/v1.12.0...v1.13.0) (2026-08-04)
 
 
