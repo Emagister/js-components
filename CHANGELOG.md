@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.14.0](https://github.com/Emagister/js-components/compare/v1.13.1...v1.14.0) (2026-10-07)
+
+
+### Features
+
+* **data-table:** add fixedLayout setting and maxLines column option ([e60f5a8](https://github.com/Emagister/js-components/commit/e60f5a8b4f536b0e497ddbc2b34a2f43395d0bf2))
+
+
+
+
 ### [1.13.1](https://github.com/Emagister/js-components/compare/v1.13.0...v1.13.1) (2026-08-07)
 
 
