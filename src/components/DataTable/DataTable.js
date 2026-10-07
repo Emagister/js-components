@@ -20,6 +20,7 @@ export default class DataTable extends Component {
             sortOrder: settings.sortOrder || this.root.dataset.sortOrder || 'asc',
             striped: settings.striped !== undefined ? settings.striped : false,
             hover: settings.hover !== undefined ? settings.hover : true,
+            fixedLayout: settings.fixedLayout === true,
             headerClass: settings.headerClass || null,
             scrollOffset: parseInt(settings.scrollOffset, 10) || 0,
             bulkDeleteUrl: settings.bulkDeleteUrl || this.root.dataset.bulkDeleteUrl || null,

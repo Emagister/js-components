@@ -56,6 +56,16 @@ describe('DataTableTemplate', () => {
             const content = template.createContent(baseState, { ...baseConfig, hover: false });
             expect(content.querySelector('table').classList.contains('table-hover')).toBe(false);
         });
+
+        it('aplica datatable-fixed-layout cuando config.fixedLayout es true', () => {
+            const content = template.createContent(baseState, { ...baseConfig, fixedLayout: true });
+            expect(content.querySelector('table').classList.contains('datatable-fixed-layout')).toBe(true);
+        });
+
+        it('no aplica datatable-fixed-layout por defecto', () => {
+            const content = template.createContent(baseState, baseConfig);
+            expect(content.querySelector('table').classList.contains('datatable-fixed-layout')).toBe(false);
+        });
     });
 
     describe('cabeceras', () => {
@@ -360,6 +370,83 @@ describe('DataTableTemplate', () => {
                 const state = { ...baseState, data: [{ id: 1, name: 'Alice', url: '/alice', hint: 'Info' }] };
                 const content = template.createContent(state, config);
                 expect(content.querySelector('tbody td a').getAttribute('tabindex')).toBeNull();
+            });
+        });
+
+        describe('límite de líneas (maxLines)', () => {
+            it('envuelve el texto de la celda en un div.datatable-cell-clamp con -webkit-line-clamp', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', maxLines: 2 }] };
+                const content = template.createContent(baseState, config);
+                const clamp = content.querySelector('tbody td > div.datatable-cell-clamp');
+                expect(clamp).not.toBeNull();
+                expect(clamp.textContent).toBe('Alice');
+                expect(clamp.style.getPropertyValue('-webkit-line-clamp')).toBe('2');
+            });
+
+            it('pone title con el texto completo en el clamp cuando la columna no tiene tooltip', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', maxLines: 2 }] };
+                const content = template.createContent(baseState, config);
+                expect(content.querySelector('.datatable-cell-clamp').getAttribute('title')).toBe('Alice');
+            });
+
+            it('no pone title en el clamp cuando la columna tiene tooltip (lo mantiene en el <td>)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', maxLines: 2, tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                const td = content.querySelector('tbody td');
+                expect(td.querySelector('.datatable-cell-clamp').hasAttribute('title')).toBe(false);
+                expect(td.getAttribute('title')).toBe('Info');
+                expect(td.getAttribute('data-component')).toBe('tooltip');
+            });
+
+            it('envuelve el enlace en un div.datatable-cell-clamp en columnas link', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', link: 'url', maxLines: 3 }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', url: '/alice' }] };
+                const content = template.createContent(state, config);
+                const clamp = content.querySelector('tbody td > div.datatable-cell-clamp');
+                expect(clamp).not.toBeNull();
+                expect(clamp.style.getPropertyValue('-webkit-line-clamp')).toBe('3');
+                expect(clamp.getAttribute('title')).toBe('Alice');
+                const a = clamp.querySelector('a');
+                expect(a.getAttribute('href')).toBe('/alice');
+                expect(a.textContent).toBe('Alice');
+            });
+
+            it('no pone title en el clamp de un link con tooltip (lo mantiene en el <a>)', () => {
+                const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', link: 'url', maxLines: 2, tooltip: 'hint' }] };
+                const state = { ...baseState, data: [{ id: 1, name: 'Alice', url: '/alice', hint: 'Info' }] };
+                const content = template.createContent(state, config);
+                const clamp = content.querySelector('.datatable-cell-clamp');
+                expect(clamp.hasAttribute('title')).toBe(false);
+                expect(clamp.querySelector('a').getAttribute('title')).toBe('Info');
+            });
+
+            it('no envuelve celdas de tipo badge', () => {
+                const config = { ...baseConfig, columns: [{ key: 'status', label: 'Estado', badge: 'level', maxLines: 2 }] };
+                const state = { ...baseState, data: [{ id: 1, status: 'Activo', level: 'success' }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('.datatable-cell-clamp')).toBeNull();
+            });
+
+            it('no envuelve celdas booleanas', () => {
+                const config = { ...baseConfig, columns: [{ key: 'active', label: 'Activo', maxLines: 2 }] };
+                const state = { ...baseState, data: [{ id: 1, active: true }] };
+                const content = template.createContent(state, config);
+                expect(content.querySelector('.datatable-cell-clamp')).toBeNull();
+            });
+
+            it('ignora maxLines si no es un entero positivo', () => {
+                for (const maxLines of [0, -1, 'abc', 1.5, null]) {
+                    const config = { ...baseConfig, columns: [{ key: 'name', label: 'Nombre', maxLines }] };
+                    const content = template.createContent(baseState, config);
+                    expect(content.querySelector('.datatable-cell-clamp')).toBeNull();
+                    expect(content.querySelector('tbody td').textContent).toBe('Alice');
+                }
+            });
+
+            it('no envuelve la celda cuando la columna no define maxLines', () => {
+                const content = template.createContent(baseState, baseConfig);
+                expect(content.querySelector('.datatable-cell-clamp')).toBeNull();
             });
         });
     });

@@ -15,6 +15,7 @@ export default class DataTableTemplate {
         const classes = ['table', 'mb-0'];
         if (config.striped) classes.push('table-striped');
         if (config.hover) classes.push('table-hover');
+        if (config.fixedLayout) classes.push('datatable-fixed-layout');
         table.className = classes.join(' ');
 
         const thead = document.createElement('thead');
@@ -187,7 +188,7 @@ export default class DataTableTemplate {
             cellLink.setAttribute('href', row[col.link]);
             cellLink.textContent = cellValue;
             this.#applyTooltip(cellLink, row, col);
-            td.appendChild(cellLink);
+            td.appendChild(this.#wrapInClamp(cellLink, cellValue, col));
             return td;
         }
 
@@ -214,8 +215,22 @@ export default class DataTableTemplate {
         }
 
         this.#applyTooltip(td, row, col);
-        td.textContent = cellValue;
+        td.appendChild(this.#wrapInClamp(document.createTextNode(cellValue), cellValue, col));
         return td;
+    }
+
+    #wrapInClamp(content, fullText, col) {
+        const maxLines = col.maxLines;
+        if (!Number.isInteger(maxLines) || maxLines < 1) return content;
+
+        const clamp = document.createElement('div');
+        clamp.className = 'datatable-cell-clamp';
+        clamp.style.setProperty('-webkit-line-clamp', String(maxLines));
+        if (!col.tooltip) {
+            clamp.setAttribute('title', String(fullText));
+        }
+        clamp.appendChild(content);
+        return clamp;
     }
 
     #appendBody(state, config, tableBody) {

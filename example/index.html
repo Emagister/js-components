@@ -58,6 +58,26 @@
             <div class="col">
                 <div class="card shadow-sm">
                     <div class="card-header bg-white">
+                        <h5 class="mb-0">DataTable con anchos fijos (<code>fixedLayout</code>) y recorte de líneas (<code>maxLines</code>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3">Con <code>fixedLayout: true</code> los anchos de columna
+                            no cambian según el contenido. La columna "Descripción" se recorta a 2 líneas y "Web" a 1
+                            línea; pasa el ratón por encima para ver el texto completo.</p>
+                        <div data-component="data-table" id="fixed-layout-datatable"
+                            data-url="http://localhost:5173/example/datatableData.json"
+                            data-columns='[{"key":"id", "label":"ID", "width": "60px"}, {"key":"name", "label":"Nombre", "width": "20%", "link": "profileUrl", "maxLines": 1}, {"key":"description", "label":"Descripción", "maxLines": 2}, {"key":"email", "label":"Email", "width": "25%", "maxLines": 1}]'
+                            data-settings='{ "perPage": 5, "pageSizeOptions": [5, 10], "fixedLayout": true }'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
                         <h5 class="mb-0">DataTable con búsqueda diferida (<code>fetchOnInit: false</code>)</h5>
                     </div>
                     <div class="card-body">

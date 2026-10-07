@@ -87,6 +87,7 @@ Opciones en `data-settings`:
 - `sortOrder` (String: `'asc'`|`'desc'`): Dirección del orden inicial.
 - `striped` (Boolean, default: false): Activa/desactiva el estilo de filas alternas.
 - `hover` (Boolean, default: true): Activa/desactiva el efecto hover en filas.
+- `fixedLayout` (Boolean, default: `false`): Añade la clase `datatable-fixed-layout` a la `<table>`, que aplica `table-layout: fixed`. Así los anchos definidos con `width` se respetan y no cambian según el contenido de las celdas. Las columnas sin `width` se reparten el espacio restante a partes iguales. Combínalo con `maxLines` en las columnas de texto largo para evitar que las filas crezcan en altura.
 - `headerClass` (String): Clases CSS aplicadas al `<tr>` del encabezado.
 - `scrollOffset` (Number, default: 0): Desplazamiento en píxeles al hacer scroll al paginar. Útil para compensar navbars fijos.
 - `bulkActions` (Array, default: `[]`): Lista de acciones de lote sobre las filas seleccionadas. **Si está vacía y tampoco se indica `bulkDeleteUrl`, la selección queda desactivada** (no aparecen checkboxes ni la barra de acciones). Cuando hay al menos una acción, se añade una columna de checkboxes al inicio de la tabla y una barra al pie con un botón por acción. Cada objeto admite:
@@ -221,6 +222,18 @@ Propiedades de `data-columns` (array de objetos):
 - `badge` (String): Clave del campo que determina el nivel del badge Bootstrap.
 - `tooltip` (String): Clave del campo que contiene el texto del tooltip. Funciona con todos los tipos de celda (texto plano, link, badge e iconos booleanos). El componente `tooltip` debe estar registrado en la página.
 - `width` (String): Ancho de la columna (cualquier valor CSS válido: `px`, `%`, `em`, etc.). Si al menos una columna define `width`, se genera un `<colgroup>` para controlar los anchos.
+- `maxLines` (Number, entero positivo): Limita el número de líneas visibles en las celdas de texto plano y de tipo `link`. El contenido se envuelve en un `<div class="datatable-cell-clamp">` con `-webkit-line-clamp: N` y el resto se oculta con puntos suspensivos. Si la columna no define `tooltip`, el `<div>` recibe un atributo `title` con el texto completo. No afecta a celdas `badge` ni booleanas; valores no enteros o menores que 1 se ignoran.
+
+```html
+<div data-component="data-table"
+     data-url="/api/courses"
+     data-columns='[
+       {"key":"title", "label":"Curso", "width":"30%", "link":"url", "maxLines": 1},
+       {"key":"description", "label":"Descripción", "maxLines": 2}
+     ]'
+     data-settings='{"fixedLayout": true}'>
+</div>
+```
 
 Propiedades de `data-actions` (array de objetos), renderizadas como iconos con tooltip:
 - `name` (String): Identificador de la acción, disponible en el evento `datatable:action`.
