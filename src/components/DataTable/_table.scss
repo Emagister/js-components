@@ -8,6 +8,17 @@
     color: var(--emg-table-header-color, #{variables.$emg-table-header-color});
   }
 
+  table.datatable-fixed-layout {
+    table-layout: fixed;
+  }
+
+  .datatable-cell-clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+
   tbody tr:hover {
     background-color: var(--emg-table-row-hover-bg, #{variables.$emg-table-row-hover-bg});
   }

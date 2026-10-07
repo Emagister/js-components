@@ -118,6 +118,17 @@ describe('DataTable', () => {
             const dt = new DataTable(element);
             expect(dt.config.disabledRow).toBe('is_inactive');
         });
+
+        it('usa fixedLayout false por defecto', () => {
+            const dt = new DataTable(element);
+            expect(dt.config.fixedLayout).toBe(false);
+        });
+
+        it('lee fixedLayout true desde data-settings', () => {
+            element.dataset.settings = JSON.stringify({ fixedLayout: true });
+            const dt = new DataTable(element);
+            expect(dt.config.fixedLayout).toBe(true);
+        });
     });
 
     describe('init()', () => {
